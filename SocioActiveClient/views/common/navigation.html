@@ -1,0 +1,62 @@
+<nav class="navbar-default navbar-static-side" role="navigation">
+    <div class="sidebar-collapse">
+        <ul side-navigation class="nav" id="side-menu">
+            <li class="nav-header">
+                <div class="dropdown profile-element" dropdown>
+                    <img alt="image" class="img-circle" src="img/Harun_Bulutlar.jpg"/>
+                    <a class="dropdown-toggle" dropdown-toggle href>
+                            <span class="clear">
+                                <span class="block m-t-xs">
+                                    <strong class="font-bold">{{main.userName}}</strong>
+                             </span>
+                                <span class="text-muted text-xs block">{{main.role}}<b class="caret"></b></span>
+                            </span>
+                    </a>
+                    <ul class="dropdown-menu animated fadeInRight m-t-xs">
+                        <li><a ui-sref="profile">Profile</a></li>
+                        <li><a ui-sref="contacts">Contacts</a></li>
+                        <li class="divider"></li>
+                        <li><a href="../login.html">Logout</a></li>
+                    </ul>
+                </div>
+                <div class="logo-element">
+                    SWE
+                </div>
+
+            </li>
+            <li ui-sref-active="index">
+                <a ui-sref="index.main"><i class="fa fa-home"></i> <span class="nav-label">Home</span></a>
+            </li>
+            <li ng-class="{active: $state.includes('activity')}">
+                <a ui-sref="inbox"><i class="fa fa-globe"></i> <span class="nav-label">Activity</span><span class="label label-warning pull-right">5</span></a>
+                <ul class="nav nav-second-level" ng-class="{in: $state.includes('activity')}">
+                    <li ui-sref-active="active"><a ui-sref="activity.groups">Groups</a></li>
+                    <li ui-sref-active="active"><a ui-sref="activity.events">Events</a></li>
+                    <li ui-sref-active="active"><a ui-sref="activity.polls">Polls</a></li>
+                    <li ui-sref-active="active"><a ui-sref="activity.instantaneous">Instantaneous</a></li>
+                </ul>
+            </li>
+            <li ng-class="{active: $state.includes('owner')}">
+                <a ui-sref="inbox"><i class="fa fa-edit"></i> <span class="nav-label">Owner</span><span class="label label-warning pull-right">5</span></a>
+                <ul class="nav nav-second-level" ng-class="{in: $state.includes('owner')}">
+                    <li ui-sref-active="active"><a ui-sref="owner.groups">Groups</a></li>
+                    <li ui-sref-active="active"><a ui-sref="owner.events">Events</a></li>
+                    <li ui-sref-active="active"><a ui-sref="owner.polls">Polls</a></li>
+                    <li ui-sref-active="active"><a ui-sref="owner.instantaneous">Instantaneous</a></li>
+                </ul>
+            </li>
+            <li ng-class="{active: $state.includes('create')}">
+                <a ui-sref="inbox"><i class="fa fa-plus-square"></i> <span class="nav-label">Create Something</span></a>
+                <ul class="nav nav-second-level" ng-class="{in: $state.includes('owner')}">
+                    <li ui-sref-active="active"><a ui-sref="create.group">Group</a></li>
+                    <li ui-sref-active="active"><a ui-sref="create.event">Event</a></li>
+                    <li ui-sref-active="active"><a ui-sref="create.poll">Poll</a></li>
+                </ul>
+            </li>
+            <li ui-sref-active="active">
+                <a ui-sref="index.post"><i class="fa fa-mail-forward"></i> <span class="nav-label">Post Something</span></a>
+            </li>
+        </ul>
+
+    </div>
+</nav>

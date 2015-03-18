@@ -1,0 +1,18 @@
+.middle-box h1.md-logo-name
+{
+    margin-left:-285px;
+}
+@media(max-width: 860px) {
+    .middle-box h1.md-logo-name
+    {
+        font-size:128px !important;
+        margin-left:-165px;
+    }
+}
+@media(max-width: 620px) {
+    .middle-box h1.md-logo-name
+    {
+        font-size:75px !important;
+        margin-left:-15px;
+    }
+}

@@ -1,0 +1,17 @@
+<div class="wrapper wrapper-content  animated fadeInRight">
+    <div class="ibox ">
+        <div class="ibox-title">
+            <h5>Select a Place</h5>
+        </div>
+        <div class="ibox-content">
+            <section id="map">
+                <div ui-map="myMap"
+                     ui-event="{'map-click': 'addMarker($event, $params)'}"
+                     ui-options="mapOptions" class="google-map"></div>
+            </section>
+            <select chosen id="myPlaces" class="chosen-select" style="width:350px;" tabindex="4" ng-model="selectedPlace" ng-options="s.name for s in myPlaces">
+            </select>
+            <button class="btn btn-primary" ng-click="selectPlace()">Select</button>
+        </div>
+    </div>
+</div>
