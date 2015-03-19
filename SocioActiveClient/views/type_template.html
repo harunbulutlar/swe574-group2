@@ -1,0 +1,25 @@
+<div ng-controller="TypeTemplateCtrl">
+    <div>
+        <h3 class="m-t-none m-b">Customize your Type</h3>
+        <div class="input-group">
+            <div class="form-group"><label>Type Name</label> <input type="text" placeholder="Enter a Title for your custom field" class="form-control" ng-model="typeParameter.name"></div>
+            <div class="form-group"><label>Field Name</label> <input type="text" placeholder="Enter a Title for your custom field" class="form-control" ng-model="typeParameterName"></div>
+            <select chosen id="primitiveTypes" class="chosen-select" style="width:350px;" tabindex="4" ng-model="typeParameterType" ng-options="s for s in $root.primitiveTypes">
+            </select>
+            <button class="btn btn-primary" ng-click="createField()">Create Field</button>
+        </div>
+    </div>
+    <div>
+        <script type="text/ng-template" id="nodes_renderer.html">
+            <div ui-tree-handle class="tree-node tree-node-content">
+                <a class="pull-right btn btn-white btn-xs" data-nodrag ng-click="remove(this)"><span class="fa fa-trash"></span></a>
+                <add-node-info node-value="node"></add-node-info>
+            </div>
+        </script>
+        <div ui-tree id="tree-root">
+            <ol ui-tree-nodes ng-model="typeParameter.data">
+                <li ng-repeat="node in typeParameter.data" ui-tree-node ng-include="'nodes_renderer.html'"></li>
+            </ol>
+        </div>
+    </div>
+</div>

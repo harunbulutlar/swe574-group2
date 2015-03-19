@@ -1,5 +1,5 @@
 
-<div class="wrapper wrapper-content animated fadeInRight">
+<div class="wrapper wrapper-content animated fadeInRight"  ng-controller="CustomTypesCtrl">
     <div class="row show-grid">
         <div class="col-lg-6">
             <div class="ibox float-e-margins">
@@ -13,54 +13,45 @@
                     <div class="form-group"><label>Title</label> <input type="text" placeholder="Enter a Title for your event" class="form-control"></div>
                     <div class="form-group"><label>Description</label> <textarea placeholder="Enter some description of your event" class="form-control"></textarea></div>
                 </div>
+                <div class="checkbox"><label> <input icheck type="checkbox" ng-click="updateSelection($event)">Use Custom Types</label></div>
+                <select chosen id="types" class="chosen-select" style="width:350px;" tabindex="4" ng-model="typeParameterType" ng-options="s for s in types">
+                </select>
+
+                <button class="btn btn-primary" ng-click="createUserField()">Create Group User Addable Field</button>
+                <!--<div>-->
+                    <!--<script type="text/ng-template" id="nodes_renderer.html">-->
+                        <!--<div ui-tree-handle class="tree-node tree-node-content">-->
+                            <!--<a class="pull-right btn btn-white btn-xs" data-nodrag ng-click="remove(this)"><span class="fa fa-trash"></span></a>-->
+                            <!--<add-node-info node-value="node"></add-node-info>-->
+                        <!--</div>-->
+                    <!--</script>-->
+                    <!--<div ui-tree id="tree-root">-->
+                        <!--<ol ui-tree-nodes ng-model="customTypes">-->
+                            <!--<li ng-repeat="node in typeParameter.data" ui-tree-node ng-include="'nodes_renderer.html'"></li>-->
+                        <!--</ol>-->
+                    <!--</div>-->
+                <!--</div>-->
             </div>
         </div>
-        <div class="col-lg-6" ng-controller="CustomModalCtrl">
+        <div class="col-lg-6">
             <div class="ibox float-e-margins">
                 <div class="ibox-title">
                     <h5>Custom Types</h5>
                     <div ibox-tools></div>
                 </div>
                 <div class="ibox-content" >
-                    <p>
-                        <button ng-repeat="n in customTypes" class="btn btn-w-m btn-primary" ng-click="typeButtonClick(n)"><i class="fa fa-eye"></i> {{n.name}}</button>
-                        <button class="btn btn-w-m btn-primary" ng-click="showTypeView(true,false)"><i class="fa fa-plus"></i> Add Type</button>
-                    </p>
+                    <tabset>
+                        <tab ng-repeat="customType in customTypes" active="customTypeTabs[customType.id]">
+                            <tab-heading>
+                                {{customType.name}}<a class="pull-right btn btn-white btn-xs" data-nodrag ng-click="removeTab(customType)"><span class="fa fa-trash"></span></a>
+                            </tab-heading>
+                            <type-template type-parameter ="customType"></type-template>
+                        </tab>
+                        <button class="btn btn-w-m btn-primary" ng-click="addCustomType()"><i class="fa fa-plus"></i> Add Type</button>
+                    </tabset>
                 </div>
-            </div>
-            <div ng-show="showTypeDiv" >
-                <div>
-                    <h3 class="m-t-none m-b">Customize your Type</h3>
-                    <div class="input-group">
-                        <div class="form-group"><label>Type Name</label> <input type="text" placeholder="Enter a Title for your custom field" class="form-control" ng-model="typeLabel"></div>
-                        <div class="form-group"><label>Field Name</label> <input type="text" placeholder="Enter a Title for your custom field" class="form-control" ng-model="fieldLabel"></div>
-                        <select chosen id="states" class="chosen-select" style="width:350px;" tabindex="4" ng-model="fieldType" ng-options="s for s in primitiveTypes">
-                        </select>
-                        <button class="btn btn-primary" ng-click="createField()">Create Field</button>
-                    </div>
-                </div>
-                <div>
-                    <script type="text/ng-template" id="nodes_renderer.html">
-                        <div ui-tree-handle class="tree-node tree-node-content">
-                            <a class="btn btn-primary btn-xs" ng-if="isExtensible(this)" data-nodrag ng-click="toggle(this)"><span class="fa" ng-class="{'fa-angle-down': collapsed, 'fa-angle-right': !collapsed}"></span></a>
-                            <a class="pull-right btn btn-white btn-xs" data-nodrag ng-click="remove(this)"><span class="fa fa-trash"></span></a>
-                            <add-node-info node-value="node"></add-node-info>
-                        </div>
-                    </script>
-                    <div ui-tree id="tree-root">
-                        <ol ui-tree-nodes ng-model="customTypeData">
-                            <li ng-repeat="node in customTypeData" ui-tree-node ng-include="'nodes_renderer.html'"></li>
-                        </ol>
-                    </div>
-                </div>
-                <p>
-                    <button class="btn btn-w-m btn-primary" ng-click="saveType()">Save Changes</button>
-                    <button ng-if="isEdit" class="btn btn-w-m btn-primary" ng-click="removeType()">Remove This Type</button>
-                    <button class="btn btn-w-m btn-primary" ng-click="closeType()">Close</button>
-                </p>
             </div>
         </div>
-
     </div>
 </div>
 
