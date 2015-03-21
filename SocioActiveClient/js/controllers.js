@@ -1,5 +1,5 @@
 function MainCtrl() {
-    this.userName = 'Harun Bulutlar';
+    this.userName = 'Osman Emre';
     this.role = "Student"
 
 }
