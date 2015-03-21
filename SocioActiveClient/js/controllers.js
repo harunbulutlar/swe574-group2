@@ -1,6 +1,6 @@
 function MainCtrl() {
     this.userName = 'Osman Emre';
-    this.role = "Student"
+    this.role = "Teacher"
 
 }
 
