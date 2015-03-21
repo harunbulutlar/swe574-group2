@@ -1,42 +1,73 @@
-$(document).ready(readyCallback); // end document.ready
-var indexPage = "/Angular_Seed_Project/index.html";
+(function () {
+    angular.module('socioactiveStart',[])
 
-function readyCallback()
-{
-    $('#login').click(onLoginClick);
-    $('#register').click(onRegisterClick);
-}
-/**
- * Created by Harun on 3/14/2015.
- */
-function onLoginClick()
-{
-    $.ajax({
-        url: '',
-        type:'POST',
-        data:
+})();
+function LoginCtrl($scope, $window, $rootScope) {
+    $scope.submit = function(){
+        var user = getUserFromLocal($rootScope.model);
+        if(user == null)
         {
-            email: '',
-            message: ''
+            alert('There is no User like that');
+            return;
         }
-    }).done(function()
-    {
-        window.location.replace(indexPage);
-    })
+
+        if(user.password != $rootScope.model.password)
+        {
+            alert('Wrong Password');
+            return;
+        }
+        sessionStorage.setItem('currentUser',$rootScope.model.email);
+        $window.location.href = 'index.html';
+    }
 }
 
-function onRegisterClick()
-{
-    $.ajax({
-        url: '',
-        type:'POST',
-        data:
+function RegisterCtrl($scope, $window, $rootScope) {
+
+    $scope.submit = function(){
+        var user = getUserFromLocal($rootScope.model);
+        if(user == null)
         {
-            email: '',
-            message: ''
+            var users = getUsersFromLocal();
+            users[$rootScope.model.email] = $rootScope.model;
+            localStorage.setItem('users',JSON.stringify(users));
+            sessionStorage.setItem('currentUser',$rootScope.model.email);
+            $window.location.href = 'index.html';
+            return;
         }
-    }).done(function()
-    {
-        window.location.replace(indexPage);
-    })
+        alert('This User Exists');
+    }
 }
+
+function getUserFromLocal(user)
+{
+    return getUsersFromLocal()[user.email];
+}
+
+function getUsersFromLocal()
+{
+    var users = JSON.parse(localStorage.getItem('users'));
+    if(users == null) {
+        users = {};
+    }
+    return users;
+}
+angular
+    .module('socioactiveStart')
+    .run(["$rootScope", function ($rootScope) {
+        $rootScope.model = {
+            email:'',
+            password:'',
+            photo:'',
+            data:{
+                groups:[],
+                events:[],
+                polls:[],
+                registeredGroups:[],
+                registeredEvents:[],
+                registeredPolls:[],
+                customTypes:[]
+            }
+        };
+    }])
+    .controller('RegisterCtrl', RegisterCtrl)
+    .controller('LoginCtrl', LoginCtrl);

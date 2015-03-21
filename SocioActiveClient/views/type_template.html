@@ -4,7 +4,7 @@
         <div class="input-group">
             <div class="form-group"><label>Type Name</label> <input type="text" placeholder="Enter a Title for your custom field" class="form-control" ng-model="typeParameter.name"></div>
             <div class="form-group"><label>Field Name</label> <input type="text" placeholder="Enter a Title for your custom field" class="form-control" ng-model="typeParameterName"></div>
-            <select chosen id="primitiveTypes" class="chosen-select" style="width:350px;" tabindex="4" ng-model="typeParameterType" ng-options="s for s in $root.primitiveTypes">
+            <select chosen id="primitiveTypes" class="chosen-select" style="width:350px;" tabindex="4" ng-model="typeParameterType" ng-options="s.name for s in $root.primitiveTypes">
             </select>
             <button class="btn btn-primary" ng-click="createField()">Create Field</button>
         </div>

@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html ng-app="socioactiveStart">
 
 <head>
 
@@ -28,15 +28,12 @@
             </div>
             <h3>Register to SocioActive</h3>
             <p>Create account to see it in action.</p>
-            <form class="m-t" role="form" action="login.html">
+            <form class="m-t" role="form" ng-submit="submit()" ng-controller="RegisterCtrl">
                 <div class="form-group">
-                    <input type="text" class="form-control" placeholder="Name" required="">
+                    <input type="email" class="form-control" ng-model="$root.model.email"   placeholder="Email" required="">
                 </div>
                 <div class="form-group">
-                    <input type="email" class="form-control" placeholder="Email" required="">
-                </div>
-                <div class="form-group">
-                    <input type="password" class="form-control" placeholder="Password" required="">
+                    <input type="password" class="form-control" ng-model="$root.model.password"  placeholder="Password" required="">
                 </div>
                 <button id="register" type="submit" class="btn btn-primary block full-width m-b">Register</button>
 
@@ -46,11 +43,20 @@
         </div>
     </div>
 
-    <!-- Mainly scripts -->
+    <!-- jQuery and Bootstrap -->
     <script src="js/jquery/jquery-2.1.1.min.js"></script>
+    <script src="js/plugins/jquery-ui/jquery-ui.js"></script>
     <script src="js/bootstrap/bootstrap.min.js"></script>
+
+    <!-- Main Angular scripts-->
+    <script src="js/angular/angular.min.js"></script>
+    <script src="js/angular/angular-route.min.js"></script>
+    <script src="js/plugins/oclazyload/dist/ocLazyLoad.min.js"></script>
+    <script src="js/ui-router/angular-ui-router.min.js"></script>
+    <script src="js/bootstrap/ui-bootstrap-tpls-0.12.0.min.js"></script>
+
     <!-- iCheck -->
-    <script src="js/login.js"></script>
+
     <script src="js/plugins/iCheck/icheck.min.js"></script>
     <script>
         $(document).ready(function(){
@@ -60,6 +66,7 @@
             });
         });
     </script>
+    <script src="js/login.js"></script>
 </body>
 
 </html>

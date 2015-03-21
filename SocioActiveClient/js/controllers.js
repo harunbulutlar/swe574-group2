@@ -44,7 +44,7 @@ function CustomTypesCtrl($scope, $modal, $rootScope) {
     };
     $scope.updateSelection = function($event) {
         var checkbox = $event.target;
-        $scope.types = (checkbox.checked ? $scope.customTypes : $rootScope.primitiveTypes);
+        $scope.types = (checkbox.checked ? $scope.customTypes : $scope.primitiveTypes);
 
     };
     $scope.removeTab = function (customType) {
@@ -53,10 +53,68 @@ function CustomTypesCtrl($scope, $modal, $rootScope) {
         $scope.customTypes.splice(index, 1);
 
     };
+    $scope.removeUserField = function (userField) {
+        var index = arrayObjectIndexOf($scope.userFields, userField.id, "id");
+        $scope.userFields.splice(index, 1);
+    };
+    $scope.createUserField = function () {
+        var userField = {
+            id: guid(),
+            name: $scope.userFieldName,
+            type: $scope.userFieldType
+        };
+        $scope.userFields.push(userField);
+
+    };
+    $scope.saveChanges = function(){
+
+        var returnObject = $scope.getCurrentUserData();
+        returnObject.currentUser.data.customTypes = $scope.customTypes;
+        returnObject.currentUser.data.groups.push(
+            {
+                title: $scope.groupTitle,
+                description: $scope.groupDescription,
+                fields: $scope.userFields
+            }
+        );
+        localStorage.setItem('users', JSON.stringify(returnObject.users));
+    };
+
+    $scope.getCurrentUserData= function(){
+        var user = sessionStorage.getItem('currentUser');
+        if(user == null)
+        {
+            //TODO: reroute to login page
+            return null;
+        }
+        var users = JSON.parse(localStorage.getItem('users'));
+        var userFromDatabase = users[user];
+        if(userFromDatabase == null)
+        {
+            //TODO: reroute to login page
+            return null;
+        }
+        return {currentUser: userFromDatabase, users:users};
+    };
+
+    $scope.userFieldType = '';
     $scope.types = $rootScope.primitiveTypes;
+    $scope.groupTitle = '';
+    $scope.groupDescription = '';
+    $scope.userFields = [];
+    $scope.userFieldName = '';
     $scope.customTypes = [];
     $scope.customTypeTabs = {};
-
+    // at the bottom of your controller
+    $scope.initPage = function () {
+        var returnObject = $scope.getCurrentUserData();
+        $scope.customTypes = returnObject.currentUser.data.customTypes;
+        angular.forEach($scope.customTypes, function(event)
+        {
+            $scope.customTypeTabs[event.id] = true;
+        });
+    };
+    $scope.initPage();
 }
 
 function TypeTemplateCtrl($scope) {
@@ -200,7 +258,7 @@ function addNodeInfo($compile, $templateCache) {
         scope: {nodeValue: '='},
         link: function (scope, element) {
             var nodeData = scope.nodeValue;
-            var cached_element = $templateCache.get(nodeData.type.toLowerCase() + ".html");
+            var cached_element = $templateCache.get(nodeData.type.name.toLowerCase() + ".html");
             var compiled_cache = $compile(cached_element)(scope);
             angular.element(element).append(nodeData.name);
             angular.element(element).append(compiled_cache);
@@ -238,7 +296,7 @@ function arrayObjectIndexOf(myArray, searchTerm, property) {
 
 
 angular
-    .module('inspinia')
+    .module('socioactive')
     .directive('addNodeInfo', addNodeInfo)
     .directive('typeTemplate', typeTemplate)
     .controller('MainCtrl', MainCtrl)
@@ -247,17 +305,17 @@ angular
     .controller('TypeTemplateCtrl', TypeTemplateCtrl)
     .run(["$templateCache", "$rootScope", function ($templateCache, $rootScope) {
         $rootScope.primitiveTypes = [
-            'Enumeration',
-            'Integer',
-            'Float',
-            'Text',
-            'Place',
-            'Time',
-            'Date',
-            'DateAndTime',
-            'Phone',
-            'Currency',
-            'IPV4'
+            {name:'Enumeration'},
+            {name:'Integer'},
+            {name:'Float'},
+            {name:'Text'},
+            {name:'Place'},
+            {name:'Time'},
+            {name:'Date'},
+            {name:'DateAndTime'},
+            {name:'Phone'},
+            {name:'Currency'},
+            {name:'IPV4'}
         ];
         $templateCache.put("enumeration.html", '<div><tags-input ng-model="node.nodeData"></tags-input> <select chosen id="myPlaces" class="form-control" style="width:350px;" tabindex="4" ng-model="selectedPlace" ng-options="s.text for s in node.nodeData"/> </div>');
         $templateCache.put("integer.html", "<div><input type='text' class='form-control' data-mask='99999' ng-model='node.nodeData'><span class='help-block'>0 to 99999</span></div>");

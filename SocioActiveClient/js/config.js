@@ -129,7 +129,7 @@ function config($stateProvider, $urlRouterProvider, $ocLazyLoadProvider) {
         })
 }
 angular
-    .module('inspinia')
+    .module('socioactive')
     .config(config)
     .run(function($rootScope, $state) {
         $rootScope.$state = $state;

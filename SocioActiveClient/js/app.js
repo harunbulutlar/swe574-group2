@@ -1,13 +1,9 @@
-/**
- * INSPINIA - Responsive Admin Theme
- * Copyright 2015 Webapplayers.com
- *
- */
 (function () {
-    angular.module('inspinia', [
+    angular.module('socioactive', [
         'ui.router',                    // Routing
         'oc.lazyLoad',                  // ocLazyLoad
-        'ui.bootstrap',                 // Ui Bootstrap
+        'ui.bootstrap'                 // Ui Bootstrap
     ])
 })();
+
 
