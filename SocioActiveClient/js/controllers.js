@@ -314,7 +314,7 @@ angular
             {name: 'Currency'},
             {name: 'IPV4'}
         ];
-        $templateCache.put("enumeration.html", '<div><tags-input ng-model="node.nodeData"></tags-input> <select chosen id="myPlaces" class="form-control" style="width:350px;" tabindex="4" ng-model="selectedPlace" ng-poll-options="s.text for s in node.nodeData"/> </div>');
+        $templateCache.put("enumeration.html", '<div><tags-input ng-model="node.nodeData"></tags-input> <select chosen id="myPlaces" class="form-control" style="width:350px;" tabindex="4" ng-model="selectedPlace" ng-options="s.text for s in node.nodeData"/> </div>');
         $templateCache.put("integer.html", "<div><input type='text' class='form-control' data-mask='99999' ng-model='node.nodeData'><span class='help-block'>0 to 99999</span></div>");
         $templateCache.put("float.html", "<div><input type='text' class='form-control' data-mask='99999.99999' ng-model='node.nodeData'><span class='help-block'>0 to 99999.99999</span></div>");
         $templateCache.put("text.html", "<div><input type='text' class='form-control'></div>");
