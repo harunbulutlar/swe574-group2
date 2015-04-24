@@ -1,10 +1,275 @@
-<!DOCTYPE html>
-<html>
-<head lang="en">
-    <meta charset="UTF-8">
-    <title></title>
-</head>
-<body>
+<div class="wrapper wrapper-content animated fadeInRight">
+    <div class="row show-grid">
+        <div class="col-lg-6">
+            <div class="ibox float-e-margins">
+                <div class="ibox-title">
+                    <h5>Create an Event</h5>
 
-</body>
-</html>
+                    <div ibox-tools></div>
+                </div>
+                <div class="ibox-content">
+                    <div class="radio"><label> <input type="radio" checked="true" value="friends" id="friendsRadio"
+                                                      name="privacyRadios"
+                                                      ng-model="$root.localStoragePollModelEmpty.pollPrivacy"
+                                                      ng-disabled="isDisabled(currentUserId, currentPollCreateUserId, isAdmin, isCreatePoll)">Friends</label>
+                    </div>
+                    <div class=" radio"><label> <input type="radio" value="public" id="publicRadio" name="privacyRadios"
+                                                       ng-model="$root.localStoragePollModelEmpty.pollPrivacy"
+                                                       ng-disabled="isDisabled(currentUserId, currentPollCreateUserId, isAdmin, isCreatePoll)">Public</label>
+                    </div>
+                    <div class=" form-group"><label>Title</label> <input type="text"
+                                                                         ng-model="$root.localStoragePollModelEmpty.pollTitle"
+                                                                         placeholder="Enter a Title for your event"
+                                                                         class="form-control"
+                                                                         ng-disabled="isDisabled(currentUserId, currentPollCreateUserId, isAdmin, isCreatePoll)">
+                    </div>
+                    <div class="form-group"><label>Detail</label> <textarea
+                            ng-model="$root.localStoragePollModelEmpty.pollDescription"
+                            placeholder="Enter some description of your event"
+                            class="form-control"
+                            ng-disabled="isDisabled(currentUserId, currentPollCreateUserId, isAdmin, isCreatePoll)"></textarea>
+                    </div>
+                    <div class="form-group"><label>End Date</label> <input type="text"
+                                                                           ng-model="$root.localStoragePollModelEmpty.endDate"
+                                                                           placeholder="Enter a Title for your event"
+                                                                           class="form-control"
+                                                                           ng-disabled="isDisabled(currentUserId, currentPollCreateUserId, isAdmin, isCreatePoll)">
+                    </div>
+
+                    <div class="form-poll"><label>Options</label>
+
+                        <!--TODO: add pollId to pollDataLocalStorage-->
+                        <blockquote ng-repeat="option in $root.localStoragePollModelEmpty.pollOptions">
+                            <div>
+                                <div class="col-lg-2">
+
+                                    <b>{{ option.optionId }}</b> <br>
+
+                                </div>
+
+                                <div class="col-lg-8">
+
+                                    <b>{{ option.optionName }}</b> <br>
+
+
+                                </div>
+
+                                <div class="col-lg-2">
+
+                                    <form name='vote' ng-submit="">
+
+                                        <a class="btn btn-xs btn-white"><i class="fa fa-thumbs-up"></i> Like </a>
+
+                                    </form>
+
+                                </div>
+                            </div>
+                            <div>
+
+                                <p>Description: {{ option.optionDetail }}</p>
+
+                            </div>
+
+                        </blockquote>
+
+                        <div class="form-group"
+                             ng-hide="isDisabled(currentUserId, currentPollCreateUserId, isAdmin, isCreatePoll)">
+
+                            <form name='addOption' ng-submit="addPollOption()">
+
+                                <input type="text" ng-model="pollOptionTempList.optionName"
+                                       placeholder="Add an option for your poll"
+                                       class="form-control">
+                                <input type="text" ng-model="pollOptionTempList.optionDetail"
+                                       placeholder="Add a definiton for your option"
+                                       class="form-control">
+                                <button type="submit" class="btn btn-primary">Add Option</button>
+
+                            </form>
+
+                        </div>
+
+                    </div>
+
+
+                </div>
+
+
+                <section ng-controller="pollTabCtrl">
+
+
+                    <div class="ibox-content">
+                        <tabset>
+                            <tab ng-click="selectTab(1)" active="isSelected(1)">
+                                <tab-heading>
+                                    Comments
+                                </tab-heading>
+
+                            </tab>
+
+                            <tab ng-click="selectTab(2)" active="isSelected(2)">
+                                <tab-heading>
+                                    Results
+                                </tab-heading>
+
+                            </tab>
+                        </tabset>
+                    </div>
+
+
+                    <div class="ibox-content">
+
+                        <div class='form-group' ng-show="isSelected(1)">
+
+                            <div class="feed-activity-list"
+                                 ng-repeat="comment in $root.localStoragePollModelEmpty.pollComments">
+
+                                <div class="feed-element">
+
+                                    <a ui-sref="profile" class="pull-left">
+                                        <img alt="image" class="img-circle" src="img/a5.jpg">
+                                    </a>
+
+                                    <div class="media-body ">
+                                        <small class="pull-right">2h ago</small>
+                                        <strong>{{comment.commentUserName}}</strong> posted a message
+                                        <br>
+                                        <small class="text-muted">{{comment.commentDateTime | date:'yyyy-MM-dd HH:mm'}}
+                                        </small>
+                                        <div class="well">
+                                            {{comment.commentBody}}
+                                        </div>
+                                        <div class="pull-right">
+                                            <a class="btn btn-xs btn-white"><i class="fa fa-thumbs-up"></i> Like </a>
+                                        </div>
+                                    </div>
+
+                                </div>
+
+
+                            </div>
+
+
+                            <form name='addComment' ng-submit="addPollComment()">
+
+                                <textarea ng-model="pollCommentTempList.commentBody"
+                                          placeholder="Post anything on your mind!"
+                                          class="form-control"></textarea>
+
+                                <button type="submit" class="btn btn-primary">Post Comment</button>
+
+                            </form>
+
+                        </div>
+
+                        <div class='form-group' ng-show="isSelected(2)">
+                            <h4>Results</h4>
+                        </div>
+
+
+                    </div>
+
+                </section>
+
+
+            </div>
+
+
+        </div>
+
+        <div class="col-lg-6" ng-controller="CustomTypesCtrl">
+
+            <div class="ibox float-e-margins">
+                <div class="ibox-title">
+                    <h5>Custom Types</h5>
+
+                    <div ibox-tools></div>
+                </div>
+                <div class="ibox-content">
+                    <tabset>
+                        <tab ng-repeat="customType in customTypes" active="customTypeTabs[customType.id]">
+                            <tab-heading>
+                                {{customType.name}}<a class="pull-right btn btn-white btn-xs" data-nodrag
+                                                      ng-click="removeTab(customType)"><span class="fa fa-trash"></span></a>
+                            </tab-heading>
+                            <type-template type-parameter="customType"></type-template>
+                        </tab>
+                        <button class="btn btn-w-m btn-primary" ng-click="addCustomType()"><i class="fa fa-plus"></i>
+                            Add Type
+                        </button>
+                    </tabset>
+                </div>
+            </div>
+
+        </div>
+
+
+        <form class="col-lg-12" ng-submit="savePollData()">
+            <button type="submit" class="btn btn-primary btn-sm btn-block"><i class="fa fa-save"></i> Save Your Changes
+            </button>
+        </form>
+    </div>
+</div>
+
+<style>
+    .angular-ui-tree-handle {
+        background: none repeat scroll 0 0 #f3f3f4;
+        border: 1px dashed #e7eaec;
+        color: inherit;
+        padding: 10px;
+        font-weight: normal;
+    }
+
+    .angular-ui-tree-handle:hover {
+        font-weight: bold;
+        cursor: pointer;
+    }
+
+    .angular-ui-tree-placeholder {
+        background: #f0f9ff;
+        border: 1px dashed #bed2db;
+        -webkit-box-sizing: border-box;
+        -moz-box-sizing: border-box;
+        box-sizing: border-box;
+    }
+
+    .group-title {
+        background-color: #687074 !important;
+        color: #FFF !important;
+    }
+
+    .tree-node {
+        background: none repeat scroll 0 0 #f3f3f4;
+        border: 1px dashed #e7eaec;
+        color: inherit;
+        padding: 10px;
+        border-radius: 3px;
+    }
+
+    .tree-node .btn {
+        min-width: 22px;
+        margin-right: 4px;
+    }
+
+    .tree-node-content {
+        margin: 5px 5px 5px 0;
+    }
+
+    .tree-handle {
+        background: none repeat scroll 0 0 #f3f3f4;
+        border: 1px dashed #e7eaec;
+        color: inherit;
+        padding: 10px;
+    }
+
+    .angular-ui-tree-handle:hover {
+    }
+
+    .angular-ui-tree-placeholder {
+        background: #f0f9ff;
+        border: 1px dashed #bed2db;
+        -webkit-box-sizing: border-box;
+        -moz-box-sizing: border-box;
+        box-sizing: border-box;
+    }
+</style>

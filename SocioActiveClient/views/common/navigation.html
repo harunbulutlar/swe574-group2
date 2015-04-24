@@ -1,4 +1,4 @@
-<nav class="navbar-default navbar-static-side" role="navigation">
+<nav class="navbar-default navbar-static-side" role="navigation" ng-controller="pollNavigationCtrl">
     <div class="sidebar-collapse">
         <ul side-navigation class="nav" id="side-menu">
             <li class="nav-header">
@@ -28,16 +28,42 @@
                 <a ui-sref="index.main"><i class="fa fa-home"></i> <span class="nav-label">Home</span></a>
             </li>
             <li ng-class="{active: $state.includes('activity')}">
-                <a ui-sref="inbox"><i class="fa fa-globe"></i> <span class="nav-label">Activity</span><span class="label label-warning pull-right">5</span></a>
-                <ul class="nav nav-second-level" ng-class="{in: $state.includes('activity')}">
+                <a ui-sref="inbox"><i class="fa fa-globe"></i> <span class="nav-label">Activity</span><span
+                        class="label label-warning pull-right">5</span></a>
+                <ul class="nav nav-second-level" ng-class="{in: $state.includes('activity')}" dropdown>
                     <li ui-sref-active="active"><a ui-sref="activity.groups">Groups</a></li>
                     <li ui-sref-active="active"><a ui-sref="activity.events">Events</a></li>
-                    <li ui-sref-active="active"><a ui-sref="activity.polls">Polls</a></li>
+
+
+                    <li ui-sref-active="active"><a class="dropdown-toggle" dropdown-toggle href>
+                            <span class="clear">
+                                <span class="block m-t-xs">
+                                    <strong class="font-bold">Poll</strong>
+                             </span>
+                            </span>
+                    </a></li>
+                    <ul class="dropdown-menu animated fadeInRight m-t-xs">
+                        <div ng-repeat="polls in localStoragePollObjectForNavigation">
+                            <li><a ui-sref="activity.polls({pollToBeViewed: polls.pollId})">{{polls.pollTitle}}</a></li>
+                        </div>
+
+                    </ul>
+
+
+                    <!--<li id="pollAccordion"><a data-toggle="collapse" data-parent="#pollAccordion" href="#collapsePoll">Polls</a>
+                    </li>
+
+                    <div id="collapsePoll" class="panel-collapse collapse" ng-controller="pollNavigationCtrl">
+                        <div class="panel-body" ng-repeat="polls in localStoragePollObjectForNavigation">
+                            <a ui-sref="activity.polls({pollToBeViewed: polls.pollId})">{{polls.pollTitle}}</a>
+                        </div>
+                    </div>-->
                     <li ui-sref-active="active"><a ui-sref="activity.instantaneous">Instantaneous</a></li>
                 </ul>
             </li>
             <li ng-class="{active: $state.includes('owner')}">
-                <a ui-sref="inbox"><i class="fa fa-edit"></i> <span class="nav-label">Owner</span><span class="label label-warning pull-right">5</span></a>
+                <a ui-sref="inbox"><i class="fa fa-edit"></i> <span class="nav-label">Owner</span><span
+                        class="label label-warning pull-right">5</span></a>
                 <ul class="nav nav-second-level" ng-class="{in: $state.includes('owner')}">
                     <li ui-sref-active="active"><a ui-sref="owner.groups">Groups</a></li>
                     <li ui-sref-active="active"><a ui-sref="owner.events">Events</a></li>
@@ -47,7 +73,7 @@
             </li>
             <li ng-class="{active: $state.includes('create')}">
                 <a ui-sref="inbox"><i class="fa fa-plus-square"></i> <span class="nav-label">Create Something</span></a>
-                <ul class="nav nav-second-level" ng-class="{in: $state.includes('owner')}">
+                <ul class="nav nav-second-level" ng-class="{in: $state.includes('create')}">
                     <li ui-sref-active="active"><a ui-sref="create.group">Group</a></li>
                     <li ui-sref-active="active"><a ui-sref="create.event">Event</a></li>
                     <li ui-sref-active="active"><a ui-sref="create.poll">Poll</a></li>

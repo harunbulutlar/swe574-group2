@@ -48,9 +48,35 @@ function config($stateProvider, $urlRouterProvider, $ocLazyLoadProvider) {
             data: { pageTitle: 'Mail detail' }
         })
         .state('activity.polls', {
-            url: "/email_compose",
-            templateUrl: "views/main.html",
-            data: { pageTitle: 'Mail compose' }
+            url: "/view_poll/:pollToBeViewed",
+            templateUrl: "views/poll.html",
+            controller: 'pollCtrl',
+            data: { pageTitle: 'View Poll' },
+            resolve: {
+                loadPlugin: function ($ocLazyLoad) {
+                    return $ocLazyLoad.load([
+                        {
+                            name: 'datePicker',
+                            files: ['css/plugins/datapicker/angular-datapicker.css','js/plugins/datapicker/datePicker.js']
+                        },
+                        {
+                            files: ['js/plugins/jasny/jasny-bootstrap.min.js']
+                        },
+                        {
+                            name: 'ui.tree',
+                            files: ['css/plugins/uiTree/angular-ui-tree.min.css','js/plugins/uiTree/angular-ui-tree.min.js']
+                        },
+                        {
+                            name: 'ngTagsInput',
+                            files: ['css/plugins/ngTags/ng-tags-input.css','js/plugins/ngTags/ng-tags-input.js']
+                        },
+                        {
+                            name: 'ui.select',
+                            files: ['css/plugins/ui-select/select.css','js/plugins/ui-select/select.js']
+                        }
+                    ]);
+                }
+            }
         })
         .state('activity.instantaneous', {
             url: "/email_template",
@@ -84,7 +110,7 @@ function config($stateProvider, $urlRouterProvider, $ocLazyLoadProvider) {
         })
         .state('create', {
             abstract: true,
-            url: "/activity",
+            url: "/create",
             templateUrl: "views/common/content.html"
         })
         .state('create.group', {
@@ -123,9 +149,35 @@ function config($stateProvider, $urlRouterProvider, $ocLazyLoadProvider) {
             }
         })
         .state('create.poll', {
-            url: "/email_compose",
+            url: "/create_poll",
             templateUrl: "views/poll.html",
-            data: { pageTitle: 'Create Poll' }
+            controller: 'pollCtrl',
+            data: { pageTitle: 'Create Poll' },
+            resolve: {
+                loadPlugin: function ($ocLazyLoad) {
+                    return $ocLazyLoad.load([
+                        {
+                            name: 'datePicker',
+                            files: ['css/plugins/datapicker/angular-datapicker.css','js/plugins/datapicker/datePicker.js']
+                        },
+                        {
+                            files: ['js/plugins/jasny/jasny-bootstrap.min.js']
+                        },
+                        {
+                            name: 'ui.tree',
+                            files: ['css/plugins/uiTree/angular-ui-tree.min.css','js/plugins/uiTree/angular-ui-tree.min.js']
+                        },
+                        {
+                            name: 'ngTagsInput',
+                            files: ['css/plugins/ngTags/ng-tags-input.css','js/plugins/ngTags/ng-tags-input.js']
+                        },
+                        {
+                            name: 'ui.select',
+                            files: ['css/plugins/ui-select/select.css','js/plugins/ui-select/select.js']
+                        }
+                    ]);
+                }
+            }
         })
 }
 angular
