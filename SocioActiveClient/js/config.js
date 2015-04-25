@@ -39,7 +39,7 @@ function config($stateProvider, $urlRouterProvider, $ocLazyLoadProvider) {
         })
         .state('activity.groups', {
             url: "/inbox",
-            templateUrl: "views/main.html",
+            templateUrl: "views/groups.html",
             data: { pageTitle: 'Mail Inbox' }
         })
         .state('activity.events', {
@@ -116,12 +116,7 @@ function config($stateProvider, $urlRouterProvider, $ocLazyLoadProvider) {
         .state('create.group', {
             url: "/inbox",
             templateUrl: "views/group.html",
-            data: { pageTitle: 'Create Group' }
-        })
-        .state('create.event', {
-            url: "/create_event",
-            templateUrl: "views/event.html",
-            data: { pageTitle: 'Create Event' },
+            data: { pageTitle: 'Create Group' },
             resolve: {
                 loadPlugin: function ($ocLazyLoad) {
                     return $ocLazyLoad.load([
@@ -147,6 +142,11 @@ function config($stateProvider, $urlRouterProvider, $ocLazyLoadProvider) {
                     ]);
                 }
             }
+        })
+        .state('create.event', {
+            url: "/create_event",
+            templateUrl: "views/event.html",
+            data: { pageTitle: 'Create Event' }
         })
         .state('create.poll', {
             url: "/create_poll",

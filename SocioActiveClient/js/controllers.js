@@ -38,19 +38,19 @@ function CustomTypesCtrl($scope, $modal, $rootScope) {
             name: "New Type",
             data: []
         };
-        $scope.customTypes.push(customType);
+        $rootScope.customTypes.push(customType);
         $scope.customTypeTabs[customType.id] = true;
 
     };
     $scope.updateSelection = function ($event) {
         var checkbox = $event.target;
-        $scope.types = (checkbox.checked ? $scope.customTypes : $scope.primitiveTypes);
+        $scope.types = (checkbox.checked ? $rootScope.customTypes : $rootScope.primitiveTypes);
 
     };
     $scope.removeTab = function (customType) {
-        var index = arrayObjectIndexOf($scope.customTypes, customType.id, "id");
+        var index = arrayObjectIndexOf($rootScope.customTypes, customType.id, "id");
         delete $scope.customTypeTabs[customType.id];
-        $scope.customTypes.splice(index, 1);
+        $rootScope.customTypes.splice(index, 1);
 
     };
     $scope.removeUserField = function (userField) {
@@ -69,7 +69,7 @@ function CustomTypesCtrl($scope, $modal, $rootScope) {
     $scope.saveChanges = function () {
 
         var returnObject = $scope.getCurrentUserData();
-        returnObject.currentUser.data.customTypes = $scope.customTypes;
+        returnObject.currentUser.data.customTypes = $rootScope.customTypes;
         returnObject.currentUser.data.groups.push(
             {
                 title: $scope.groupTitle,
@@ -101,20 +101,19 @@ function CustomTypesCtrl($scope, $modal, $rootScope) {
     $scope.groupDescription = '';
     $scope.userFields = [];
     $scope.userFieldName = '';
-    $scope.customTypes = [];
     $scope.customTypeTabs = {};
     // at the bottom of your controller
     $scope.initPage = function () {
         var returnObject = $scope.getCurrentUserData();
-        $scope.customTypes = returnObject.currentUser.data.customTypes;
-        angular.forEach($scope.customTypes, function (event) {
+        $rootScope.customTypes = returnObject.currentUser.data.customTypes;
+        angular.forEach($rootScope.customTypes, function (event) {
             $scope.customTypeTabs[event.id] = true;
         });
     };
     $scope.initPage();
 }
 
-function TypeTemplateCtrl($scope) {
+function TypeTemplateCtrl($scope,$rootScope) {
 
     $scope.remove = function (scope) {
         scope.remove();
@@ -146,6 +145,15 @@ function TypeTemplateCtrl($scope) {
     $scope.typeParameterType = "";
 }
 
+function NodeInfoCtrl($scope,$rootScope) {
+
+    $scope.updateSelection = function ($event) {
+        var checkbox = $event.target;
+        $scope.types = (checkbox.checked ? $rootScope.customTypes : $rootScope.primitiveTypes);
+    };
+
+    $scope.types = $rootScope.primitiveTypes;
+}
 
 function GoogleMaps($scope, $modalInstance) {
     $scope.myMarkers = [];
@@ -259,7 +267,8 @@ function addNodeInfo($compile, $templateCache) {
             var compiled_cache = $compile(cached_element)(scope);
             angular.element(element).append(nodeData.name);
             angular.element(element).append(compiled_cache);
-        }
+        },
+        controller: NodeInfoCtrl
     }
 }
 
@@ -300,9 +309,11 @@ angular
     .controller('CustomTypesCtrl', CustomTypesCtrl)
     .controller('GoogleMaps', GoogleMaps)
     .controller('TypeTemplateCtrl', TypeTemplateCtrl)
+    .controller('NodeInfoCtrl', NodeInfoCtrl)
     .run(["$templateCache", "$rootScope", function ($templateCache, $rootScope) {
         $rootScope.primitiveTypes = [
             {name: 'Enumeration'},
+            {name: 'List'},
             {name: 'Integer'},
             {name: 'Float'},
             {name: 'Text'},
@@ -314,7 +325,11 @@ angular
             {name: 'Currency'},
             {name: 'IPV4'}
         ];
+
+        $rootScope.customTypes = [];
+
         $templateCache.put("enumeration.html", '<div><tags-input ng-model="node.nodeData"></tags-input> <select chosen id="myPlaces" class="form-control" style="width:350px;" tabindex="4" ng-model="selectedPlace" ng-options="s.text for s in node.nodeData"/> </div>');
+        $templateCache.put("list.html", '<div class="checkbox"><label> <input icheck type="checkbox" ng-click="updateSelection($event)">Use Custom Types</label></div><select chosen id="types" class="chosen-select" style="width:350px;" tabindex="4" ng-model="userFieldType" ng-options="s.name for s in types"></select>');
         $templateCache.put("integer.html", "<div><input type='text' class='form-control' data-mask='99999' ng-model='node.nodeData'><span class='help-block'>0 to 99999</span></div>");
         $templateCache.put("float.html", "<div><input type='text' class='form-control' data-mask='99999.99999' ng-model='node.nodeData'><span class='help-block'>0 to 99999.99999</span></div>");
         $templateCache.put("text.html", "<div><input type='text' class='form-control'></div>");
