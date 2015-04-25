@@ -1,4 +1,4 @@
-<nav class="navbar-default navbar-static-side" role="navigation" ng-controller="pollNavigationCtrl">
+<nav class="navbar-default navbar-static-side" role="navigation">
     <div class="sidebar-collapse">
         <ul side-navigation class="nav" id="side-menu">
             <li class="nav-header">
@@ -35,14 +35,14 @@
                     <li ui-sref-active="active"><a ui-sref="activity.events">Events</a></li>
 
 
-                    <li ui-sref-active="active"><a class="dropdown-toggle" dropdown-toggle href>
+                    <li><a class="dropdown-toggle" dropdown-toggle href>
                             <span class="clear">
                                 <span class="block m-t-xs">
                                     <strong class="font-bold">Poll</strong>
                              </span>
                             </span>
                     </a></li>
-                    <ul class="dropdown-menu animated fadeInRight m-t-xs">
+                    <ul ng-controller="pollNavigationCtrl" class="dropdown-menu animated fadeInRight m-t-xs">
                         <div ng-repeat="polls in localStoragePollObjectForNavigation">
                             <li><a ui-sref="activity.polls({pollToBeViewed: polls.pollId})">{{polls.pollTitle}}</a></li>
                         </div>
