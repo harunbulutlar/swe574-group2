@@ -2,9 +2,10 @@
  * Created by Osman Emre on 22.04.2015.
  */
 
-function pollCtrl($scope, $rootScope, $stateParams) {
+function pollCtrl($scope, $rootScope, $stateParams, $state) {
 
     $scope.currentUserId = 2;
+    $scope.currentUserName = "Osman Emre"
     $scope.isCreatePoll = false;
     $scope.isVotedTemp = false;
 
@@ -21,7 +22,7 @@ function pollCtrl($scope, $rootScope, $stateParams) {
         $scope.localStoragePollObjectCount = Object.keys($scope.localStoragePollObject).length;
     }
 
-    var pollToBeViewed = null;
+    $scope.pollToBeViewed = $stateParams.pollToBeViewed;
 
     var initialize = function () {
         $rootScope.localStoragePollModel = {
@@ -40,15 +41,11 @@ function pollCtrl($scope, $rootScope, $stateParams) {
         };
     };
 
-    if ($stateParams.pollToBeViewed != null) {
+    if ($scope.pollToBeViewed != null) {
 
-        pollToBeViewed = $stateParams.pollToBeViewed;
+        $rootScope.localStoragePollModel = $scope.localStoragePollObject[$scope.pollToBeViewed];
 
-        $rootScope.localStoragePollModel = $scope.localStoragePollObject[pollToBeViewed];
-
-        $scope.currentPollCreateUserId = 1;
-
-        $scope.localStoragePollOptionObject = $scope.localStoragePollObject[pollToBeViewed].pollOptions;
+        $scope.localStoragePollOptionObject = $scope.localStoragePollObject[$scope.pollToBeViewed].pollOptions;
 
 
     } else {
@@ -56,10 +53,9 @@ function pollCtrl($scope, $rootScope, $stateParams) {
         initialize();
 
         $scope.isCreatePoll = true;
-        $scope.currentPollCreateUserId = '';
         $scope.localStoragePollOptionObject = null;
 
-        $rootScope.localStoragePollModel.pollId = $scope.localStoragePollObjectCount + 1;
+        $rootScope.localStoragePollModel.pollId = guid();
         $rootScope.localStoragePollModel.createdBy = $scope.currentUserId;
         $rootScope.localStoragePollModel.createDate = $scope.currentDateTime;
         $rootScope.localStoragePollModel.updateDate = $scope.currentDateTime;
@@ -71,11 +67,13 @@ function pollCtrl($scope, $rootScope, $stateParams) {
         if ($scope.localStoragePollOptionObject == null) {
             $scope.localStoragePollOptionObjectCounter = Object.keys($scope.localStoragePollModel.pollOptions).length;
         } else {
-            $scope.localStoragePollOptionObjectCounter = Object.keys($scope.localStoragePollObject[pollToBeViewed].pollOptions).length;
+            $scope.localStoragePollOptionObjectCounter = Object.keys($scope.localStoragePollObject[$scope.pollToBeViewed].pollOptions).length;
         }
 
-        $rootScope.localStoragePollModel.pollOptions[$scope.localStoragePollOptionObjectCounter + 1] = {
-            "optionId": $scope.localStoragePollOptionObjectCounter + 1,
+        var optionID = guid();
+
+        $rootScope.localStoragePollModel.pollOptions[optionID] = {
+            "optionId": optionID,
             "optionName": $scope.pollOptionTempList.optionName,
             "optionDetail": $scope.pollOptionTempList.optionDetail,
             "optionVoteCount": 0
@@ -89,10 +87,10 @@ function pollCtrl($scope, $rootScope, $stateParams) {
     $scope.addPollComment = function () {
 
         $rootScope.localStoragePollModel.pollComments.push({
-            "commentId": $rootScope.localStoragePollModel.pollComments.length + 1,
+            "commentId": guid(),
             "commentBody": $scope.pollCommentTempList.commentBody,
             "commentUserId": $scope.currentUserId,
-            "commentUserName": "Osman Emre", /*TODO Bunu kullanýcýya baðla*/
+            "commentUserName": $scope.currentUserName, /*TODO Bunu kullanýcýya baðla*/
             "commentDateTime": $scope.currentDateTime
         });
 
@@ -105,21 +103,26 @@ function pollCtrl($scope, $rootScope, $stateParams) {
 
         if ($rootScope.localStoragePollModel.pollTags[$scope.pollTagTempList.tagName] != null) {
 
-                alert("You can't add same tag and context! Change the context or tag itself!");
+            alert("You can't add same tag and context! Change the context or tag itself!");
 
-            } else {
-                $rootScope.localStoragePollModel.pollTags[$scope.pollTagTempList.tagName] = {
-                    "tagName": $scope.pollTagTempList.tagName,
-                    "tagContext": $scope.pollTagTempList.tagContext
-                };
-            }
+        } else {
+            $rootScope.localStoragePollModel.pollTags[$scope.pollTagTempList.tagName] = {
+                "tagName": $scope.pollTagTempList.tagName,
+                "tagContext": $scope.pollTagTempList.tagContext
+            };
+        }
 
         $scope.pollTagTempList.tagName = '';
         $scope.pollTagTempList.tagContext = '';
 
     };
 
-    /*TODO bunu optionId li hale getir!! optionId'yi bir level üste çýkarýrsan olur*/
+
+    $scope.removeTag = function (tagToBeRemoved) {
+        delete $rootScope.localStoragePollModel.pollTags[tagToBeRemoved];
+
+    };
+
     $scope.votePoll = function (optionId, optionName, optionDetail, optionVoteCount, votedBy) {
 
         $rootScope.localStoragePollModel.pollOptions[optionId] = {
@@ -134,14 +137,19 @@ function pollCtrl($scope, $rootScope, $stateParams) {
         $scope.isVotedTemp = true;
         $rootScope.localStoragePollModel.pollParticipantList.push(votedBy);
 
+        if($scope.pollToBeViewed != null){
+            $scope.savePollData();
+        };
+
+
     };
 
-    $scope.isCurrentUserVoted = function(currentUser){
+    $scope.isCurrentUserVoted = function (currentUser) {
 
-        if($scope.isVotedTemp == true || $rootScope.localStoragePollModel.pollParticipantList.indexOf(currentUser ) != -1){
+        if ($scope.isVotedTemp == true || $rootScope.localStoragePollModel.pollParticipantList.indexOf(currentUser) != -1) {
 
             return true;
-        }else{
+        } else {
 
             return false;
         }
@@ -153,8 +161,13 @@ function pollCtrl($scope, $rootScope, $stateParams) {
         var pollOption = getPollDataFromLocalStorage();
         pollOption[$rootScope.localStoragePollModel.pollId] = $rootScope.localStoragePollModel;
         localStorage.setItem('pollData', JSON.stringify(pollOption));
+        if ($scope.pollToBeViewed == null) {
+            $state.go('activity.polls', { 'pollToBeViewed': $rootScope.localStoragePollModel.pollId});
+        }else{
 
-        initialize();
+            $scope.reloadState();
+        }
+
 
     };
 
@@ -167,13 +180,17 @@ function pollCtrl($scope, $rootScope, $stateParams) {
 
         } else {
 
-            if ((currentUserId == $scope.localStoragePollObject[pollToBeViewed].createdBy) || isAdmin) {
+            if ((currentUserId == $scope.localStoragePollObject[$scope.pollToBeViewed].createdBy) || isAdmin) {
                 return false;
             } else {
                 return true;
             }
         }
 
+    };
+
+    $scope.reloadState = function() {
+        $state.reload();
     };
 
 }

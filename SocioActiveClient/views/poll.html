@@ -3,12 +3,13 @@
         <div class="col-lg-6">
             <div class="ibox float-e-margins">
                 <div class="ibox-title">
-                    <h5>Create an Event</h5>
+                    <h5 ng-show="pollToBeViewed == null">Create a Poll</h5>
+                    <h5 ng-show="pollToBeViewed != null">Displaying poll</h5>
 
                     <div ibox-tools></div>
                 </div>
                 <div class="ibox-content">
-                    <div class="radio"><label> <input type="radio" checked="true" value="friends" id="friendsRadio"
+                    <div class="radio"><label> <input type="radio" value="friends" id="friendsRadio" ng-checked="true"
                                                       name="privacyRadios"
                                                       ng-model="$root.localStoragePollModel.pollPrivacy"
                                                       ng-disabled="isDisabled(main.userId, main.isAdmin)">Friends</label>
@@ -40,57 +41,57 @@
 
                     <div class="form-poll"><label>Options</label>
 
-                        <div class="panel">
-                            <div class="panel-body">
-                                <ul class="list-group"
-                                    ng-repeat="option in $root.localStoragePollModel.pollOptions">
+                        <div class="form-group" >
+                            <div class="panel">
+                                <div class="panel-body" ng-hide="$root.localStoragePollModel.pollOptions == {}">
+                                    <ul class="list-group"
+                                        ng-repeat="option in $root.localStoragePollModel.pollOptions">
 
-                                    <li class="list-group-item">
+                                        <li class="list-group-item">
 
+                                            <form name='vote'>
 
-                                        <form name='vote'>
+                                                <a class="btn btn-xs btn-white pull-right"
+                                                   ng-click="votePoll(option.optionId, option.optionName, option.optionDetail, option.optionVoteCount, main.userId)"
+                                                   ng-class=" {disabled: isCurrentUserVoted(main.userId)}"><i
+                                                        class="fa fa-thumbs-up"></i>Vote</a>
 
-                                            <a class="btn btn-xs btn-white pull-right"
-                                               ng-click="votePoll(option.optionId, option.optionName, option.optionDetail, option.optionVoteCount, main.userId)"
-                                               ng-class=" {disabled: isCurrentUserVoted(main.userId)}"><i
-                                                    class="fa fa-thumbs-up"></i>Vote</a>
-
-                                        </form>
-                                        <b>{{ option.optionName }}</b> | {{ option.optionDetail }} || {{
-                                        option.optionVoteCount }}
-
-
-                                    </li>
+                                            </form>
+                                            <b>{{ option.optionName }}</b> | {{ option.optionDetail }} || {{
+                                            option.optionVoteCount }}
 
 
-                                </ul>
+                                        </li>
 
+
+                                    </ul>
+
+
+                                </div>
+                            </div>
+
+                            <!--TODO: add pollId to pollDataLocalStorage-->
+
+                            <div class="form-group"
+                                 ng-hide="isDisabled(main.userId, main.isAdmin)">
+
+                                <form name='addOption' ng-submit="addPollOption()">
+
+                                    <input type="text" ng-model="pollOptionTempList.optionName"
+                                           placeholder="Add an option for your poll"
+                                           class="form-control">
+                                    <input type="text" ng-model="pollOptionTempList.optionDetail"
+                                           placeholder="Add a definiton for your option"
+                                           class="form-control">
+                                    <button type="submit" class="btn btn-primary">Add Option</button>
+
+                                </form>
 
                             </div>
                         </div>
-
-                        <!--TODO: add pollId to pollDataLocalStorage-->
-
-                        <div class="form-group"
-                             ng-hide="isDisabled(main.userId, main.isAdmin)">
-
-                            <form name='addOption' ng-submit="addPollOption()">
-
-                                <input type="text" ng-model="pollOptionTempList.optionName"
-                                       placeholder="Add an option for your poll"
-                                       class="form-control">
-                                <input type="text" ng-model="pollOptionTempList.optionDetail"
-                                       placeholder="Add a definiton for your option"
-                                       class="form-control">
-                                <button type="submit" class="btn btn-primary">Add Option</button>
-
-                            </form>
-
-                        </div>
-
                     </div>
 
-                    <div class="form-poll"><label>Tags</label>
+                    <div class="form-poll"><label>Tags {{$root.localStoragePollModel.pollTags['trabzon']}}</label>
 
                         <div class="form-group">
                             <tabset>
@@ -100,7 +101,7 @@
 
                                         <p style="color: grey">{{tag.tagContext}}<a
                                                 class="pull-right btn btn-white btn-xs" data-nodrag
-                                                ng-click="removeTab(tag)"><span class="fa fa-trash"></span></a>
+                                                ng-click="removeTag(tag.tagName)"><span class="fa fa-trash"></span></a>
                                             <br>
 
                                     </tab-heading>
