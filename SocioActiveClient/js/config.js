@@ -86,7 +86,7 @@ function config($stateProvider, $urlRouterProvider, $ocLazyLoadProvider) {
             url: "/view_poll/:pollToBeViewed",
             templateUrl: "views/poll.html",
             controller: 'pollCtrl',
-            data: { pageTitle: 'View Poll' },
+            data: { pageTitle: 'View Poll'},
             resolve: {
                 loadPlugin: function ($ocLazyLoad) {
                     return $ocLazyLoad.load([
