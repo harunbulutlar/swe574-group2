@@ -11,30 +11,29 @@
                     <div class="radio"><label> <input type="radio" checked="true" value="friends" id="friendsRadio"
                                                       name="privacyRadios"
                                                       ng-model="$root.localStoragePollModel.pollPrivacy"
-                                                      ng-disabled="isDisabled(currentUserId, currentPollCreateUserId, isAdmin, isCreatePoll)">Friends</label>
+                                                      ng-disabled="isDisabled(main.userId, main.isAdmin)">Friends</label>
                     </div>
                     <div class=" radio"><label> <input type="radio" value="public" id="publicRadio" name="privacyRadios"
                                                        ng-model="$root.localStoragePollModel.pollPrivacy"
-                                                       ng-disabled="isDisabled(currentUserId, currentPollCreateUserId, isAdmin, isCreatePoll)">Public</label>
+                                                       ng-disabled="isDisabled(main.userId, main.isAdmin)">Public</label>
                     </div>
                     <div class=" form-group"><label>Title</label> <input type="text"
                                                                          ng-model="$root.localStoragePollModel.pollTitle"
                                                                          placeholder="Enter a Title for your event"
                                                                          class="form-control"
-                                                                         ng-disabled="isDisabled(currentUserId, currentPollCreateUserId, isAdmin, isCreatePoll)">
+                                                                         ng-disabled="isDisabled(main.userId, main.isAdmin)">
                     </div>
                     <div class="form-group"><label>Detail</label> <textarea
                             ng-model="$root.localStoragePollModel.pollDescription"
                             placeholder="Enter some description of your event"
                             class="form-control"
-                            ng-disabled="isDisabled(currentUserId, currentPollCreateUserId, isAdmin, isCreatePoll)"></textarea>
+                            ng-disabled="isDisabled(main.userId, main.isAdmin)"></textarea>
                     </div>
                     <div class="form-group"><label>End Date</label>
 
-
                         <div class='input-group date'><input type='datetime' class='form-control' date-time
                                                              ng-model='$root.localStoragePollModel.endDate' view='date'
-                                                             ng-disabled="isDisabled(currentUserId, currentPollCreateUserId, isAdmin, isCreatePoll)"><span
+                                                             ng-disabled="isDisabled(main.userId, main.isAdmin)"><span
                                 class='input-group-addon'><i class='fa fa-calendar'></i></span></div>
 
                     </div>
@@ -52,14 +51,14 @@
                                         <form name='vote'>
 
                                             <a class="btn btn-xs btn-white pull-right"
-                                               ng-click="votePoll(option.optionId, option.optionName, option.optionDetail, option.optionVoteCount, main.userId)"><i
+                                               ng-click="votePoll(option.optionId, option.optionName, option.optionDetail, option.optionVoteCount, main.userId)"
+                                               ng-class=" {disabled: isCurrentUserVoted(main.userId)}"><i
                                                     class="fa fa-thumbs-up"></i>Vote</a>
 
-                                            <b>{{ option.optionName }}</b> | {{ option.optionDetail }} || {{
-                                            option.optionVoteCount }}
-
-
                                         </form>
+                                        <b>{{ option.optionName }}</b> | {{ option.optionDetail }} || {{
+                                        option.optionVoteCount }}
+
 
                                     </li>
 
@@ -70,11 +69,10 @@
                             </div>
                         </div>
 
-
                         <!--TODO: add pollId to pollDataLocalStorage-->
 
                         <div class="form-group"
-                             ng-hide="isDisabled(currentUserId, currentPollCreateUserId, isAdmin, isCreatePoll)">
+                             ng-hide="isDisabled(main.userId, main.isAdmin)">
 
                             <form name='addOption' ng-submit="addPollOption()">
 
@@ -92,6 +90,47 @@
 
                     </div>
 
+                    <div class="form-poll"><label>Tags</label>
+
+                        <div class="form-group">
+                            <tabset>
+                                <tab ng-repeat="tag in $root.localStoragePollModel.pollTags">
+                                    <tab-heading>
+                                        <h3>{{tag.tagName}}</h3>
+
+                                        <p style="color: grey">{{tag.tagContext}}<a
+                                                class="pull-right btn btn-white btn-xs" data-nodrag
+                                                ng-click="removeTab(tag)"><span class="fa fa-trash"></span></a>
+                                            <br>
+
+                                    </tab-heading>
+                                </tab>
+                            </tabset>
+                        </div>
+
+                        <div class="form-group">
+
+                            <form name='addTag' ng-submit="addPollTag()">
+
+                                <input type="text" ng-model="pollTagTempList.tagName"
+                                       placeholder="Add a tag for your poll"
+                                       class="form-control"
+                                       id="semanticTagName" ng-required="true">
+
+                                <select id="semanticTagContext" class="form-control"
+                                        ng-model="pollTagTempList.tagContext" placeholder="Add a context for your tag"
+                                        ng-required="true">
+
+                                </select>
+
+                                <button type="submit" class="btn btn-primary">Add Tag</button>
+
+                            </form>
+
+                        </div>
+
+
+                    </div>
 
                 </div>
 
@@ -274,3 +313,56 @@
         box-sizing: border-box;
     }
 </style>
+
+<script>
+
+    $(document).ready(function () {
+
+        $('#semanticTagName').focusout(function () {
+
+            $('#semanticTagContext').empty();
+            var input_parameter = this.value;
+
+            function getRelatedCategories(keyword, currenttopic, uniqueCat) {
+                var topic_id = currenttopic;
+
+                var service_url = 'https://www.googleapis.com/freebase/v1/topic';
+                var params = {
+                    'key': 'AIzaSyBfJNRIjAao3J0PZeO9ALipSJ_k9NjETwc'
+                };
+
+                $.getJSON(service_url + topic_id, params, function (topic) {
+
+                    if (topic.property['/type/object/type'].values[0].text != 'Topic') {
+                        current_topic = topic.property['/type/object/type'].values[0].text;
+                        if (uniqueCat[current_topic] == null) {
+
+                            uniqueCat[current_topic] = "exists";
+                            $('<option>', {text: current_topic, value: current_topic}).appendTo('#semanticTagContext');
+                            /*return $('<option>').val(current_topic).text(current_topic);*/
+
+                        }
+                    }
+                });
+            }
+
+            var service_url = 'https://www.googleapis.com/freebase/v1/search';
+
+            var params = {
+                'query': input_parameter,
+                'key': 'AIzaSyBfJNRIjAao3J0PZeO9ALipSJ_k9NjETwc',
+                'limit': 50
+            };
+
+            $.getJSON(service_url + '?callback=?', params, function (response) {
+
+                var uniqueCat = {};
+                $.each(response.result, function (i, result) {
+                    getRelatedCategories(result['name'], result['mid'], uniqueCat);
+                });
+            });
+
+        });
+    });
+
+</script>
