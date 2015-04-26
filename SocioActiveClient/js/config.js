@@ -22,6 +22,41 @@ function config($stateProvider, $urlRouterProvider, $ocLazyLoadProvider) {
             url: "/index",
             templateUrl: "views/common/content.html"
         })
+        .state('profile', {
+            abstract: true,
+            url: "/profile",
+            templateUrl: "views/common/content.html"
+        })
+        .state('profile.user', {
+            url: "/profile/user",
+            templateUrl: "views/profile.html",
+            data: { pageTitle: 'Profile Page' },
+            resolve: {
+                loadPlugin: function ($ocLazyLoad) {
+                    return $ocLazyLoad.load([
+                        {
+                            name: 'datePicker',
+                            files: ['css/plugins/datapicker/angular-datapicker.css','js/plugins/datapicker/datePicker.js']
+                        },
+                        {
+                            files: ['js/plugins/jasny/jasny-bootstrap.min.js']
+                        },
+                        {
+                            name: 'ui.tree',
+                            files: ['css/plugins/uiTree/angular-ui-tree.min.css','js/plugins/uiTree/angular-ui-tree.min.js']
+                        },
+                        {
+                            name: 'ngTagsInput',
+                            files: ['css/plugins/ngTags/ng-tags-input.css','js/plugins/ngTags/ng-tags-input.js']
+                        },
+                        {
+                            name: 'ui.select',
+                            files: ['css/plugins/ui-select/select.css','js/plugins/ui-select/select.js']
+                        }
+                    ]);
+                }
+            }
+        })
         .state('index.main', {
             url: "/main",
             templateUrl: "views/main.html",
@@ -39,7 +74,7 @@ function config($stateProvider, $urlRouterProvider, $ocLazyLoadProvider) {
         })
         .state('activity.groups', {
             url: "/inbox",
-            templateUrl: "views/main.html",
+            templateUrl: "views/groups.html",
             data: { pageTitle: 'Mail Inbox' }
         })
         .state('activity.events', {
@@ -116,12 +151,7 @@ function config($stateProvider, $urlRouterProvider, $ocLazyLoadProvider) {
         .state('create.group', {
             url: "/inbox",
             templateUrl: "views/group.html",
-            data: { pageTitle: 'Create Group' }
-        })
-        .state('create.event', {
-            url: "/create_event",
-            templateUrl: "views/event.html",
-            data: { pageTitle: 'Create Event' },
+            data: { pageTitle: 'Create Group' },
             resolve: {
                 loadPlugin: function ($ocLazyLoad) {
                     return $ocLazyLoad.load([
@@ -147,6 +177,11 @@ function config($stateProvider, $urlRouterProvider, $ocLazyLoadProvider) {
                     ]);
                 }
             }
+        })
+        .state('create.event', {
+            url: "/create_event",
+            templateUrl: "views/event.html",
+            data: { pageTitle: 'Create Event' }
         })
         .state('create.poll', {
             url: "/create_poll",
