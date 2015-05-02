@@ -85,7 +85,7 @@ function config($stateProvider, $urlRouterProvider, $ocLazyLoadProvider) {
         .state('activity.polls', {
             url: "/view_poll/:pollToBeViewed",
             templateUrl: "views/poll.html",
-            controller: 'pollCtrl',
+            controller: 'PollCtrl',
             data: { pageTitle: 'View Poll'},
             resolve: {
                 loadPlugin: function ($ocLazyLoad) {
@@ -186,7 +186,7 @@ function config($stateProvider, $urlRouterProvider, $ocLazyLoadProvider) {
         .state('create.poll', {
             url: "/create_poll",
             templateUrl: "views/poll.html",
-            controller: 'pollCtrl',
+            controller: 'PollCtrl',
             data: { pageTitle: 'Create Poll' },
             resolve: {
                 loadPlugin: function ($ocLazyLoad) {

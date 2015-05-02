@@ -41,7 +41,7 @@
 
                     <div class="form-poll"><label>Options</label>
 
-                        <div class="form-group" >
+                        <div class="form-group">
                             <div class="panel">
                                 <div class="panel-body" ng-hide="$root.localStoragePollModel.pollOptions == {}">
                                     <ul class="list-group"
@@ -53,12 +53,16 @@
 
                                                 <a class="btn btn-xs btn-white pull-right"
                                                    ng-click="votePoll(option.optionId, option.optionName, option.optionDetail, option.optionVoteCount, main.userId)"
-                                                   ng-class=" {disabled: isCurrentUserVoted(main.userId)}"><i
+                                                   ng-hide="isCurrentUserVoted(main.userId)"><i
                                                         class="fa fa-thumbs-up"></i>Vote</a>
 
+                                                <a class="btn btn-xs btn-white pull-right"
+                                                   ng-class=" {disabled: isCurrentUserVoted(main.userId)}"
+                                                   ng-show="isCurrentUserVoted(main.userId)"><i
+                                                        class="fa fa-thumbs-up"></i>{{ option.optionVoteCount }}</a>
+
                                             </form>
-                                            <b>{{ option.optionName }}</b> | {{ option.optionDetail }} || {{
-                                            option.optionVoteCount }}
+                                            <b>{{ option.optionName }}</b> | {{ option.optionDetail }}
 
 
                                         </li>
@@ -91,7 +95,7 @@
                         </div>
                     </div>
 
-                    <div class="form-poll"><label>Tags {{$root.localStoragePollModel.pollTags['trabzon']}}</label>
+                    <div class="form-poll"><label>Tags</label>
 
                         <div class="form-group">
                             <tabset>
@@ -99,9 +103,9 @@
                                     <tab-heading>
                                         <h3>{{tag.tagName}}</h3>
 
-                                        <p style="color: grey">{{tag.tagContext}}<a
+                                        <p style="color: grey; font-style: italic">{{tag.tagContext}}<a
                                                 class="pull-right btn btn-white btn-xs" data-nodrag
-                                                ng-click="removeTag(tag.tagName)"><span class="fa fa-trash"></span></a>
+                                                ng-click="removeTag(tag.tagId)"><span class="fa fa-trash"></span></a>
                                             <br>
 
                                     </tab-heading>
@@ -109,34 +113,25 @@
                             </tabset>
                         </div>
 
-                        <div class="form-group">
+                        <div class="form-poll">
 
-                            <form name='addTag' ng-submit="addPollTag()">
+                            <input type="text" ng-model="pollTagTempId"
+                                   typeahead="contextHead.id as contextHead.name for contextHead in getTagContext($viewValue)"
+                                   class="form-control" typeahead-loading="loadingLocations" typeahead-min-length="3"
+                                   typeahead-wait-ms="300" typeahead-on-select="addPollTag(pollTagTempId)">
 
-                                <input type="text" ng-model="pollTagTempList.tagName"
-                                       placeholder="Add a tag for your poll"
-                                       class="form-control"
-                                       id="semanticTagName" ng-required="true">
-
-                                <select id="semanticTagContext" class="form-control"
-                                        ng-model="pollTagTempList.tagContext" placeholder="Add a context for your tag"
-                                        ng-required="true">
-
-                                </select>
-
-                                <button type="submit" class="btn btn-primary">Add Tag</button>
-
-                            </form>
+                            <i ng-show="loadingLocations" class="glyphicon glyphicon-refresh"></i>
 
                         </div>
 
 
                     </div>
 
+
                 </div>
 
 
-                <section ng-controller="pollTabCtrl">
+                <section ng-controller="PollTabCtrl">
 
 
                     <div class="ibox-content">
@@ -157,7 +152,6 @@
                         </tabset>
                     </div>
 
-
                     <div class="ibox-content">
 
                         <div class='form-group' ng-show="isSelected(1)">
@@ -172,16 +166,15 @@
                                     </a>
 
                                     <div class="media-body ">
-                                        <small class="pull-right">2h ago</small>
+                                        <small class="pull-right">{{pollCommentDateDifference(comment.commentDateTime)}}
+                                            ago
+                                        </small>
                                         <strong>{{comment.commentUserName}}</strong> posted a message
                                         <br>
                                         <small class="text-muted">{{comment.commentDateTime | date:'yyyy-MM-dd HH:mm'}}
                                         </small>
                                         <div class="well">
                                             {{comment.commentBody}}
-                                        </div>
-                                        <div class="pull-right">
-                                            <a class="btn btn-xs btn-white"><i class="fa fa-thumbs-up"></i> Like </a>
                                         </div>
                                     </div>
 
@@ -252,69 +245,6 @@
     </div>
 </div>
 
-<style>
-    .angular-ui-tree-handle {
-        background: none repeat scroll 0 0 #f3f3f4;
-        border: 1px dashed #e7eaec;
-        color: inherit;
-        padding: 10px;
-        font-weight: normal;
-    }
-
-    .angular-ui-tree-handle:hover {
-        font-weight: bold;
-        cursor: pointer;
-    }
-
-    .angular-ui-tree-placeholder {
-        background: #f0f9ff;
-        border: 1px dashed #bed2db;
-        -webkit-box-sizing: border-box;
-        -moz-box-sizing: border-box;
-        box-sizing: border-box;
-    }
-
-    .group-title {
-        background-color: #687074 !important;
-        color: #FFF !important;
-    }
-
-    .tree-node {
-        background: none repeat scroll 0 0 #f3f3f4;
-        border: 1px dashed #e7eaec;
-        color: inherit;
-        padding: 10px;
-        border-radius: 3px;
-    }
-
-    .tree-node .btn {
-        min-width: 22px;
-        margin-right: 4px;
-    }
-
-    .tree-node-content {
-        margin: 5px 5px 5px 0;
-    }
-
-    .tree-handle {
-        background: none repeat scroll 0 0 #f3f3f4;
-        border: 1px dashed #e7eaec;
-        color: inherit;
-        padding: 10px;
-    }
-
-    .angular-ui-tree-handle:hover {
-    }
-
-    .angular-ui-tree-placeholder {
-        background: #f0f9ff;
-        border: 1px dashed #bed2db;
-        -webkit-box-sizing: border-box;
-        -moz-box-sizing: border-box;
-        box-sizing: border-box;
-    }
-</style>
-
 <script>
 
     $(document).ready(function () {
@@ -324,8 +254,8 @@
             $('#semanticTagContext').empty();
             var input_parameter = this.value;
 
-            function getRelatedCategories(keyword, currenttopic, uniqueCat) {
-                var topic_id = currenttopic;
+            function getRelatedCategories(keyword, currentTopic, uniqueCat) {
+                var topic_id = currentTopic;
 
                 var service_url = 'https://www.googleapis.com/freebase/v1/topic';
                 var params = {
@@ -335,7 +265,7 @@
                 $.getJSON(service_url + topic_id, params, function (topic) {
 
                     if (topic.property['/type/object/type'].values[0].text != 'Topic') {
-                        current_topic = topic.property['/type/object/type'].values[0].text;
+                        var current_topic = topic.property['/type/object/type'].values[0].text;
                         if (uniqueCat[current_topic] == null) {
 
                             uniqueCat[current_topic] = "exists";

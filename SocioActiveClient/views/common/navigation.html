@@ -42,7 +42,7 @@
                              </span>
                             </span>
                     </a></li>
-                    <ul ng-controller="pollNavigationCtrl" class="dropdown-menu animated fadeInRight m-t-xs">
+                    <ul ng-controller="PollNavigationCtrl" class="dropdown-menu animated fadeInRight m-t-xs">
                         <div ng-repeat="polls in localStoragePollObjectForNavigation">
                             <li><a ui-sref="activity.polls({pollToBeViewed: polls.pollId})">{{polls.pollTitle}}</a></li>
                         </div>
@@ -53,7 +53,7 @@
                     <!--<li id="pollAccordion"><a data-toggle="collapse" data-parent="#pollAccordion" href="#collapsePoll">Polls</a>
                     </li>
 
-                    <div id="collapsePoll" class="panel-collapse collapse" ng-controller="pollNavigationCtrl">
+                    <div id="collapsePoll" class="panel-collapse collapse" ng-controller="PollNavigationCtrl">
                         <div class="panel-body" ng-repeat="polls in localStoragePollObjectForNavigation">
                             <a ui-sref="activity.polls({pollToBeViewed: polls.pollId})">{{polls.pollTitle}}</a>
                         </div>

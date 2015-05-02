@@ -1,6 +1,6 @@
 function MainCtrl() {
     this.userName = 'Osman Emre';
-    this.userId = 2;
+    this.userId = 1;
     this.isAdmin = false;
     this.role = "Master Student"
 }
