@@ -15,6 +15,7 @@ function LoginCtrl($scope, $window, $rootScope) {
             return;
         }
         sessionStorage.setItem('currentUser', $rootScope.model.email);
+        sessionStorage.setItem('currentUserInfo', JSON.stringify(user));
         $window.location.href = 'index.html';
     }
 }
@@ -28,6 +29,7 @@ function RegisterCtrl($scope, $window, $rootScope, MEMBER) {
             users[$rootScope.model.email] = $rootScope.model;
             localStorage.setItem('users', JSON.stringify(users));
             sessionStorage.setItem('currentUser', $rootScope.model.email);
+            sessionStorage.setItem('currentUserInfo', JSON.stringify($rootScope.model));
             $window.location.href = 'index.html';
             return;
         }
@@ -56,6 +58,8 @@ angular
         $rootScope.model = {
             email: '',
             password: '',
+            userName:'',
+            userLastName:'',
             photo: '',
             role: '',
             data: {
@@ -66,7 +70,8 @@ angular
                 registeredEvents: [],
                 registeredPolls: [],
                 customTypes: []
-            }
+            },
+            isAdmin: false
         };
     }])
     .controller('RegisterCtrl', RegisterCtrl)

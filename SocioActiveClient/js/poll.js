@@ -4,8 +4,12 @@
 
 function PollCtrl($scope, $rootScope, $stateParams, $state, $http, MEMBER) {
 
-    $scope.currentUserId = 2;
+    var currentUser = JSON.parse(sessionStorage.getItem('currentUserInfo'));
+
+    $scope.currentUserEmail = currentUser.email;
     $scope.currentUserName = "Osman Emre";
+    $scope.currentUserIsAdmin = currentUser.isAdmin;
+
     $scope.isVotedTemp = false;
 
     $scope.pollOptionTempList = [];
@@ -15,15 +19,8 @@ function PollCtrl($scope, $rootScope, $stateParams, $state, $http, MEMBER) {
 
     $scope.pollRoles = MEMBER.MEMBER_ROLES;
 
-    $scope.localStoragePollObject = getPollDataFromLocalStorage();
-
-    if ($scope.localStoragePollObject == null) {
-        $scope.localStoragePollObjectCount = 0
-    } else {
-        $scope.localStoragePollObjectCount = Object.keys($scope.localStoragePollObject).length;
-    }
-
     $scope.pollToBeViewed = $stateParams.pollToBeViewed;
+
 
     var initialize = function () {
         $rootScope.localStoragePollModel = {
@@ -45,31 +42,23 @@ function PollCtrl($scope, $rootScope, $stateParams, $state, $http, MEMBER) {
 
     if ($scope.pollToBeViewed != null) {
 
-        $rootScope.localStoragePollModel = $scope.localStoragePollObject[$scope.pollToBeViewed];
+        $scope.localStoragePollObject = getPollListFromLocalStorage();
 
-        $scope.localStoragePollOptionObject = $scope.localStoragePollObject[$scope.pollToBeViewed].pollOptions;
+        $rootScope.localStoragePollModel = $scope.localStoragePollObject[$scope.pollToBeViewed];
 
 
     } else {
 
         initialize();
 
-        $scope.localStoragePollOptionObject = null;
-
         $rootScope.localStoragePollModel.pollId = guid();
-        $rootScope.localStoragePollModel.createdBy = $scope.currentUserId;
+        $rootScope.localStoragePollModel.createdBy = $scope.currentUserEmail;
         $rootScope.localStoragePollModel.createDate = new Date();
         $rootScope.localStoragePollModel.updateDate = new Date();
     }
 
 
     $scope.addPollOption = function () {
-
-        if ($scope.localStoragePollOptionObject == null) {
-            $scope.localStoragePollOptionObjectCounter = Object.keys($scope.localStoragePollModel.pollOptions).length;
-        } else {
-            $scope.localStoragePollOptionObjectCounter = Object.keys($scope.localStoragePollObject[$scope.pollToBeViewed].pollOptions).length;
-        }
 
         var optionID = guid();
 
@@ -90,7 +79,7 @@ function PollCtrl($scope, $rootScope, $stateParams, $state, $http, MEMBER) {
         $rootScope.localStoragePollModel.pollComments.push({
             "commentId": guid(),
             "commentBody": $scope.pollCommentTempList.commentBody,
-            "commentUserId": $scope.currentUserId,
+            "commentUserEmail": $scope.currentUserEmail,
             "commentUserName": $scope.currentUserName, /*TODO Bunu kullanýcýya baðla*/
             "commentDateTime": new Date().getTime()
         });
@@ -99,7 +88,7 @@ function PollCtrl($scope, $rootScope, $stateParams, $state, $http, MEMBER) {
 
     };
 
-    $scope.votePoll = function (optionId, optionName, optionDetail, optionVoteCount, votedBy) {
+    $scope.votePoll = function (optionId, optionName, optionDetail, optionVoteCount) {
 
         $rootScope.localStoragePollModel.pollOptions[optionId] = {
 
@@ -111,7 +100,7 @@ function PollCtrl($scope, $rootScope, $stateParams, $state, $http, MEMBER) {
         };
 
         $scope.isVotedTemp = true;
-        $rootScope.localStoragePollModel.pollParticipantList.push(votedBy);
+        $rootScope.localStoragePollModel.pollParticipantList.push($scope.currentUserEmail);
 
         if ($scope.pollToBeViewed != null) {
             $scope.savePollData();
@@ -120,9 +109,9 @@ function PollCtrl($scope, $rootScope, $stateParams, $state, $http, MEMBER) {
 
     };
 
-    $scope.isCurrentUserVoted = function (currentUser) {
+    $scope.isCurrentUserVoted = function () {
 
-        if ($scope.isVotedTemp == true || $rootScope.localStoragePollModel.pollParticipantList.indexOf(currentUser) != -1) {
+        if ($scope.isVotedTemp == true || $rootScope.localStoragePollModel.pollParticipantList.indexOf($scope.currentUserEmail) != -1) {
 
             return true;
         } else {
@@ -134,13 +123,17 @@ function PollCtrl($scope, $rootScope, $stateParams, $state, $http, MEMBER) {
 
     $scope.savePollData = function () {
 
-        var pollOption = getPollDataFromLocalStorage();
+        var pollOption = getPollListFromLocalStorage();
         pollOption[$rootScope.localStoragePollModel.pollId] = $rootScope.localStoragePollModel;
         localStorage.setItem('pollData', JSON.stringify(pollOption));
         if ($scope.pollToBeViewed == null) {
+
+            alert("Your poll created!");
             $state.go('activity.polls', {'pollToBeViewed': $rootScope.localStoragePollModel.pollId});
+
         } else {
 
+            alert("Your changes are saved!");
             $scope.reloadState();
         }
 
@@ -148,7 +141,7 @@ function PollCtrl($scope, $rootScope, $stateParams, $state, $http, MEMBER) {
     };
 
 
-    $scope.isPollDisabled = function (currentUserId, isAdmin) {
+    $scope.isPollDisabled = function () {
 
         if ($scope.pollToBeViewed == null) {
 
@@ -156,7 +149,7 @@ function PollCtrl($scope, $rootScope, $stateParams, $state, $http, MEMBER) {
 
         } else {
 
-            if ((currentUserId == $scope.localStoragePollObject[$scope.pollToBeViewed].createdBy) || isAdmin) {
+            if (($scope.currentUserEmail == $scope.localStoragePollObject[$scope.pollToBeViewed].createdBy) ||  $scope.currentUserIsAdmin) {
                 return false;
             } else {
                 return true;
@@ -248,7 +241,7 @@ function PollCtrl($scope, $rootScope, $stateParams, $state, $http, MEMBER) {
     };
 }
 
-function getPollDataFromLocalStorage() {
+function getPollListFromLocalStorage() {
     var pollData = JSON.parse(localStorage.getItem('pollData'));
     if (pollData == null) {
         pollData = {};
@@ -274,7 +267,7 @@ function PollTabCtrl($scope) {
 }
 
 function PollNavigationCtrl($scope) {
-    $scope.localStoragePollObjectForNavigation = getPollDataFromLocalStorage();
+    $scope.localStoragePollObjectForNavigation = getPollListFromLocalStorage();
 }
 
 

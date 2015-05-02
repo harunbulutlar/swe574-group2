@@ -20,7 +20,7 @@
                             ng-model="$root.localStoragePollModel.pollDescription"
                             placeholder="Enter some description of your event"
                             class="form-control"
-                            ng-disabled="isPollDisabled(main.userId, main.isAdmin)"></textarea>
+                            ng-disabled="isPollDisabled()"></textarea>
                     </div>
 
                     <div class="form-group"><label>Just For: </label>
@@ -29,17 +29,17 @@
                                                           ng-checked="true"
                                                           name="privacyRadios"
                                                           ng-model="$root.localStoragePollModel.pollPrivacy"
-                                                          ng-disabled="isPollDisabled(main.userId, main.isAdmin)">Friends</label>
+                                                          ng-disabled="isPollDisabled()">Friends</label>
                         </div>
                         <div class=" radio"><label> <input type="radio" value="public" id="publicRadio"
                                                            name="privacyRadios"
                                                            ng-model="$root.localStoragePollModel.pollPrivacy"
-                                                           ng-disabled="isPollDisabled(main.userId, main.isAdmin)">Public</label>
+                                                           ng-disabled="isPollDisabled()">Public</label>
                         </div>
                         <select class="form-control MultiSelect" data-placeholder="Roles"
                                 ng-model="$root.localStoragePollModel.pollRoles"
                                 ng-options="roles for roles in pollRoles" multiple="multiple" multiselect-dropdown
-                                ng-disabled="isPollDisabled(main.userId, main.isAdmin)">
+                                ng-disabled="isPollDisabled()">
                         </select>
                     </div>
 
@@ -47,7 +47,7 @@
 
                         <div class='input-group date'><input type='datetime' class='form-control' date-time
                                                              ng-model='$root.localStoragePollModel.endDate' view='date'
-                                                             ng-disabled="isPollDisabled(main.userId, main.isAdmin)"
+                                                             ng-disabled="isPollDisabled()"
                                                              required=""><span
                                 class='input-group-addon'><i class='fa fa-calendar'></i></span></div>
 
@@ -67,13 +67,13 @@
                                             <form name='vote'>
 
                                                 <a class="btn btn-xs btn-white pull-right"
-                                                   ng-click="votePoll(option.optionId, option.optionName, option.optionDetail, option.optionVoteCount, main.userId)"
-                                                   ng-hide="isCurrentUserVoted(main.userId)"><i
+                                                   ng-click="votePoll(option.optionId, option.optionName, option.optionDetail, option.optionVoteCount)"
+                                                   ng-hide="isCurrentUserVoted()"><i
                                                         class="fa fa-thumbs-up"></i>Vote</a>
 
                                                 <a class="btn btn-xs btn-white pull-right"
-                                                   ng-class=" {disabled: isCurrentUserVoted(main.userId)}"
-                                                   ng-show="isCurrentUserVoted(main.userId)"><i
+                                                   ng-class=" {disabled: isCurrentUserVoted()}"
+                                                   ng-show="isCurrentUserVoted()"><i
                                                         class="fa fa-thumbs-up"></i>{{ option.optionVoteCount }}</a>
 
                                             </form>
@@ -90,7 +90,7 @@
                             </div>
 
                             <div class="form-group"
-                                 ng-hide="isPollDisabled(main.userId, main.isAdmin)">
+                                 ng-hide="isPollDisabled()">
 
                                 <form name='addOption' ng-submit="addPollOption()">
 

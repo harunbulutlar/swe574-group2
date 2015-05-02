@@ -1,8 +1,10 @@
 function MainCtrl() {
+    var currentUser = JSON.parse(sessionStorage.getItem('currentUserInfo'));
     this.userName = 'Osman Emre';
     this.userId = 1;
     this.isAdmin = false;
-    this.role = "Master Student"
+    this.role = currentUser.role;
+    this.email = currentUser.email;
 }
 
 function CustomTypesCtrl($scope, $modal, $rootScope) {
