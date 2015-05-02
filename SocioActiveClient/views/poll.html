@@ -9,40 +9,55 @@
                     <div ibox-tools></div>
                 </div>
                 <div class="ibox-content">
-                    <div class="radio"><label> <input type="radio" value="friends" id="friendsRadio" ng-checked="true"
-                                                      name="privacyRadios"
-                                                      ng-model="$root.localStoragePollModel.pollPrivacy"
-                                                      ng-disabled="isDisabled(main.userId, main.isAdmin)">Friends</label>
-                    </div>
-                    <div class=" radio"><label> <input type="radio" value="public" id="publicRadio" name="privacyRadios"
-                                                       ng-model="$root.localStoragePollModel.pollPrivacy"
-                                                       ng-disabled="isDisabled(main.userId, main.isAdmin)">Public</label>
-                    </div>
                     <div class=" form-group"><label>Title</label> <input type="text"
                                                                          ng-model="$root.localStoragePollModel.pollTitle"
                                                                          placeholder="Enter a Title for your event"
                                                                          class="form-control"
-                                                                         ng-disabled="isDisabled(main.userId, main.isAdmin)">
+                                                                         ng-disabled="isPollDisabled(main.userId, main.isAdmin)"
+                                                                         required="">
                     </div>
                     <div class="form-group"><label>Detail</label> <textarea
                             ng-model="$root.localStoragePollModel.pollDescription"
                             placeholder="Enter some description of your event"
                             class="form-control"
-                            ng-disabled="isDisabled(main.userId, main.isAdmin)"></textarea>
+                            ng-disabled="isPollDisabled(main.userId, main.isAdmin)"></textarea>
                     </div>
+
+                    <div class="form-group"><label>Just For: </label>
+
+                        <div class="radio"><label> <input type="radio" value="friends" id="friendsRadio"
+                                                          ng-checked="true"
+                                                          name="privacyRadios"
+                                                          ng-model="$root.localStoragePollModel.pollPrivacy"
+                                                          ng-disabled="isPollDisabled(main.userId, main.isAdmin)">Friends</label>
+                        </div>
+                        <div class=" radio"><label> <input type="radio" value="public" id="publicRadio"
+                                                           name="privacyRadios"
+                                                           ng-model="$root.localStoragePollModel.pollPrivacy"
+                                                           ng-disabled="isPollDisabled(main.userId, main.isAdmin)">Public</label>
+                        </div>
+                        <select class="form-control MultiSelect" data-placeholder="Roles"
+                                ng-model="$root.localStoragePollModel.pollRoles"
+                                ng-options="roles for roles in pollRoles" multiple="multiple" multiselect-dropdown
+                                ng-disabled="isPollDisabled(main.userId, main.isAdmin)">
+                        </select>
+                    </div>
+
                     <div class="form-group"><label>End Date</label>
 
                         <div class='input-group date'><input type='datetime' class='form-control' date-time
                                                              ng-model='$root.localStoragePollModel.endDate' view='date'
-                                                             ng-disabled="isDisabled(main.userId, main.isAdmin)"><span
+                                                             ng-disabled="isPollDisabled(main.userId, main.isAdmin)"
+                                                             required=""><span
                                 class='input-group-addon'><i class='fa fa-calendar'></i></span></div>
 
                     </div>
 
                     <div class="form-poll"><label>Options</label>
 
+
                         <div class="form-group">
-                            <div class="panel">
+                            <div class="panel pre-scrollable">
                                 <div class="panel-body" ng-hide="$root.localStoragePollModel.pollOptions == {}">
                                     <ul class="list-group"
                                         ng-repeat="option in $root.localStoragePollModel.pollOptions">
@@ -74,10 +89,8 @@
                                 </div>
                             </div>
 
-                            <!--TODO: add pollId to pollDataLocalStorage-->
-
                             <div class="form-group"
-                                 ng-hide="isDisabled(main.userId, main.isAdmin)">
+                                 ng-hide="isPollDisabled(main.userId, main.isAdmin)">
 
                                 <form name='addOption' ng-submit="addPollOption()">
 
@@ -136,14 +149,14 @@
 
                     <div class="ibox-content">
                         <tabset>
-                            <tab ng-click="selectTab(1)" active="isSelected(1)">
+                            <tab ng-click="selectTab(1)">
                                 <tab-heading>
                                     Comments
                                 </tab-heading>
 
                             </tab>
 
-                            <tab ng-click="selectTab(2)" active="isSelected(2)">
+                            <tab ng-click="selectTab(2)">
                                 <tab-heading>
                                     Results
                                 </tab-heading>
@@ -156,30 +169,33 @@
 
                         <div class='form-group' ng-show="isSelected(1)">
 
-                            <div class="feed-activity-list"
-                                 ng-repeat="comment in $root.localStoragePollModel.pollComments">
+                            <div class="panel pre-scrollable">
+                                <div class="feed-activity-list"
+                                     ng-repeat="comment in $root.localStoragePollModel.pollComments">
 
-                                <div class="feed-element">
+                                    <div class="feed-element">
 
-                                    <a ui-sref="profile" class="pull-left">
-                                        <img alt="image" class="img-circle" src="img/a5.jpg">
-                                    </a>
+                                        <a ui-sref="profile" class="pull-left">
+                                            <img alt="image" class="img-circle" src="img/a5.jpg">
+                                        </a>
 
-                                    <div class="media-body ">
-                                        <small class="pull-right">{{pollCommentDateDifference(comment.commentDateTime)}}
-                                            ago
-                                        </small>
-                                        <strong>{{comment.commentUserName}}</strong> posted a message
-                                        <br>
-                                        <small class="text-muted">{{comment.commentDateTime | date:'yyyy-MM-dd HH:mm'}}
-                                        </small>
-                                        <div class="well">
-                                            {{comment.commentBody}}
+                                        <div class="media-body ">
+                                            <small class="pull-right">
+                                                {{pollCommentDateDifference(comment.commentDateTime)}}
+                                                ago
+                                            </small>
+                                            <strong>{{comment.commentUserName}}</strong> posted a message
+                                            <br>
+                                            <small class="text-muted">{{comment.commentDateTime | date:'yyyy-MM-dd HH:mm'}}
+                                            </small>
+                                            <div class="well">
+                                                {{comment.commentBody}}
+                                            </div>
                                         </div>
+
                                     </div>
 
                                 </div>
-
                             </div>
 
                             <form name='addComment' ng-submit="addPollComment()">
