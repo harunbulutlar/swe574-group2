@@ -14,7 +14,6 @@ function PollCtrl($scope, $rootScope, $stateParams, $state, $http, MEMBER) {
     $scope.pollTagTempId = [];
 
     $scope.pollRoles = MEMBER.MEMBER_ROLES;
-    $rootScope.localStoragePollModel.pollRoles = [$scope.pollRoles[0]];
 
     $scope.localStoragePollObject = getPollDataFromLocalStorage();
 
