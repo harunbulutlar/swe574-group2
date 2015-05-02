@@ -19,54 +19,54 @@
 
 <body class="gray-bg">
 
-    <div class="middle-box text-center loginscreen   animated fadeInDown">
+<div class="middle-box text-center loginscreen   animated fadeInDown">
+    <div>
         <div>
-            <div>
 
-                <h1 class="md-logo-name logo-name">SocioActive</h1>
+            <h1 class="md-logo-name logo-name">SocioActive</h1>
 
-            </div>
-            <h3>Register to SocioActive</h3>
-            <p>Create account to see it in action.</p>
-            <form class="m-t" role="form" ng-submit="submit()" ng-controller="RegisterCtrl">
-                <div class="form-group">
-                    <input type="email" class="form-control" ng-model="$root.model.email"   placeholder="Email" required="">
-                </div>
-                <div class="form-group">
-                    <input type="password" class="form-control" ng-model="$root.model.password"  placeholder="Password" required="">
-                </div>
-                <button id="register" type="submit" class="btn btn-primary block full-width m-b">Register</button>
-
-                <p class="text-muted text-center"><small>Already have an account?</small></p>
-                <a class="btn btn-sm btn-white btn-block" href="login.html">Login</a>
-            </form>
         </div>
+        <h3>Register to SocioActive</h3>
+        <p>Create account to see it in action.</p>
+        <form class="m-t" role="form" ng-submit="submit()" ng-controller="RegisterCtrl">
+            <div class="form-group">
+                <input type="email" class="form-control" ng-model="$root.model.email"   placeholder="Email" required="">
+            </div>
+            <div class="form-group">
+                <input type="password" class="form-control" ng-model="$root.model.password"  placeholder="Password" required="">
+            </div>
+            <button id="register" type="submit" class="btn btn-primary block full-width m-b">Register</button>
+
+            <p class="text-muted text-center"><small>Already have an account?</small></p>
+            <a class="btn btn-sm btn-white btn-block" href="login.html">Login</a>
+        </form>
     </div>
+</div>
 
-    <!-- jQuery and Bootstrap -->
-    <script src="js/jquery/jquery-2.1.1.min.js"></script>
-    <script src="js/plugins/jquery-ui/jquery-ui.js"></script>
-    <script src="js/bootstrap/bootstrap.min.js"></script>
+<!-- jQuery and Bootstrap -->
+<script src="js/jquery/jquery-2.1.1.min.js"></script>
+<script src="js/plugins/jquery-ui/jquery-ui.js"></script>
+<script src="js/bootstrap/bootstrap.min.js"></script>
 
-    <!-- Main Angular scripts-->
-    <script src="js/angular/angular.min.js"></script>
-    <script src="js/angular/angular-route.min.js"></script>
-    <script src="js/plugins/oclazyload/dist/ocLazyLoad.min.js"></script>
-    <script src="js/ui-router/angular-ui-router.min.js"></script>
-    <script src="js/bootstrap/ui-bootstrap-tpls-0.12.0.min.js"></script>
+<!-- Main Angular scripts-->
+<script src="js/angular/angular.min.js"></script>
+<script src="js/angular/angular-route.min.js"></script>
+<script src="js/plugins/oclazyload/dist/ocLazyLoad.min.js"></script>
+<script src="js/ui-router/angular-ui-router.min.js"></script>
+<script src="js/bootstrap/ui-bootstrap-tpls-0.12.0.min.js"></script>
 
-    <!-- iCheck -->
+<!-- iCheck -->
 
-    <script src="js/plugins/iCheck/icheck.min.js"></script>
-    <script>
-        $(document).ready(function(){
-            $('.i-checks').iCheck({
-                checkboxClass: 'icheckbox_square-green',
-                radioClass: 'iradio_square-green'
-            });
+<script src="js/plugins/iCheck/icheck.min.js"></script>
+<script>
+    $(document).ready(function(){
+        $('.i-checks').iCheck({
+            checkboxClass: 'icheckbox_square-green',
+            radioClass: 'iradio_square-green'
         });
-    </script>
-    <script src="js/login.js"></script>
+    });
+</script>
+<script src="js/login.js"></script>
 </body>
 
 </html>

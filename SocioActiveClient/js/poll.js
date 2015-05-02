@@ -2,7 +2,7 @@
  * Created by Osman Emre on 22.04.2015.
  */
 
-function PollCtrl($scope, $rootScope, $stateParams, $state, $http) {
+function PollCtrl($scope, $rootScope, $stateParams, $state, $http, MEMBER) {
 
     $scope.currentUserId = 2;
     $scope.currentUserName = "Osman Emre";
@@ -12,6 +12,9 @@ function PollCtrl($scope, $rootScope, $stateParams, $state, $http) {
     $scope.pollCommentTempList = [];
     $scope.pollTagTempList = [];
     $scope.pollTagTempId = [];
+
+    $scope.pollRoles = MEMBER.MEMBER_ROLES;
+    $rootScope.localStoragePollModel.pollRoles = [$scope.pollRoles[0]];
 
     $scope.localStoragePollObject = getPollDataFromLocalStorage();
 
@@ -36,7 +39,8 @@ function PollCtrl($scope, $rootScope, $stateParams, $state, $http) {
             "endDate": "",
             "updateDate": "",
             "pollComments": [],
-            "pollTags": {}
+            "pollTags": {},
+            "pollRoles": []
         };
     };
 
@@ -145,7 +149,7 @@ function PollCtrl($scope, $rootScope, $stateParams, $state, $http) {
     };
 
 
-    $scope.isDisabled = function (currentUserId, isAdmin) {
+    $scope.isPollDisabled = function (currentUserId, isAdmin) {
 
         if ($scope.pollToBeViewed == null) {
 
@@ -233,11 +237,11 @@ function PollCtrl($scope, $rootScope, $stateParams, $state, $http) {
 
         }else if (dateDifference(date) < 1440){
 
-            return Math.round(dateDifference(date) / (1000 * 60 * 60)) + " hours";
+            return Math.round(dateDifference(date) / (60)) + " hours";
 
         }else{
 
-            return Math.round(dateDifference(date) / (1000 * 60 * 60 * 24)) + " days";
+            return Math.round(dateDifference(date) / (60 * 24)) + " days";
         }
 
 
@@ -329,7 +333,8 @@ angular
             "endDate": "",
             "updateDate": "",
             "pollComments": [],
-            "pollTags": {}
+            "pollTags": {},
+            "pollRoles": []
         };
 
     }]);

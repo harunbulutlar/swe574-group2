@@ -53,6 +53,7 @@ function getUsersFromLocal()
 }
 angular
     .module('socioactiveStart')
+    .constant('MEMBER', {"MEMBER_ROLES": ["Undergraduate", "Graduate", "Postgraduate", "Prep Student", "Teaching Assistant", "Research Assistant", "Alumni", "Faculty Staff", "Other"]})
     .run(["$rootScope", function ($rootScope) {
         $rootScope.model = {
             email:'',
