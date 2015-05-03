@@ -11,14 +11,14 @@
                 <div class="ibox-content">
                     <div class=" form-group"><label>Title</label> <input type="text"
                                                                          ng-model="$root.localStoragePollModel.pollTitle"
-                                                                         placeholder="Enter a Title for your event"
+                                                                         placeholder="Enter a Title for your poll"
                                                                          class="form-control"
                                                                          ng-disabled="isPollDisabled(main.userId, main.isAdmin)"
                                                                          required="">
                     </div>
                     <div class="form-group"><label>Detail</label> <textarea
                             ng-model="$root.localStoragePollModel.pollDescription"
-                            placeholder="Enter some description of your event"
+                            placeholder="Enter some description for your poll"
                             class="form-control"
                             ng-disabled="isPollDisabled()"></textarea>
                     </div>
@@ -57,8 +57,8 @@
 
 
                         <div class="form-group">
-                            <div class="panel pre-scrollable">
-                                <div class="panel-body" ng-hide="$root.localStoragePollModel.pollOptions == {}">
+                            <div class="panel pre-scrollable" ng-hide="isObjectEmpty($root.localStoragePollModel.pollOptions)">
+                                <div class="panel-body">
                                     <ul class="list-group"
                                         ng-repeat="option in $root.localStoragePollModel.pollOptions">
 

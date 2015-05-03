@@ -69,7 +69,9 @@ angular
                 registeredGroups: [],
                 registeredEvents: [],
                 registeredPolls: [],
-                customTypes: []
+                customTypes: [],
+                friends:[],
+                relatedContext: []
             },
             isAdmin: false
         };

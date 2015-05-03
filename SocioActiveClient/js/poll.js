@@ -58,6 +58,7 @@ function PollCtrl($scope, $rootScope, $stateParams, $state, $http, MEMBER) {
     }
 
 
+
     $scope.addPollOption = function () {
 
         var optionID = guid();
@@ -122,6 +123,27 @@ function PollCtrl($scope, $rootScope, $stateParams, $state, $http, MEMBER) {
     };
 
     $scope.savePollData = function () {
+
+        if(! $rootScope.localStoragePollModel.pollTitle){
+
+            alert("You need to enter a title for your poll!")
+            return;
+
+        }
+
+        if(! $rootScope.localStoragePollModel.pollDescription){
+
+            alert("You need to enter a description for your poll!")
+            return;
+
+        }
+
+        if($scope.isObjectEmpty($rootScope.localStoragePollModel.pollOptions)){
+
+            alert("You need to add options for your poll!")
+            return;
+
+        }
 
         var pollOption = getPollListFromLocalStorage();
         pollOption[$rootScope.localStoragePollModel.pollId] = $rootScope.localStoragePollModel;
@@ -237,6 +259,27 @@ function PollCtrl($scope, $rootScope, $stateParams, $state, $http, MEMBER) {
         }
 
 
+
+    };
+
+    $scope.isObjectEmpty = function(obj){
+
+        // null and undefined are "empty"
+        if (obj == null) return true;
+
+        // Assume if it has a length property with a non-zero value
+        // that that property is correct.
+        if (obj.length > 0)    return false;
+        if (obj.length === 0)  return true;
+
+        // Otherwise, does it have any properties of its own?
+        // Note that this doesn't handle
+        // toString and valueOf enumeration bugs in IE < 9
+        for (var key in obj) {
+            if (hasOwnProperty.call(obj, key)) return false;
+        }
+
+        return true;
 
     };
 }
