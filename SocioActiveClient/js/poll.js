@@ -21,6 +21,7 @@ function PollCtrl($scope, $rootScope, $stateParams, $state, $http, MEMBER) {
 
     $scope.pollToBeViewed = $stateParams.pollToBeViewed;
 
+    $scope.tagContextList = ["Location", "city/town/village", "aa", "bb", "cc", "dd"];
 
     var initialize = function () {
         $rootScope.localStoragePollModel = {
@@ -58,7 +59,6 @@ function PollCtrl($scope, $rootScope, $stateParams, $state, $http, MEMBER) {
     }
 
 
-
     $scope.addPollOption = function () {
 
         var optionId = guid();
@@ -87,7 +87,7 @@ function PollCtrl($scope, $rootScope, $stateParams, $state, $http, MEMBER) {
 
     };
 
-    $scope.removePollOption = function(optionId){
+    $scope.removePollOption = function (optionId) {
 
         delete $rootScope.localStoragePollModel.pollOptions[optionId];
 
@@ -165,21 +165,21 @@ function PollCtrl($scope, $rootScope, $stateParams, $state, $http, MEMBER) {
 
     $scope.savePollData = function () {
 
-        if(! $rootScope.localStoragePollModel.pollTitle){
+        if (!$rootScope.localStoragePollModel.pollTitle) {
 
             alert("You need to enter a title for your poll!")
             return;
 
         }
 
-        if(! $rootScope.localStoragePollModel.pollDescription){
+        if (!$rootScope.localStoragePollModel.pollDescription) {
 
             alert("You need to enter a description for your poll!")
             return;
 
         }
 
-        if($scope.isObjectEmpty($rootScope.localStoragePollModel.pollOptions)){
+        if ($scope.isObjectEmpty($rootScope.localStoragePollModel.pollOptions)) {
 
             alert("You need to add options for your poll!")
             return;
@@ -212,7 +212,7 @@ function PollCtrl($scope, $rootScope, $stateParams, $state, $http, MEMBER) {
 
         } else {
 
-            if (($scope.currentUserEmail == $scope.localStoragePollObject[$scope.pollToBeViewed].createdBy) ||  $scope.currentUserIsAdmin) {
+            if (($scope.currentUserEmail == $scope.localStoragePollObject[$scope.pollToBeViewed].createdBy) || $scope.currentUserIsAdmin) {
                 return false;
             } else {
                 return true;
@@ -246,16 +246,24 @@ function PollCtrl($scope, $rootScope, $stateParams, $state, $http, MEMBER) {
 
             var scoreAverage = calculateAverage(scores);
             var scoreStandardDeviation = calculateStandardDeviation(scores);
-            var scoreTag = scoreAverage - scoreStandardDeviation/2;
+            var scoreTag = scoreAverage - scoreStandardDeviation / 2;
 
             var tagContextFilteredData = tagContextRawData.filter(function (contextFilter) {
-                return (contextFilter.name != '') && (contextFilter.score >= scoreTag);
+                if (contextFilter.hasOwnProperty('notable') && contextFilter.notable.name != '') {
+
+                    return (contextFilter.name != '') && (contextFilter.score >= scoreTag);
+                }
             });
 
             angular.forEach(tagContextFilteredData, function (item) {
                 if (item.hasOwnProperty('notable')) {
                     var tagId = guid();
-                    contexts.push({id: tagId, name: item.name + '<p style= "font-style: italic" class="pull-right">' + item.notable.name, score: item.score});
+                    contexts.push({
+                        id: tagId,
+                        name: item.name + '<p style= "font-style: italic" class="pull-right">' + item.notable.name,
+                        score: item.score
+                    });
+
                     $scope.pollTagTempList[tagId] = {
                         tagId: tagId,
                         tagName: item.name,
@@ -270,8 +278,54 @@ function PollCtrl($scope, $rootScope, $stateParams, $state, $http, MEMBER) {
 
     };
 
+    $scope.getTagContextDetail = function (currentTopic) {
+
+        var topic_id = currentTopic;
+
+        return $http.get('https://www.googleapis.com/freebase/v1/topic' + topic_id, {
+            params: {
+                key: 'AIzaSyBfJNRIjAao3J0PZeO9ALipSJ_k9NjETwc',
+                filter: '/location'
+            }
+        }).then(function (result) {
+
+            $scope.denemeData1 = result.data;
+
+            return $scope.denemeData1;
+
+        });
+    };
+
 
     $scope.addPollTag = function (tagId) {
+
+        $rootScope.localStoragePollModel.pollTags[tagId] = $scope.pollTagTempList[tagId];
+
+        $scope.pollTagTempId = [];
+
+        if ($scope.pollToBeViewed != null) {
+
+            /*saveData($rootScope.localStoragePollModel.pollId, $rootScope.localStoragePollModel);*/
+
+            var pollList = getPollListFromLocalStorage();
+            var tempPoll = pollList[$rootScope.localStoragePollModel.pollId];
+            tempPoll.pollTags[tagId] = $rootScope.localStoragePollModel.pollTags[tagId];
+            pollList[$rootScope.localStoragePollModel.pollId] = tempPoll;
+            localStorage.setItem('pollData', JSON.stringify(pollList));
+
+        }
+
+    };
+
+    $scope.addManualPollTag = function(tagName, tagContext){
+
+        var tagId = guid();
+
+        $scope.pollTagTempList[tagId] = {
+            tagId: tagId,
+            tagName: tagName,
+            tagContext: tagContext
+        };
 
         $rootScope.localStoragePollModel.pollTags[tagId] = $scope.pollTagTempList[tagId];
 
@@ -310,24 +364,23 @@ function PollCtrl($scope, $rootScope, $stateParams, $state, $http, MEMBER) {
     };
 
     $scope.pollCommentDateDifference = function (date) {
-        if(dateDifference(date) <  60){
+        if (dateDifference(date) < 60) {
 
             return dateDifference(date) + " mins";
 
-        }else if (dateDifference(date) < 1440){
+        } else if (dateDifference(date) < 1440) {
 
             return Math.round(dateDifference(date) / (60)) + " hours";
 
-        }else{
+        } else {
 
             return Math.round(dateDifference(date) / (60 * 24)) + " days";
         }
 
 
-
     };
 
-    $scope.isObjectEmpty = function(obj){
+    $scope.isObjectEmpty = function (obj) {
 
         // null and undefined are "empty"
         if (obj == null) return true;
@@ -403,7 +456,7 @@ function calculateAverage(data) {
     return avg;
 }
 
-function dateDifference (date){
+function dateDifference(date) {
 
     var curDate = new Date();
 
@@ -415,7 +468,7 @@ function dateDifference (date){
 
 }
 
-function saveTempData(pollId, pollData, pollAttribute){
+function saveTempData(pollId, pollData, pollAttribute) {
 
 }
 

@@ -69,7 +69,8 @@
 
                                                 <a class="pull-right btn btn-white btn-xs" data-nodrag
                                                    ng-click="removePollOption(option.optionId)"
-                                                   ng-show="(isVotedTemp == false) && (pollToBeViewed == null)"><span class="fa fa-trash"></span></a>
+                                                   ng-show="(isVotedTemp == false) && (pollToBeViewed == null)"><span
+                                                        class="fa fa-trash"></span></a>
 
                                                 <a class="btn btn-xs btn-white pull-right"
                                                    ng-click="votePoll(option.optionId, option.optionName, option.optionDetail, option.optionVoteCount)"
@@ -136,9 +137,17 @@
                             <input type="text" ng-model="pollTagTempId"
                                    typeahead="contextHead.id as contextHead.name for contextHead in getTagContext($viewValue)"
                                    class="form-control" typeahead-loading="loadingLocations" typeahead-min-length="3"
-                                   typeahead-wait-ms="300" typeahead-on-select="addPollTag(pollTagTempId)">
+                                   typeahead-wait-ms="300" typeahead-on-select="addPollTag(pollTagTempId)"
+                                   id="semanticTagName" placeholder="Enter tag...">
 
                             <i ng-show="loadingLocations" class="glyphicon glyphicon-refresh"></i>
+
+
+                            <input type="text" ng-model="pollContextTempId"
+                                   typeahead="contextHead for contextHead in tagContextList | filter:$viewValue | limitTo:10"
+                                   class="form-control" typeahead-on-select="addManualPollTag(pollTagTempId, pollContextTempId)"
+                                   placeholder="Enter tag context..." ng-show="pollTagTempId != ''">
+
 
                         </div>
 
@@ -191,7 +200,8 @@
                                             </small>
                                             <strong>{{comment.commentUserName}}</strong> posted a message
                                             <br>
-                                            <small class="text-muted">{{comment.commentDateTime | date:'yyyy-MM-dd HH:mm'}}
+                                            <small class="text-muted">{{comment.commentDateTime | date:'yyyy-MM-dd
+                                                HH:mm'}}
                                             </small>
                                             <div class="well">
                                                 {{comment.commentBody}}
