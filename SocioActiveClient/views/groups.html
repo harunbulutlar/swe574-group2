@@ -1,10 +1,21 @@
-<!DOCTYPE html>
-<html>
-<head lang="en">
-    <meta charset="UTF-8">
-    <title></title>
-</head>
-<body>
-
-</body>
-</html>
+<div ng-controller="CurrentGroupsCtrl">
+    <div class="col-lg-6">
+        <div class="ibox float-e-margins">
+            <div class="ibox-content">
+                <div class="feed-activity-list" ng-repeat="group in currentGroups()">
+                    <div class="feed-element">
+                        <div class="media-body ">
+                            <strong>{{group.owner.email}}</strong> posted a new group => {{group.title}} <br><button class="btn btn-primary" ng-click="show()">show</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-6">
+        <div class="ibox float-e-margins">
+            <div class="ibox-content">
+            </div>
+        </div>
+    </div>
+</div>

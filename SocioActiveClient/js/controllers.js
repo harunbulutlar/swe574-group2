@@ -69,15 +69,21 @@ function CustomTypesCtrl($scope, $modal, $rootScope) {
     $scope.saveChanges = function () {
 
         var returnObject = $scope.getCurrentUserData();
-        returnObject.currentUser.data.customTypes = $rootScope.customTypes;
-        returnObject.currentUser.data.groups.push(
-            {
-                title: $scope.groupTitle,
-                description: $scope.groupDescription,
-                fields: $scope.userFields
-            }
-        );
-        localStorage.setItem('users', JSON.stringify(returnObject.users));
+        var createdGroup =
+        {
+            owner:returnObject.currentUser,
+            title: $scope.groupTitle,
+            description: $scope.groupDescription,
+            fields: $scope.userFields
+
+        };
+        var groups = JSON.parse(localStorage.getItem('groups'));
+        if(groups == null)
+        {
+            groups = [];
+        }
+        groups.push(createdGroup);
+        localStorage.setItem('groups', JSON.stringify(groups));
     };
 
     $scope.getCurrentUserData = function () {
@@ -153,6 +159,21 @@ function NodeInfoCtrl($scope,$rootScope) {
     };
 
     $scope.types = $rootScope.primitiveTypes;
+}
+
+function CurrentGroupsCtrl($scope) {
+
+    $scope.currentGroups = function () {
+        if($scope.currentGroupsInternal == '')
+        {
+            $scope.currentGroupsInternal = JSON.parse(localStorage.getItem('groups'));
+        }
+        return $scope.currentGroupsInternal;
+    };
+    $scope.show = function () {
+
+    };
+    $scope.currentGroupsInternal = '';
 }
 
 function GoogleMaps($scope, $modalInstance) {
@@ -310,6 +331,7 @@ angular
     .controller('GoogleMaps', GoogleMaps)
     .controller('TypeTemplateCtrl', TypeTemplateCtrl)
     .controller('NodeInfoCtrl', NodeInfoCtrl)
+    .controller('CurrentGroupsCtrl', CurrentGroupsCtrl)
     .run(["$templateCache", "$rootScope", function ($templateCache, $rootScope) {
         $rootScope.primitiveTypes = [
             {name: 'Enumeration'},

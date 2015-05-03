@@ -40,7 +40,32 @@ function config($stateProvider, $urlRouterProvider, $ocLazyLoadProvider) {
         .state('activity.groups', {
             url: "/inbox",
             templateUrl: "views/groups.html",
-            data: { pageTitle: 'Mail Inbox' }
+            data: { pageTitle: 'Current Groups' },
+            resolve: {
+                loadPlugin: function ($ocLazyLoad) {
+                    return $ocLazyLoad.load([
+                        {
+                            name: 'datePicker',
+                            files: ['css/plugins/datapicker/angular-datapicker.css','js/plugins/datapicker/datePicker.js']
+                        },
+                        {
+                            files: ['js/plugins/jasny/jasny-bootstrap.min.js']
+                        },
+                        {
+                            name: 'ui.tree',
+                            files: ['css/plugins/uiTree/angular-ui-tree.min.css','js/plugins/uiTree/angular-ui-tree.min.js']
+                        },
+                        {
+                            name: 'ngTagsInput',
+                            files: ['css/plugins/ngTags/ng-tags-input.css','js/plugins/ngTags/ng-tags-input.js']
+                        },
+                        {
+                            name: 'ui.select',
+                            files: ['css/plugins/ui-select/select.css','js/plugins/ui-select/select.js']
+                        }
+                    ]);
+                }
+            }
         })
         .state('activity.events', {
             url: "/email_view",
