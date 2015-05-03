@@ -57,7 +57,8 @@
 
 
                         <div class="form-group">
-                            <div class="panel pre-scrollable" ng-hide="isObjectEmpty($root.localStoragePollModel.pollOptions)">
+                            <div class="panel pre-scrollable"
+                                 ng-hide="isObjectEmpty($root.localStoragePollModel.pollOptions)">
                                 <div class="panel-body">
                                     <ul class="list-group"
                                         ng-repeat="option in $root.localStoragePollModel.pollOptions">
@@ -65,6 +66,10 @@
                                         <li class="list-group-item">
 
                                             <form name='vote'>
+
+                                                <a class="pull-right btn btn-white btn-xs" data-nodrag
+                                                   ng-click="removePollOption(option.optionId)"
+                                                   ng-show="(isVotedTemp == false) && (pollToBeViewed == null)"><span class="fa fa-trash"></span></a>
 
                                                 <a class="btn btn-xs btn-white pull-right"
                                                    ng-click="votePoll(option.optionId, option.optionName, option.optionDetail, option.optionVoteCount)"
@@ -96,7 +101,7 @@
 
                                     <input type="text" ng-model="pollOptionTempList.optionName"
                                            placeholder="Add an option for your poll"
-                                           class="form-control">
+                                           class="form-control" required="">
                                     <input type="text" ng-model="pollOptionTempList.optionDetail"
                                            placeholder="Add a definiton for your option"
                                            class="form-control">
@@ -202,7 +207,7 @@
 
                                 <textarea ng-model="pollCommentTempList.commentBody"
                                           placeholder="Post anything on your mind!"
-                                          class="form-control"></textarea>
+                                          class="form-control" required=""></textarea>
 
                                 <button type="submit" class="btn btn-primary">Post Comment</button>
 

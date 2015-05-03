@@ -34,7 +34,7 @@ function PollCtrl($scope, $rootScope, $stateParams, $state, $http, MEMBER) {
             "createDate": "",
             "endDate": "",
             "updateDate": "",
-            "pollComments": [],
+            "pollComments": {},
             "pollTags": {},
             "pollRoles": []
         };
@@ -61,10 +61,10 @@ function PollCtrl($scope, $rootScope, $stateParams, $state, $http, MEMBER) {
 
     $scope.addPollOption = function () {
 
-        var optionID = guid();
+        var optionId = guid();
 
-        $rootScope.localStoragePollModel.pollOptions[optionID] = {
-            "optionId": optionID,
+        $rootScope.localStoragePollModel.pollOptions[optionId] = {
+            "optionId": optionId,
             "optionName": $scope.pollOptionTempList.optionName,
             "optionDetail": $scope.pollOptionTempList.optionDetail,
             "optionVoteCount": 0
@@ -73,19 +73,51 @@ function PollCtrl($scope, $rootScope, $stateParams, $state, $http, MEMBER) {
         $scope.pollOptionTempList.optionName = '';
         $scope.pollOptionTempList.optionDetail = '';
 
+        if ($scope.pollToBeViewed != null) {
+
+            /*saveData($rootScope.localStoragePollModel.pollId, $rootScope.localStoragePollModel);*/
+
+            var pollList = getPollListFromLocalStorage();
+            var tempPoll = pollList[$rootScope.localStoragePollModel.pollId];
+            tempPoll.pollOptions[optionId] = $rootScope.localStoragePollModel.pollOptions[optionId];
+            pollList[$rootScope.localStoragePollModel.pollId] = tempPoll;
+            localStorage.setItem('pollData', JSON.stringify(pollList));
+
+        }
+
+    };
+
+    $scope.removePollOption = function(optionId){
+
+        delete $rootScope.localStoragePollModel.pollOptions[optionId];
+
     };
 
     $scope.addPollComment = function () {
 
-        $rootScope.localStoragePollModel.pollComments.push({
-            "commentId": guid(),
+        var commentId = guid();
+
+        $rootScope.localStoragePollModel.pollComments[commentId] = {
+            "commentId": commentId,
             "commentBody": $scope.pollCommentTempList.commentBody,
             "commentUserEmail": $scope.currentUserEmail,
             "commentUserName": $scope.currentUserName, /*TODO Bunu kullanýcýya baðla*/
             "commentDateTime": new Date().getTime()
-        });
+        };
 
         $scope.pollCommentTempList.commentBody = '';
+
+        if ($scope.pollToBeViewed != null) {
+
+            /*saveData($rootScope.localStoragePollModel.pollId, $rootScope.localStoragePollModel);*/
+
+            var pollList = getPollListFromLocalStorage();
+            var tempPoll = pollList[$rootScope.localStoragePollModel.pollId];
+            tempPoll.pollComments[commentId] = $rootScope.localStoragePollModel.pollComments[commentId];
+            pollList[$rootScope.localStoragePollModel.pollId] = tempPoll;
+            localStorage.setItem('pollData', JSON.stringify(pollList));
+
+        }
 
     };
 
@@ -104,7 +136,16 @@ function PollCtrl($scope, $rootScope, $stateParams, $state, $http, MEMBER) {
         $rootScope.localStoragePollModel.pollParticipantList.push($scope.currentUserEmail);
 
         if ($scope.pollToBeViewed != null) {
-            $scope.savePollData();
+
+            /*saveData($rootScope.localStoragePollModel.pollId, $rootScope.localStoragePollModel);*/
+
+            var pollList = getPollListFromLocalStorage();
+            var tempPoll = pollList[$rootScope.localStoragePollModel.pollId];
+            tempPoll.pollOptions[optionId] = $rootScope.localStoragePollModel.pollOptions[optionId];
+            tempPoll.pollParticipantList.push($scope.currentUserEmail);
+            pollList[$rootScope.localStoragePollModel.pollId] = tempPoll;
+            localStorage.setItem('pollData', JSON.stringify(pollList));
+
         }
 
 
@@ -145,9 +186,9 @@ function PollCtrl($scope, $rootScope, $stateParams, $state, $http, MEMBER) {
 
         }
 
-        var pollOption = getPollListFromLocalStorage();
-        pollOption[$rootScope.localStoragePollModel.pollId] = $rootScope.localStoragePollModel;
-        localStorage.setItem('pollData', JSON.stringify(pollOption));
+        var pollList = getPollListFromLocalStorage();
+        pollList[$rootScope.localStoragePollModel.pollId] = $rootScope.localStoragePollModel;
+        localStorage.setItem('pollData', JSON.stringify(pollList));
         if ($scope.pollToBeViewed == null) {
 
             alert("Your poll created!");
@@ -236,11 +277,35 @@ function PollCtrl($scope, $rootScope, $stateParams, $state, $http, MEMBER) {
 
         $scope.pollTagTempId = [];
 
+        if ($scope.pollToBeViewed != null) {
+
+            /*saveData($rootScope.localStoragePollModel.pollId, $rootScope.localStoragePollModel);*/
+
+            var pollList = getPollListFromLocalStorage();
+            var tempPoll = pollList[$rootScope.localStoragePollModel.pollId];
+            tempPoll.pollTags[tagId] = $rootScope.localStoragePollModel.pollTags[tagId];
+            pollList[$rootScope.localStoragePollModel.pollId] = tempPoll;
+            localStorage.setItem('pollData', JSON.stringify(pollList));
+
+        }
+
     };
 
 
     $scope.removeTag = function (tagToBeRemoved) {
         delete $rootScope.localStoragePollModel.pollTags[tagToBeRemoved];
+
+        if ($scope.pollToBeViewed != null) {
+
+            /*saveData($rootScope.localStoragePollModel.pollId, $rootScope.localStoragePollModel);*/
+
+            var pollList = getPollListFromLocalStorage();
+            var tempPoll = pollList[$rootScope.localStoragePollModel.pollId];
+            tempPoll.pollTags = $rootScope.localStoragePollModel.pollTags;
+            pollList[$rootScope.localStoragePollModel.pollId] = tempPoll;
+            localStorage.setItem('pollData', JSON.stringify(pollList));
+
+        }
 
     };
 
@@ -350,6 +415,11 @@ function dateDifference (date){
 
 }
 
+function saveTempData(pollId, pollData, pollAttribute){
+
+}
+
+
 angular
     .module('socioactive')
     .controller('PollCtrl', PollCtrl)
@@ -367,7 +437,7 @@ angular
             "createDate": "",
             "endDate": "",
             "updateDate": "",
-            "pollComments": [],
+            "pollComments": {},
             "pollTags": {},
             "pollRoles": []
         };
