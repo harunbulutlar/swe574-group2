@@ -1,7 +1,10 @@
 function MainCtrl() {
+    var currentUser = JSON.parse(sessionStorage.getItem('currentUserInfo'));
     this.userName = 'Osman Emre';
-    this.role = "Master"
-
+    this.userId = 1;
+    this.isAdmin = false;
+    this.role = currentUser.role;
+    this.email = currentUser.email;
 }
 
 function CustomTypesCtrl($scope, $modal, $rootScope) {
@@ -119,7 +122,7 @@ function CustomTypesCtrl($scope, $modal, $rootScope) {
     $scope.initPage();
 }
 
-function TypeTemplateCtrl($scope,$rootScope) {
+function TypeTemplateCtrl($scope, $rootScope) {
 
     $scope.remove = function (scope) {
         scope.remove();
@@ -151,7 +154,7 @@ function TypeTemplateCtrl($scope,$rootScope) {
     $scope.typeParameterType = "";
 }
 
-function NodeInfoCtrl($scope,$rootScope) {
+function NodeInfoCtrl($scope, $rootScope) {
 
     $scope.updateSelection = function ($event) {
         var checkbox = $event.target;
@@ -303,6 +306,16 @@ function typeTemplate() {
     };
 }
 
+function tagTemplate() {
+    return {
+        restrict: "E",
+        scope: {
+            tagParameter: '='
+        },
+        templateUrl: 'views/tag_template.html'
+    };
+}
+
 function guid() {
     function s4() {
         return Math.floor((1 + Math.random()) * 0x10000)
@@ -326,6 +339,7 @@ angular
     .module('socioactive')
     .directive('addNodeInfo', addNodeInfo)
     .directive('typeTemplate', typeTemplate)
+    .directive('tagTemplate', tagTemplate)
     .controller('MainCtrl', MainCtrl)
     .controller('CustomTypesCtrl', CustomTypesCtrl)
     .controller('GoogleMaps', GoogleMaps)
