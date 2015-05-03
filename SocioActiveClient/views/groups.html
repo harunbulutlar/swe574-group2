@@ -5,7 +5,7 @@
                 <div class="feed-activity-list" ng-repeat="group in currentGroups()">
                     <div class="feed-element">
                         <div class="media-body ">
-                            <strong>{{group.owner.email}}</strong> posted a new group => {{group.title}} <br><button class="btn btn-primary" ng-click="show()">show</button>
+                            <strong>{{group.owner.email}}</strong> posted a new group => {{group.title}} <br><button class="btn btn-primary" ng-click="show(group)">show</button>
                         </div>
                     </div>
                 </div>
@@ -15,7 +15,83 @@
     <div class="col-lg-6">
         <div class="ibox float-e-margins">
             <div class="ibox-content">
+                <div class="form-group"><label>{{selectedGroup.title}}</label></div>
+                <div class="form-group"><label>{{selectedGroup.description}}</label></div>
+
+            </div>
+            <div>
+                <script type="text/ng-template" id="field_renderer.html">
+                    <div ui-tree-handle class="tree-node tree-node-content">
+                        <a class="pull-right btn btn-white btn-xs" data-nodrag ng-click="addContent(node)"><span class="fa fa-plus"></span></a>
+                        <div >{{node.name}}(Type:{{node.type.name}})</div>
+                        <button class="btn btn-primary" ng-click="addButtonClick(node.type.id)">Add</button>
+                    </div>
+                </script>
+                <div ui-tree id="tree-root">
+                    <ol ui-tree-nodes ng-model="selectedGroup.fields">
+                        <li ng-repeat="node in selectedGroup.fields" ui-tree-node ng-include="'field_renderer.html'"></li>
+                    </ol>
+                </div>
             </div>
         </div>
     </div>
 </div>
+
+<style>
+    .angular-ui-tree-handle {
+        background: none repeat scroll 0 0 #f3f3f4;
+        border: 1px dashed #e7eaec;
+        color: inherit;
+        padding: 10px;
+        font-weight: normal;
+    }
+    .angular-ui-tree-handle:hover {
+        font-weight: bold;
+        cursor: pointer;
+    }
+    .angular-ui-tree-placeholder {
+        background: #f0f9ff;
+        border: 1px dashed #bed2db;
+        -webkit-box-sizing: border-box;
+        -moz-box-sizing: border-box;
+        box-sizing: border-box;
+    }
+    .group-title {
+        background-color: #687074 !important;
+        color: #FFF !important;
+    }
+    .tree-node {
+        background: none repeat scroll 0 0 #f3f3f4;
+        border: 1px dashed #e7eaec;
+        color: inherit;
+        padding: 10px;
+        border-radius: 3px;
+    }
+
+    .tree-node .btn {
+        min-width: 22px;
+        margin-right: 4px;
+    }
+
+    .tree-node-content {
+        margin: 5px 5px 5px 0;
+    }
+
+    .tree-handle {
+        background: none repeat scroll 0 0 #f3f3f4;
+        border: 1px dashed #e7eaec;
+        color: inherit;
+        padding: 10px;
+    }
+
+    .angular-ui-tree-handle:hover {
+    }
+
+    .angular-ui-tree-placeholder {
+        background: #f0f9ff;
+        border: 1px dashed #bed2db;
+        -webkit-box-sizing: border-box;
+        -moz-box-sizing: border-box;
+        box-sizing: border-box;
+    }
+</style>

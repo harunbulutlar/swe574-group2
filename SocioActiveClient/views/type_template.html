@@ -13,9 +13,10 @@
         <script type="text/ng-template" id="nodes_renderer.html">
             <div ui-tree-handle class="tree-node tree-node-content">
                 <a class="pull-right btn btn-white btn-xs" data-nodrag ng-click="remove(this)"><span class="fa fa-trash"></span></a>
-                <add-node-info node-value="node"></add-node-info>
+                <add-node-info node-value="node" node-type=""></add-node-info>
             </div>
         </script>
+
         <div ui-tree id="tree-root">
             <ol ui-tree-nodes ng-model="typeParameter.data">
                 <li ng-repeat="node in typeParameter.data" ui-tree-node ng-include="'nodes_renderer.html'"></li>
