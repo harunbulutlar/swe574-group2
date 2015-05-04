@@ -21,7 +21,6 @@ function PollCtrl($scope, $rootScope, $stateParams, $state, $http, MEMBER) {
 
     $scope.pollToBeViewed = $stateParams.pollToBeViewed;
 
-    $scope.tagContextList = ["Location", "city/town/village", "aa", "bb", "cc", "dd"];
 
     var initialize = function () {
         $rootScope.localStoragePollModel = {
@@ -239,9 +238,12 @@ function PollCtrl($scope, $rootScope, $stateParams, $state, $http, MEMBER) {
 
             var scores = [];
             var contexts = [];
+            $scope.getDataDeneme = []; //TODO remove
 
             angular.forEach(tagContextRawData, function (item) {
+
                 scores.push(item.score);
+
             });
 
             var scoreAverage = calculateAverage(scores);
@@ -252,6 +254,7 @@ function PollCtrl($scope, $rootScope, $stateParams, $state, $http, MEMBER) {
                 if (contextFilter.hasOwnProperty('notable') && contextFilter.notable.name != '') {
 
                     return (contextFilter.name != '') && (contextFilter.score >= scoreTag);
+
                 }
             });
 
@@ -269,6 +272,9 @@ function PollCtrl($scope, $rootScope, $stateParams, $state, $http, MEMBER) {
                         tagName: item.name,
                         tagContext: item.notable.name
                     };
+
+                    $scope.getDataDeneme.push(item.notable.name); //TODO remove
+
                 }
             });
 
@@ -400,6 +406,165 @@ function PollCtrl($scope, $rootScope, $stateParams, $state, $http, MEMBER) {
         return true;
 
     };
+
+    $scope.tagContextList = ["Professional Sports Team",
+        "College/University",
+        "Place with local areas",
+        "Airport",
+        "Newspaper",
+        "Event",
+        "Architectural style",
+        "Music theatre Play",
+        "Soccer team",
+        "Soft rock Artist",
+        "Art Gallery",
+        "Archdiocese",
+        "Conducted Ensemble",
+        "Film festival",
+        "Mass Transportation System",
+        "Neighborhood",
+        "Organisation",
+        "Musical comedy Film",
+        "Fire",
+        "School district",
+        "Location",
+        "Government Agency",
+        "City/Town/Village",
+        "Administrative Division",
+        "Structure",
+        "System of nobility",
+        "Museum",
+        "City/Town/Village",
+        "Sports Facility",
+        "Arms industry Business",
+        "Musical Recording",
+        "Composition",
+        "Consumer electronics Business",
+        "Operating System",
+        "Office suite Software",
+        "Spreadsheet Software",
+        "Word processor Software",
+        "Software framework Software",
+        "E-mail client Software",
+        "Relational database management system Software",
+        "Content management system Software",
+        "Integrated development environment Software",
+        "Presentation Software",
+        "Collaborative Software",
+        "Web portal Website",
+        "Computer and video game industry Business",
+        "Website",
+        "Software",
+        "Search engine Website",
+        "Web application Software",
+        "Video Game Developer",
+        "Computer",
+        "Brand",
+        "Programming Language",
+        "Operating system Software",
+        "Desktop publishing Software",
+        "Literature Subject",
+        "Video Game Series",
+        "Film series",
+        "Fantasy Book",
+        "Animation Film",
+        "Fantasy Film",
+        "Broadcast Content",
+        "MMORPG Video Game",
+        "Olympic Basketball Player",
+        "Game",
+        "Action role-playing Video Game",
+        "Product line",
+        "Role-playing Video Game",
+        "Multiplayer Video Game",
+        "Real-time strategy Video Game",
+        "Work of Fiction",
+        "Psychedelic rock Album",
+        "Soundtrack",
+        "Politician",
+        "Role-playing Game",
+        "Film score Artist",
+        "Hard rock Artist",
+        "Heavy metal Album",
+        "Rhythm Video Game",
+        "Organism Classification",
+        "Thriller Film",
+        "Non-Fiction Book",
+        "Rockumentary Film",
+        "Concert tour",
+        "Thrash metal Album",
+        "Composition",
+        "Musical Album",
+        "Cello rock Album",
+        "Documentary Film",
+        "Consumer product",
+        "Biological Genus",
+        "Business Operation",
+        "Biological Species",
+        "Compact Cassette Musical Release",
+        "Compact Disc Musical Release",
+        "Record label",
+        "Digital media Musical Release",
+        "Magazine",
+        "Astronomical Discovery",
+        "Film character",
+        "Opera",
+        "Recurring event",
+        "Music Festival",
+        "Fictional Object",
+        "Product category",
+        "Drug form shape",
+        "Award category",
+        "Film subject",
+        "Sport",
+        "Protocol",
+        "Chemical Compound",
+        "Country",
+        "Profession",
+        "Crime Fiction Film",
+        "Field of study",
+        "Ethnicity",
+        "American Football player",
+        "Chinese Film",
+        "Trade journal Magazine",
+        "US President",
+        "Job title",
+        "Quotation Subject",
+        "Industry",
+        "Crime Fiction Book",
+        "Folk Artist",
+        "Suspense Book",
+        "Olympic games",
+        "Spanish province",
+        "Basketball Team",
+        "Team handball Team",
+        "Tennis Tournament",
+        "Religious Jurisdiction",
+        "Neo-gothic Structure",
+        "Olympic event competition",
+        "Railway",
+        "Multi-event tournament",
+        "Opera House",
+        "Opera Album",
+        "Noble person",
+        "Modern Art Museum",
+        "Soccer Midfielder",
+        "Man",
+        "TV Episode",
+        "TV Character",
+        "Soccer",
+        "Award",
+        "Sports League Award Type",
+        "TV Program",
+        "Tourist attraction",
+        "Award ceremony",
+        "Sports League Championship Event",
+        "Soccer Organization",
+        "Sports Video Game",
+        "Sports League Season",
+        "Football League Season",
+        "Artist"
+    ];
 }
 
 function getPollListFromLocalStorage() {

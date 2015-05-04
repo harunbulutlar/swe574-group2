@@ -1,5 +1,9 @@
-function MainCtrl() {
+function MainCtrl($window) {
+
     var currentUser = JSON.parse(sessionStorage.getItem('currentUserInfo'));
+    if (currentUser == null){
+        $window.location.href = 'login.html';
+    }
     this.userName = 'Osman Emre';
     this.userId = 1;
     this.isAdmin = false;
@@ -95,11 +99,13 @@ function CustomTypesCtrl($scope, $modal, $rootScope) {
         var user = sessionStorage.getItem('currentUser');
         if (user == null) {
             //TODO: reroute to login page
+
             return null;
         }
         var users = JSON.parse(localStorage.getItem('users'));
         var userFromDatabase = users[user];
         if (userFromDatabase == null) {
+
             //TODO: reroute to login page
             return null;
         }
