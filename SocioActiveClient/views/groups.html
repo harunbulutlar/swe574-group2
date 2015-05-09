@@ -2,7 +2,7 @@
     <div class="col-lg-6">
         <div class="ibox float-e-margins">
             <div class="ibox-content">
-                <div class="feed-activity-list" ng-repeat="group in currentGroups()">
+                <div class="feed-activity-list" ng-repeat="group in data.groups">
                     <div class="feed-element">
                         <div class="media-body ">
                             <strong>{{group.owner.email}}</strong> posted a new group => {{group.title}} <br><button class="btn btn-primary" ng-click="show(group)">show</button>

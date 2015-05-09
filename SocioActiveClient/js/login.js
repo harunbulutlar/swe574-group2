@@ -42,11 +42,10 @@ function RegisterCtrl($scope, $window,fireFactory, $rootScope, MEMBER) {
             if (error) {
                 console.log("Error creating user:", error);
             } else {
-                var createdUserData = fireFactory.firebaseRef().child('users').child(userData.uid);
-                createdUserData.set({
-                        name: $scope.getName($rootScope.model.email),
-                        role: $rootScope.model.role
-                    });
+                var createdUserData = fireFactory.getUserData(userData.uid);
+                $rootScope.model.userName = $scope.getName($rootScope.model.email);
+                angular.copy($rootScope.model, createdUserData);
+                createdUserData.$save();
                 console.log("Successfully created user account with uid:", userData.uid);
                 $window.location.href = 'login.html';
             }
@@ -64,7 +63,6 @@ angular
     .run(["$rootScope", function ($rootScope) {
         $rootScope.model = {
             email: '',
-            password: '',
             userName:'',
             userLastName:'',
             photo: '',
@@ -85,13 +83,24 @@ angular
     }])
     .controller('RegisterCtrl', RegisterCtrl)
     .controller('LoginCtrl', LoginCtrl)
-    .factory('fireFactory', [
-        function fireFactory() {
-            return {
-                firebaseRef: function(path) {
-                    var baseUrl = "https://resplendent-fire-2746.firebaseio.com";
-                    path = (path !== '' && path) ?  baseUrl + '/' + path : baseUrl;
-                    return new Firebase(path);
-                }
+    .factory('fireFactory', [ '$firebaseObject',
+        function fireFactory($firebaseObject) {
+            var helperFactory = {};
+            helperFactory.firebaseRef = function (path) {
+                var baseUrl = "https://resplendent-fire-2746.firebaseio.com";
+                path = (path !== '' && path) ?  baseUrl + '/' + path : baseUrl;
+                return new Firebase(path);
             };
-    }]);
+            helperFactory.getUserData = function (uid) {
+                return $firebaseObject(helperFactory.firebaseRef().child('users').child(uid));
+            };
+            helperFactory.getGroups= function () {
+                return $firebaseObject(helperFactory.firebaseRef().child('groups'));
+            };
+            helperFactory.getGroups= function () {
+                return $firebaseObject(helperFactory.firebaseRef().child('groups'));
+            };
+            return helperFactory;
+
+        }]
+);

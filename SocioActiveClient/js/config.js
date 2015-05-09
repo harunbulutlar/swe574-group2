@@ -260,6 +260,21 @@ function config($stateProvider, $urlRouterProvider, $ocLazyLoadProvider) {
                 }
             }
         })
+        .state('index.picture_upload', {
+            url: "/picture_upload",
+            templateUrl: "views/picture_upload.html",
+            data: { pageTitle: 'Picture upload' },
+            resolve: {
+                loadPlugin: function ($ocLazyLoad) {
+                    return $ocLazyLoad.load([
+                        {
+                            name:'flow',
+                            files: ['js/plugins/ngFlow/ng-flow-standalone.js']
+                        }
+                    ]);
+                }
+            }
+        })
 }
 angular
     .module('socioactive')

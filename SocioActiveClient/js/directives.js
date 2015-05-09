@@ -105,7 +105,30 @@ function minimalizaSidebar($timeout) {
     };
 };
 
-
+/**
+ * dropZone - Directive for Drag and drop zone file upload plugin
+ */
+function dropZone() {
+    return function(scope, element, attrs) {
+        element.dropzone({
+            url: "/upload",
+            maxFilesize: 100,
+            paramName: "uploadfile",
+            maxThumbnailFilesize: 5,
+            init: function() {
+                this.on('success', function(file, json) {
+                });
+                this.on('addedfile', function(file) {
+                    scope.$apply(function(){
+                        scope.files.push(file);
+                    });
+                });
+                this.on('drop', function(file) {
+                });
+            }
+        });
+    }
+}
 
 /**
  *
@@ -116,4 +139,5 @@ angular
     .directive('pageTitle', pageTitle)
     .directive('sideNavigation', sideNavigation)
     .directive('iboxTools', iboxTools)
-    .directive('minimalizaSidebar', minimalizaSidebar);
+    .directive('minimalizaSidebar', minimalizaSidebar)
+    .directive('dropZone', dropZone);

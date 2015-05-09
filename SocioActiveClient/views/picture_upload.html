@@ -1,0 +1,43 @@
+<div class="row wrapper border-bottom white-bg page-heading">
+    <div class="col-lg-10">
+        <h2>Picture upload</h2>
+        <ol class="breadcrumb">
+            <li class="active">
+                <strong>Upload a Profile Picture</strong>
+            </li>
+        </ol>
+    </div>
+    <div class="col-lg-2">
+
+    </div>
+</div>
+<div class="wrapper wrapper-content animated fadeIn" ng-controller="PictureUploadCtrl">
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="ibox float-e-margins">
+                <div class="ibox-title">
+                    <h5>Dropzone Area</h5>
+
+                    <div ibox-tools></div>
+                </div>
+                <div flow-init="{target: '/upload'}"
+                     flow-files-submitted="$flow.upload()"
+                     flow-file-success="$file.msg = $message">
+
+                    <input type="file" flow-btn/>
+                    Input OR Other element as upload button
+                    <span class="btn" flow-btn>Upload File</span>
+
+                    <table>
+                        <tr ng-repeat="file in $flow.files">
+                            <td>{{$index+1}}</td>
+                            <td>{{file.name}}</td>
+                            <td>{{file.msg}}</td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>

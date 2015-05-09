@@ -7,7 +7,7 @@
                     <a class="dropdown-toggle" dropdown-toggle href>
                             <span class="clear">
                                 <span class="block m-t-xs">
-                                    <strong class="font-bold">{{main.currentUserData.name}}</strong>
+                                    <strong class="font-bold">{{main.currentUserData.userName}}</strong>
                              </span>
                                 <span class="text-muted text-xs block">{{main.currentUserData.role}}<b class="caret"></b></span>
                             </span>
@@ -26,6 +26,9 @@
             </li>
             <li ui-sref-active="index">
                 <a ui-sref="index.main"><i class="fa fa-home"></i> <span class="nav-label">Home</span></a>
+            </li>
+            <li ui-sref-active="index">
+                <a ui-sref="index.picture_upload"><i class="fa fa-diamond"></i> <span class="nav-label">Picture Upload</span></a>
             </li>
             <li ng-class="{active: $state.includes('activity')}">
                 <a ui-sref="inbox"><i class="fa fa-globe"></i> <span class="nav-label">Activity</span><span
@@ -84,6 +87,7 @@
             <li ui-sref-active="active">
                 <a ui-sref="index.post"><i class="fa fa-mail-forward"></i> <span class="nav-label">Post Something</span></a>
             </li>
+
         </ul>
 
     </div>

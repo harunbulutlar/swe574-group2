@@ -1,4 +1,4 @@
-function MainCtrl($scope,$window,fireFactory, $firebaseObject) {
+function MainCtrl( $window, fireFactory) {
 
     this.authData = fireFactory.firebaseRef().getAuth();
     if (this.authData) {
@@ -10,14 +10,13 @@ function MainCtrl($scope,$window,fireFactory, $firebaseObject) {
     this.isAdmin = false;
     this.email = this.authData.password;
     this.currentUserData = fireFactory.getUserData(this.userId);
-    this.logout = function()
-    {
+    this.logout = function () {
         fireFactory.firebaseRef().unauth();
         $window.location.href = 'login.html';
     }
 }
 
-function CustomTypesCtrl($scope, $rootScope) {
+function CustomTypesCtrl($scope, $rootScope, fireFactory) {
     $scope.addCustomType = function () {
         var customType = {
             id: guid(),
@@ -40,70 +39,67 @@ function CustomTypesCtrl($scope, $rootScope) {
 
     };
     $scope.removeUserField = function (userField) {
-        var index = arrayObjectIndexOf($scope.userFields, userField.id, "id");
-        $scope.userFields.splice(index, 1);
+        var index = arrayObjectIndexOf($scope.createdGroup.fields, userField.id, "id");
+        $scope.createdGroup.fields.splice(index, 1);
     };
+
     $scope.createUserField = function () {
-        var userField = {
+        $scope.createdGroup.fields.push({
             id: guid(),
             name: $scope.userFieldName,
             type: $scope.userFieldType
-        };
-        $scope.userFields.push(userField);
-
+        });
     };
+
     $scope.saveChanges = function () {
 
-        var returnObject = $scope.getCurrentUserData();
-        var createdGroup =
-        {
-            id: guid(),
-            owner: returnObject.currentUser,
-            title: $scope.groupTitle,
-            description: $scope.groupDescription,
-            fields: $scope.userFields,
-            content: null
 
+        if ($scope.createdGroup.title == '') {
+            alert('Group has no title');
+            return;
+        }
+        if ($scope.createdGroup.description == '') {
+            alert('Group has no description');
+            return;
+        }
+        if ($scope.createdGroup.fields.length == 0) {
+            alert('You do not have any fields for your group');
+            return;
+        }
+        var saveAfterLoad = function(data, groups){
+            groups.push($scope.createdGroup);
+            data.$save();
+            $scope.mainCtrl.currentUserData.$save();
         };
-        var groups = JSON.parse(localStorage.getItem('groups'));
-        if (groups == null) {
-            groups = [];
-        }
-        groups.push(createdGroup);
-        localStorage.setItem('groups', JSON.stringify(groups));
+        var data = fireFactory.loadGroups(saveAfterLoad);
+
     };
 
-    $scope.getCurrentUserData = function () {
-        var user = sessionStorage.getItem('currentUser');
-        if (user == null) {
-            //TODO: reroute to login page
-
-            return null;
-        }
-        var users = JSON.parse(localStorage.getItem('users'));
-        var userFromDatabase = users[user];
-        if (userFromDatabase == null) {
-
-            //TODO: reroute to login page
-            return null;
-        }
-        return {currentUser: userFromDatabase, users: users};
-    };
-
+    $scope.createdGroup = {};
     $scope.userFieldType = '';
     $scope.types = $rootScope.primitiveTypes;
-    $scope.groupTitle = '';
-    $scope.groupDescription = '';
-    $scope.userFields = [];
     $scope.userFieldName = '';
     $scope.customTypeTabs = {};
     // at the bottom of your controller
     $scope.initPage = function () {
-        var returnObject = $scope.getCurrentUserData();
-        $rootScope.customTypes = returnObject.currentUser.data.customTypes;
+        var returnObject = this.main.currentUserData;
+        if (!returnObject.customTypes) {
+            returnObject.customTypes = [];
+        }
+        $rootScope.customTypes = returnObject.customTypes;
         angular.forEach($rootScope.customTypes, function (event) {
             $scope.customTypeTabs[event.id] = true;
         });
+        $scope.createdGroup = {
+            id: guid(),
+            owner: this.main.userId,
+            title: '',
+            description: '',
+            fields: [],
+            content: null
+        };
+        $scope.mainCtrl = this.main;
+
     };
     $scope.initPage();
 }
@@ -220,33 +216,31 @@ function arrayObjectIndexOf(myArray, searchTerm, property) {
     }
     return -1;
 }
-function CurrentGroupsCtrl($scope, $state) {
+function CurrentGroupsCtrl($scope, $state,fireFactory) {
 
-    $scope.currentGroups = function () {
-        if ($scope.currentGroupsInternal == '') {
-            $scope.currentGroupsInternal = JSON.parse(localStorage.getItem('groups'));
-        }
-        return $scope.currentGroupsInternal;
-    };
+    fireFactory.loadData(function(loadedData){
+        $scope.data = loadedData;
+    });
+    $scope.selectedGroup = null;
     $scope.show = function (group) {
         $scope.selectedGroup = group;
     };
+
     $scope.addContent = function (node) {
     };
-    $scope.currentGroupsInternal = '';
-    $scope.selectedGroup = '';
+
     $scope.addButtonClick = function (selectedTypeId) {
         $state.go('activity.group_add_content', {groupId: $scope.selectedGroup.id, typeId: selectedTypeId});
     }
 }
+
 function GroupAddCtrl($scope, $state, $stateParams) {
     $scope.userFields = null;
     $scope.load = function () {
-
         var groupId = $stateParams.groupId;
         var typeId = $stateParams.typeId;
         var groups = JSON.parse(localStorage.getItem('groups'));
-
+        $scope.currentGroups = fireFactory.getData().groups;
         for (var i = 0, len = groups.length; i < len; i++) {
             if (groups[i].id == groupId) {
                 $scope.userFields = groups[i].fields;
@@ -260,9 +254,14 @@ function GroupAddCtrl($scope, $state, $stateParams) {
         }
     };
     $scope.load();
-
 }
 
+function PictureUploadCtrl($scope) {
+    $scope.files = [];
+    $scope.uploadPicture = function(){
+        $scope.files;
+    }
+}
 angular
     .module('socioactive')
     .directive('addNodeInfo', addNodeInfo)
@@ -274,6 +273,7 @@ angular
     .controller('NodeInfoCtrl', NodeInfoCtrl)
     .controller('CurrentGroupsCtrl', CurrentGroupsCtrl)
     .controller('GroupAddCtrl', GroupAddCtrl)
+    .controller('PictureUploadCtrl', PictureUploadCtrl)
     .run(["$templateCache", "$rootScope", function ($templateCache, $rootScope) {
         $rootScope.primitiveTypes = [
             {name: 'Enumeration'},
@@ -307,18 +307,34 @@ angular
         $templateCache.put("currency.html", "<div><input type='text' class='form-control' data-mask='$ 999,999,999.99' ng-model='nodeValue.nodeData'><span class='help-block'>$ 999,999,999.99</span></div>");
         $templateCache.put("ipv4.html", "<div><input type='text' class='form-control' data-mask='999.999.999.9999' ng-model='nodeValue.nodeData'><span class='help-block'>192.168.100.200</span></div>");
     }])
-    .factory('fireFactory', [ '$firebaseObject',
+    .factory('fireFactory', ['$firebaseObject',
         function fireFactory($firebaseObject) {
             var helperFactory = {};
             helperFactory.firebaseRef = function (path) {
                 var baseUrl = "https://resplendent-fire-2746.firebaseio.com";
-                path = (path !== '' && path) ?  baseUrl + '/' + path : baseUrl;
+                path = (path !== '' && path) ? baseUrl + '/' + path : baseUrl;
                 return new Firebase(path);
             };
             helperFactory.getUserData = function (uid) {
                 return $firebaseObject(helperFactory.firebaseRef().child('users').child(uid));
             };
+            helperFactory.getData = function () {
+                return $firebaseObject(helperFactory.firebaseRef().child('data'));
+            };
+            helperFactory.loadData = function (callback) {
+                var data = helperFactory.getData();
+                data.$loaded().then(callback)
+            };
+            helperFactory.loadGroups = function (callback) {
+                var data = helperFactory.getData();
+                data.$loaded().then(function(loadedData){
+                    if(!loadedData.groups){
+                        loadedData.groups = [];
+                    }
+                    callback(loadedData,loadedData.groups);
+                })
+            };
             return helperFactory;
 
         }]
-    );
+);
