@@ -324,7 +324,7 @@ angular
                 return new Firebase(path);
             };
             helperFactory.getUserData = function (uid) {
-                return firebaseRef().child('users').child(uid);
+                return helperFactory.firebaseRef().child('users').child(uid);
             };
             return helperFactory;
 
