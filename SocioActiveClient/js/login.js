@@ -52,7 +52,6 @@ function RegisterCtrl($scope, $window,fireFactory, $rootScope, MEMBER) {
             }
         });
     };
-// find a suitable name based on the meta info given by each provider
     $scope.getName = function(authData) {
         return authData.replace(/@.*/, '');
     };

@@ -6,42 +6,26 @@ function MainCtrl($window,fireFactory) {
     } else {
         $window.location.href = 'login.html';
     }
-
-    var currentUserData = fireFactory.firebaseRef().child('users').child(authData.uid);
-    this.userName = '';
-    this.role = '';
-     currentUserData.once('value', function(snap) {
-         this.userName = snap.val().name;
-         this.role = snap.val().role;
-    });
-
     this.userId = authData.uid;
     this.isAdmin = false;
     this.email = authData.password;
-}
-//function MainCtrl($window) {
-//
-//    //var authData = fireFactory.firebaseRef().getAuth();
-//    //if (authData) {
-//    //    console.log("User " + authData.uid + " is logged in with " + authData.provider);
-//    //} else {
-//    //    $window.location.href = 'login.html';
-//    //}
-//    //
-//    //var currentUserData = fireFactory.firebaseRef().child('users').child(authData.uid);
-//    //this.userName = '';
-//    //this.role = '';
-//    // currentUserData.once('value', function(snap) {
-//    //     this.userName = snap.val().name;
-//    //     this.role = snap.val().role;
-//    //});
-//    this.userName = 'zxcqweqasd';
-//    this.userId = 3;
-//    this.isAdmin = false;
-//    this.email = "asdasd@asd.com";
-//}
+    var currentUserData = fireFactory.getUserData(this.userId);
+    this.userName = '';
+    this.role = '';
+     currentUserData.once('value', function(snap) {
+         var userInfo = snap.val();
+         if(userInfo.name){
+             this.userName = userInfo.name;
+         }
+         if(userInfo.role){
+             this.role = userInfo.role;
+         }
 
-function CustomTypesCtrl($scope, $modal, $rootScope) {
+    });
+
+}
+
+function CustomTypesCtrl($scope, $rootScope) {
     $scope.addCustomType = function () {
         var customType = {
             id: guid(),
@@ -333,12 +317,16 @@ angular
     }])
     .factory('fireFactory', [
         function fireFactory() {
-            return {
-                firebaseRef: function (path) {
-                    var baseUrl = "https://resplendent-fire-2746.firebaseio.com";
-                    path = (path !== '' && path) ?  baseUrl + '/' + path : baseUrl;
-                    return new Firebase(path);
-                }
+            var helperFactory = {};
+            helperFactory.firebaseRef = function (path) {
+                var baseUrl = "https://resplendent-fire-2746.firebaseio.com";
+                path = (path !== '' && path) ?  baseUrl + '/' + path : baseUrl;
+                return new Firebase(path);
             };
+            helperFactory.getUserData = function (uid) {
+                return firebaseRef().child('users').child(uid);
+            };
+            return helperFactory;
+
         }]
     );
