@@ -1,15 +1,20 @@
 function MainCtrl($scope,$window,fireFactory, $firebaseObject) {
 
-    var authData = fireFactory.firebaseRef().getAuth();
-    if (authData) {
-        console.log("User " + authData.uid + " is logged in with " + authData.provider);
+    this.authData = fireFactory.firebaseRef().getAuth();
+    if (this.authData) {
+        console.log("User " + this.authData.uid + " is logged in with " + this.authData.provider);
     } else {
         $window.location.href = 'login.html';
     }
-    this.userId = authData.uid;
+    this.userId = this.authData.uid;
     this.isAdmin = false;
-    this.email = authData.password;
+    this.email = this.authData.password;
     this.currentUserData = fireFactory.getUserData(this.userId);
+    this.logout = function()
+    {
+        fireFactory.firebaseRef().unauth();
+        $window.location.href = 'login.html';
+    }
 }
 
 function CustomTypesCtrl($scope, $rootScope) {
