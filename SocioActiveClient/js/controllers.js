@@ -1,4 +1,4 @@
-function MainCtrl($window,fireFactory) {
+function MainCtrl($scope,$window,fireFactory, $firebaseObject) {
 
     var authData = fireFactory.firebaseRef().getAuth();
     if (authData) {
@@ -9,20 +9,7 @@ function MainCtrl($window,fireFactory) {
     this.userId = authData.uid;
     this.isAdmin = false;
     this.email = authData.password;
-    var currentUserData = fireFactory.getUserData(this.userId);
-    this.userName = '';
-    this.role = '';
-     currentUserData.once('value', function(snap) {
-         var userInfo = snap.val();
-         if(userInfo.name){
-             this.userName = userInfo.name;
-         }
-         if(userInfo.role){
-             this.role = userInfo.role;
-         }
-
-    });
-
+    this.currentUserData = fireFactory.getUserData(this.userId);
 }
 
 function CustomTypesCtrl($scope, $rootScope) {
@@ -315,8 +302,8 @@ angular
         $templateCache.put("currency.html", "<div><input type='text' class='form-control' data-mask='$ 999,999,999.99' ng-model='nodeValue.nodeData'><span class='help-block'>$ 999,999,999.99</span></div>");
         $templateCache.put("ipv4.html", "<div><input type='text' class='form-control' data-mask='999.999.999.9999' ng-model='nodeValue.nodeData'><span class='help-block'>192.168.100.200</span></div>");
     }])
-    .factory('fireFactory', [
-        function fireFactory() {
+    .factory('fireFactory', [ '$firebaseObject',
+        function fireFactory($firebaseObject) {
             var helperFactory = {};
             helperFactory.firebaseRef = function (path) {
                 var baseUrl = "https://resplendent-fire-2746.firebaseio.com";
@@ -324,7 +311,7 @@ angular
                 return new Firebase(path);
             };
             helperFactory.getUserData = function (uid) {
-                return helperFactory.firebaseRef().child('users').child(uid);
+                return $firebaseObject(helperFactory.firebaseRef().child('users').child(uid));
             };
             return helperFactory;
 
