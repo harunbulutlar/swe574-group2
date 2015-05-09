@@ -45,7 +45,7 @@
                        required="">
             </div>
 
-            <button id="register" type="submit" class="btn btn-primary block full-width m-b">Register</button>
+            <button id="register" ng-click="registerClick()" class="btn btn-primary block full-width m-b">Register</button>
 
             <p class="text-muted text-center">
                 <small>Already have an account?</small>
@@ -66,7 +66,9 @@
 <script src="js/plugins/oclazyload/dist/ocLazyLoad.min.js"></script>
 <script src="js/ui-router/angular-ui-router.min.js"></script>
 <script src="js/bootstrap/ui-bootstrap-tpls-0.12.0.min.js"></script>
+<script src="js/plugins/firebase/firebase.js"></script>
 
+<script src="js/plugins/firebase/angularfire.min.js"></script>
 <!-- iCheck -->
 
 <script src="js/plugins/iCheck/icheck.min.js"></script>

@@ -1,44 +1,47 @@
-function MainCtrl($window) {
+function MainCtrl($window,fireFactory) {
 
-    var currentUser = JSON.parse(sessionStorage.getItem('currentUserInfo'));
-    if (currentUser == null){
+    var authData = fireFactory.firebaseRef().getAuth();
+    if (authData) {
+        console.log("User " + authData.uid + " is logged in with " + authData.provider);
+    } else {
         $window.location.href = 'login.html';
     }
-    this.userName = 'Osman Emre';
-    this.userId = 1;
+
+    var currentUserData = fireFactory.firebaseRef().child('users').child(authData.uid);
+    this.userName = '';
+    this.role = '';
+     currentUserData.once('value', function(snap) {
+         this.userName = snap.val().name;
+         this.role = snap.val().role;
+    });
+
+    this.userId = authData.uid;
     this.isAdmin = false;
-    this.role = currentUser.role;
-    this.email = currentUser.email;
+    this.email = authData.password;
 }
+//function MainCtrl($window) {
+//
+//    //var authData = fireFactory.firebaseRef().getAuth();
+//    //if (authData) {
+//    //    console.log("User " + authData.uid + " is logged in with " + authData.provider);
+//    //} else {
+//    //    $window.location.href = 'login.html';
+//    //}
+//    //
+//    //var currentUserData = fireFactory.firebaseRef().child('users').child(authData.uid);
+//    //this.userName = '';
+//    //this.role = '';
+//    // currentUserData.once('value', function(snap) {
+//    //     this.userName = snap.val().name;
+//    //     this.role = snap.val().role;
+//    //});
+//    this.userName = 'zxcqweqasd';
+//    this.userId = 3;
+//    this.isAdmin = false;
+//    this.email = "asdasd@asd.com";
+//}
 
 function CustomTypesCtrl($scope, $modal, $rootScope) {
-
-    $scope.openMap = function (size, scope) {
-
-        var modalInstance = $modal.open({
-            templateUrl: 'views/place_modal.html',
-            controller: GoogleMaps,
-            size: size,
-            resolve: {
-                loadPlugin: function ($ocLazyLoad) {
-                    return $ocLazyLoad.load([
-                        {
-                            name: 'ui.event',
-                            files: ['js/plugins/uievents/event.js']
-                        },
-                        {
-                            name: 'ui.map',
-                            files: ['js/plugins/uimaps/ui-map.js']
-                        }
-                    ]);
-                }
-            }
-        });
-        modalInstance.result.then(function (locationData) {
-            scope.$modelValue.nodeData = locationData;
-        });
-    };
-
     $scope.addCustomType = function () {
         var customType = {
             id: guid(),
@@ -79,7 +82,7 @@ function CustomTypesCtrl($scope, $modal, $rootScope) {
         var createdGroup =
         {
             id: guid(),
-            owner:returnObject.currentUser,
+            owner: returnObject.currentUser,
             title: $scope.groupTitle,
             description: $scope.groupDescription,
             fields: $scope.userFields,
@@ -87,8 +90,7 @@ function CustomTypesCtrl($scope, $modal, $rootScope) {
 
         };
         var groups = JSON.parse(localStorage.getItem('groups'));
-        if(groups == null)
-        {
+        if (groups == null) {
             groups = [];
         }
         groups.push(createdGroup);
@@ -172,11 +174,10 @@ function NodeInfoCtrl($scope, $rootScope) {
     $scope.listTypes = $rootScope.primitiveTypes;
     $scope.newSubItem = function (nodeValue) {
 
-        if(nodeValue.nodeContent == null || nodeValue.nodeContent == '')
-        {
+        if (nodeValue.nodeContent == null || nodeValue.nodeContent == '') {
             nodeValue.nodeContent = [];
         }
-        nodeValue.nodeContent.push({id:guid(),data:angular.copy(nodeValue.nodeData.data)});
+        nodeValue.nodeContent.push({id: guid(), data: angular.copy(nodeValue.nodeData.data)});
     };
     $scope.removeSubNode = function (item) {
 
@@ -188,13 +189,14 @@ function NodeInfoCtrl($scope, $rootScope) {
 function addNodeInfo($compile, $templateCache) {
     return {
         restrict: 'E',
-        scope: {nodeValue: '=',
-                nodeType: '='},
+        scope: {
+            nodeValue: '=',
+            nodeType: '='
+        },
         link: function (scope, element) {
             var nodeData = scope.nodeValue;
-            var cached_element = $templateCache.get(nodeData.type.name.toLowerCase()+ "_"+ scope.nodeType + ".html");
-            if(cached_element == null || cached_element == '')
-            {
+            var cached_element = $templateCache.get(nodeData.type.name.toLowerCase() + "_" + scope.nodeType + ".html");
+            if (cached_element == null || cached_element == '') {
                 cached_element = $templateCache.get(nodeData.type.name.toLowerCase() + ".html");
             }
             var compiled_cache = $compile(cached_element)(scope);
@@ -242,11 +244,10 @@ function arrayObjectIndexOf(myArray, searchTerm, property) {
     }
     return -1;
 }
-function CurrentGroupsCtrl($scope,$state) {
+function CurrentGroupsCtrl($scope, $state) {
 
     $scope.currentGroups = function () {
-        if($scope.currentGroupsInternal == '')
-        {
+        if ($scope.currentGroupsInternal == '') {
             $scope.currentGroupsInternal = JSON.parse(localStorage.getItem('groups'));
         }
         return $scope.currentGroupsInternal;
@@ -258,26 +259,24 @@ function CurrentGroupsCtrl($scope,$state) {
     };
     $scope.currentGroupsInternal = '';
     $scope.selectedGroup = '';
-    $scope.addButtonClick = function(selectedTypeId){
-        $state.go('activity.group_add_content',{groupId:$scope.selectedGroup.id,typeId: selectedTypeId});
+    $scope.addButtonClick = function (selectedTypeId) {
+        $state.go('activity.group_add_content', {groupId: $scope.selectedGroup.id, typeId: selectedTypeId});
     }
 }
 function GroupAddCtrl($scope, $state, $stateParams) {
     $scope.userFields = null;
-    $scope.load = function() {
+    $scope.load = function () {
 
         var groupId = $stateParams.groupId;
         var typeId = $stateParams.typeId;
         var groups = JSON.parse(localStorage.getItem('groups'));
 
         for (var i = 0, len = groups.length; i < len; i++) {
-            if(groups[i].id == groupId)
-            {
-                $scope.userFields= groups[i].fields;
+            if (groups[i].id == groupId) {
+                $scope.userFields = groups[i].fields;
                 for (var y = 0, lenFields = $scope.userFields.length; y < lenFields; y++) {
-                    if($scope.userFields[y].type.id == typeId)
-                    {
-                        $scope.customType= $scope.userFields[y].type;
+                    if ($scope.userFields[y].type.id == typeId) {
+                        $scope.customType = $scope.userFields[y].type;
                         break;
                     }
                 }
@@ -287,107 +286,6 @@ function GroupAddCtrl($scope, $state, $stateParams) {
     $scope.load();
 
 }
-function GoogleMaps($scope, $modalInstance) {
-    $scope.myMarkers = [];
-    $scope.myPlaces = [];
-
-    $scope.mapOptions = {
-        zoom: 11,
-        center: new google.maps.LatLng(40.6700, -73.9400),
-        // Style for Google Maps
-        styles: [{
-            "featureType": "water",
-            "stylers": [{"saturation": 43}, {"lightness": -11}, {"hue": "#0088ff"}]
-        }, {
-            "featureType": "road",
-            "elementType": "geometry.fill",
-            "stylers": [{"hue": "#ff0000"}, {"saturation": -100}, {"lightness": 99}]
-        }, {
-            "featureType": "road",
-            "elementType": "geometry.stroke",
-            "stylers": [{"color": "#808080"}, {"lightness": 54}]
-        }, {
-            "featureType": "landscape.man_made",
-            "elementType": "geometry.fill",
-            "stylers": [{"color": "#ece2d9"}]
-        }, {
-            "featureType": "poi.park",
-            "elementType": "geometry.fill",
-            "stylers": [{"color": "#ccdca1"}]
-        }, {
-            "featureType": "road",
-            "elementType": "labels.text.fill",
-            "stylers": [{"color": "#767676"}]
-        }, {
-            "featureType": "road",
-            "elementType": "labels.text.stroke",
-            "stylers": [{"color": "#ffffff"}]
-        }, {"featureType": "poi", "stylers": [{"visibility": "off"}]}, {
-            "featureType": "landscape.natural",
-            "elementType": "geometry.fill",
-            "stylers": [{"visibility": "on"}, {"color": "#b8cb93"}]
-        }, {"featureType": "poi.park", "stylers": [{"visibility": "on"}]}, {
-            "featureType": "poi.sports_complex",
-            "stylers": [{"visibility": "on"}]
-        }, {"featureType": "poi.medical", "stylers": [{"visibility": "on"}]}, {
-            "featureType": "poi.business",
-            "stylers": [{"visibility": "simplified"}]
-        }],
-        mapTypeId: google.maps.MapTypeId.ROADMAP
-    };
-    window.setTimeout(function () {
-        google.maps.event.trigger($scope.myMap, 'resize');
-    }, 100);
-
-    if (navigator.geolocation) {
-        navigator.geolocation.getCurrentPosition(function (position) {
-            var pos = new google.maps.LatLng(position.coords.latitude,
-                position.coords.longitude);
-            $scope.myMap.setCenter(pos);
-        });
-    }
-    $scope.addMarker = function ($event, $params) {
-        for (var i = 0; i < $scope.myMarkers.length; i++) {
-            $scope.myMarkers[i].setMap(null);
-        }
-        $scope.myMarkers = [];
-        $scope.myMarkers.push(new google.maps.Marker({
-            map: $scope.myMap,
-            position: $params[0].latLng
-        }));
-        var request = {
-            location: $scope.myMarkers[0].position,
-            radius: '50'
-        };
-        $scope.myPlaces = [];
-        if (typeof $scope.service == 'undefined') {
-            $scope.service = new google.maps.places.PlacesService($scope.myMap);
-        }
-
-        $scope.service.nearbySearch(request, function (results, status) {
-
-            if (status == google.maps.places.PlacesServiceStatus.OK) {
-
-                for (var i = 0; i < results.length; i++) {
-                    $scope.myPlaces.push(results[i]);
-                }
-                $scope.selectedPlace = $scope.myPlaces[0];
-                results = [];
-            }
-        });
-    };
-    $scope.selectPlace = function () {
-        if (typeof $scope.myMarkers !== 'undefined' && $scope.myMarkers.length > 0) {
-
-            var locationData = {
-                position: $scope.myMarkers[0].position,
-                place: $scope.selectedPlace
-            };
-            $modalInstance.close(locationData);
-        }
-
-    };
-}
 
 angular
     .module('socioactive')
@@ -396,7 +294,6 @@ angular
     .directive('tagTemplate', tagTemplate)
     .controller('MainCtrl', MainCtrl)
     .controller('CustomTypesCtrl', CustomTypesCtrl)
-    .controller('GoogleMaps', GoogleMaps)
     .controller('TypeTemplateCtrl', TypeTemplateCtrl)
     .controller('NodeInfoCtrl', NodeInfoCtrl)
     .controller('CurrentGroupsCtrl', CurrentGroupsCtrl)
@@ -422,7 +319,7 @@ angular
         $templateCache.put("enumeration.html", '<div><tags-input ng-model="nodeValue.nodeOptions"></tags-input> <select chosen class="form-control" style="width:350px;" tabindex="4" ng-model="nodeValue.nodeData" ng-options="s.text for s in nodeValue.nodeOptions"/> </div>');
         $templateCache.put("enumeration_edit.html", '<div><select chosen class="form-control" style="width:350px;" tabindex="4" ng-model="nodeValue.nodeData" ng-options="s.text for s in nodeValue.nodeOptions"/> </div>');
         $templateCache.put("list.html", '<div class="checkbox"><label> <input icheck type="checkbox" ng-click="updateSelection($event)">Use Custom Types</label></div><select chosen class="chosen-select" style="width:350px;" tabindex="4" ng-model="nodeValue.nodeData" ng-options="s as s.name for s in listTypes"></select>');
-        $templateCache.put("list_edit.html",'<a class="pull-right btn btn-white btn-xs" data-nodrag ng-click="newSubItem(nodeValue)"><span class="fa fa-plus"></span></a><div ui-tree id="tree-root"><ol ui-tree-nodes ng-model="nodeValue.nodeContent"><li ng-repeat="subNode in nodeValue.nodeContent" ui-tree-node ng-include="\'list_renderer.html\'"></li></ol></div>');
+        $templateCache.put("list_edit.html", '<a class="pull-right btn btn-white btn-xs" data-nodrag ng-click="newSubItem(nodeValue)"><span class="fa fa-plus"></span></a><div ui-tree id="tree-root"><ol ui-tree-nodes ng-model="nodeValue.nodeContent"><li ng-repeat="subNode in nodeValue.nodeContent" ui-tree-node ng-include="\'list_renderer.html\'"></li></ol></div>');
         $templateCache.put("integer.html", "<div><input type='text' class='form-control' data-mask='99999' ng-model='nodeValue.nodeData'><span class='help-block'>0 to 99999</span></div>");
         $templateCache.put("float.html", "<div><input type='text' class='form-control' data-mask='99999.99999' ng-model='nodeValue.nodeData'><span class='help-block'>0 to 99999.99999</span></div>");
         $templateCache.put("text.html", "<div><input type='text' class='form-control' ng-model='nodeValue.nodeData'></div>");
@@ -433,4 +330,15 @@ angular
         $templateCache.put("phone.html", "<div><input type='text' class='form-control' data-mask='(999) 999-9999' ng-model='nodeValue.nodeData'><span class='help-block'>(999) 999-9999</span></div>");
         $templateCache.put("currency.html", "<div><input type='text' class='form-control' data-mask='$ 999,999,999.99' ng-model='nodeValue.nodeData'><span class='help-block'>$ 999,999,999.99</span></div>");
         $templateCache.put("ipv4.html", "<div><input type='text' class='form-control' data-mask='999.999.999.9999' ng-model='nodeValue.nodeData'><span class='help-block'>192.168.100.200</span></div>");
-    }]);
+    }])
+    .factory('fireFactory', [
+        function fireFactory() {
+            return {
+                firebaseRef: function (path) {
+                    var baseUrl = "https://resplendent-fire-2746.firebaseio.com";
+                    path = (path !== '' && path) ?  baseUrl + '/' + path : baseUrl;
+                    return new Firebase(path);
+                }
+            };
+        }]
+    );

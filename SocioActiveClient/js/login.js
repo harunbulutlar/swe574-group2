@@ -2,91 +2,65 @@
     angular.module('socioactiveStart', [])
 
 })();
-function LoginCtrl($scope, $window, $rootScope) {
-    $scope.submit = function () {
-        var user = getUserFromLocal($rootScope.model);
-        if (user == null) {
-            alert('There is no User like that');
-            return;
-        }
+function LoginCtrl($scope, $window, $rootScope,fireFactory) {
+    var ref = fireFactory.firebaseRef();
+    var authData = ref.getAuth();
 
-        if (user.password != $rootScope.model.password) {
-            alert('Wrong Password');
-            return;
-        }
-        sessionStorage.setItem('currentUser', $rootScope.model.email);
-        sessionStorage.setItem('currentUserInfo', JSON.stringify(user));
+    if (authData) {
+        console.log("User " + authData.uid + " is logged in with " + authData.provider);
         $window.location.href = 'index.html';
+    } else {
+        console.log("User is logged out");
     }
-}
-function RegisterCtrl($scope, $window, $rootScope, $http) {
 
     $scope.submit = function () {
-        var user = getUserFromLocal($rootScope.model);
-        if (user != null) {
-        } else {
-            var users = getUsersFromLocal();
-            users[$rootScope.model.email] = $rootScope.model;
-            //var postObject = new Object();
-            //postObject.email = $rootScope.model.email;
-            //postObject.userData = JSON.stringify(users);
-            //$http({
-            //    url: 'http://localhost:8080/people',
-            //    dataType: 'json',
-            //    method: 'POST',
-            //    data: postObject,
-            //    headers: {
-            //        "Content-Type": "application/json"
-            //    }
-            //}).success(function(response){
-            //    alert("success");
-            //    $scope.response = response;
-            //}).error(function(error){
-            //    $scope.error = error;
-            //    alert($scope.error);
-            //
-            //});
-            //
-
-            localStorage.setItem('users', JSON.stringify(users));
-            sessionStorage.setItem('currentUser', $rootScope.model.email);
-        }
-
-function RegisterCtrl($scope, $window, $rootScope, MEMBER) {
-
-    $scope.submit = function () {
-        var user = getUserFromLocal($rootScope.model);
-        if (user == null) {
-            var users = getUsersFromLocal();
-            users[$rootScope.model.email] = $rootScope.model;
-            localStorage.setItem('users', JSON.stringify(users));
-            sessionStorage.setItem('currentUser', $rootScope.model.email);
-            sessionStorage.setItem('currentUserInfo', JSON.stringify($rootScope.model));
-            $window.location.href = 'index.html';
-            return;
-        }
-        alert('This User Exists');
+        var ref = fireFactory.firebaseRef();
+        ref.authWithPassword({
+            email    : $rootScope.model.email,
+            password : $rootScope.model.password
+        }, function(error, authData) {
+            if (error) {
+                console.log("Error getting user:", error);
+            } else {
+                console.log("Successfully got user account with uid:", authData.uid);
+                $window.location.href = 'index.html';
+            }
+        }, {
+            remember: "sessionOnly"
+        });
     };
 
+}
+
+function RegisterCtrl($scope, $window,fireFactory, $rootScope, MEMBER) {
+
+    $scope.registerClick = function(){
+        fireFactory.firebaseRef().createUser({
+            email    : $rootScope.model.email,
+            password : $rootScope.model.password
+        }, function(error, userData) {
+            if (error) {
+                console.log("Error creating user:", error);
+            } else {
+                var createdUserData = fireFactory.firebaseRef().child('users').child(userData.uid);
+                createdUserData.set({
+                        name: $scope.getName($rootScope.model.email),
+                        role: $rootScope.model.role
+                    });
+                console.log("Successfully created user account with uid:", userData.uid);
+                $window.location.href = 'login.html';
+            }
+        });
+    };
+// find a suitable name based on the meta info given by each provider
+    $scope.getName = function(authData) {
+        return authData.replace(/@.*/, '');
+    };
     $scope.memberRoles = MEMBER.MEMBER_ROLES;
     $rootScope.model.role = MEMBER.MEMBER_ROLES[0];
 }
-
-
-
-function getUserFromLocal(user) {
-    return getUsersFromLocal()[user.email];
-}
-
-function getUsersFromLocal() {
-    var users = JSON.parse(localStorage.getItem('users'));
-    if (users == null) {
-        users = {};
-    }
-    return users;
-}
 angular
-    .module('socioactiveStart')
+    .module('socioactiveStart', ['firebase'])
     .constant('MEMBER', {"MEMBER_ROLES": ["Undergraduate", "Graduate", "Postgraduate", "Prep Student", "Teaching Assistant", "Research Assistant", "Alumni", "Faculty Staff", "Other"]})
     .run(["$rootScope", function ($rootScope) {
         $rootScope.model = {
@@ -111,4 +85,14 @@ angular
         };
     }])
     .controller('RegisterCtrl', RegisterCtrl)
-    .controller('LoginCtrl', LoginCtrl);}
+    .controller('LoginCtrl', LoginCtrl)
+    .factory('fireFactory', [
+        function fireFactory() {
+            return {
+                firebaseRef: function(path) {
+                    var baseUrl = "https://resplendent-fire-2746.firebaseio.com";
+                    path = (path !== '' && path) ?  baseUrl + '/' + path : baseUrl;
+                    return new Firebase(path);
+                }
+            };
+    }]);
