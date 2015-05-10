@@ -8,12 +8,18 @@ function MainCtrl( $window, fireFactory) {
     }
     this.userId = this.authData.uid;
     this.isAdmin = false;
-    this.email = this.authData.password;
+
     this.currentUserData = fireFactory.getUserData(this.userId);
+
+    this.email = this.authData.password.email;
     this.logout = function () {
         fireFactory.firebaseRef().unauth();
         $window.location.href = 'login.html';
-    }
+    };
+
+    this.userName = this.currentUserData.userName;
+    this.userIsAdmin = this.currentUserData.isAdmin;
+
 }
 
 function CustomTypesCtrl($scope, $rootScope, fireFactory) {
@@ -234,7 +240,7 @@ function CurrentGroupsCtrl($scope, $state,fireFactory) {
     }
 }
 
-function GroupAddCtrl($scope, $state, $stateParams) {
+function GroupAddCtrl($scope, $state, $stateParams, fireFactory) {
     $scope.userFields = null;
     $scope.load = function () {
         var groupId = $stateParams.groupId;

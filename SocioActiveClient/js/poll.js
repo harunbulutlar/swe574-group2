@@ -2,13 +2,15 @@
  * Created by Osman Emre on 22.04.2015.
  */
 
-function PollCtrl($scope, $rootScope, $stateParams, $state, $http, MEMBER) {
+/** @namespace contextFilter.notable */
 
-    var currentUser = JSON.parse(sessionStorage.getItem('currentUserInfo'));
 
-    $scope.currentUserEmail = currentUser.email;
-    $scope.currentUserName = "Osman Emre";
-    $scope.currentUserIsAdmin = currentUser.isAdmin;
+function PollCtrl($scope, $rootScope, $stateParams, $state, $http, MEMBER, fireFactoryForPoll) {
+
+
+
+
+
 
     $scope.isVotedTemp = false;
 
@@ -22,7 +24,7 @@ function PollCtrl($scope, $rootScope, $stateParams, $state, $http, MEMBER) {
     $scope.pollToBeViewed = $stateParams.pollToBeViewed;
 
 
-    var initialize = function () {
+    $scope.initialize = function () {
         $rootScope.localStoragePollModel = {
             "pollId": "",
             "pollPrivacy": "",
@@ -38,6 +40,17 @@ function PollCtrl($scope, $rootScope, $stateParams, $state, $http, MEMBER) {
             "pollTags": {},
             "pollRoles": []
         };
+
+        $scope.initializeUser();
+    };
+
+
+    $scope.initializeUser = function () {
+        $scope.mainCtrl = this.main;
+
+        $scope.currentUserEmail = $scope.mainCtrl.email;
+        $scope.currentUserName = $scope.mainCtrl.userName;
+        $scope.currentUserIsAdmin = this.userIsAdmin;
     };
 
     if ($scope.pollToBeViewed != null) {
@@ -46,10 +59,11 @@ function PollCtrl($scope, $rootScope, $stateParams, $state, $http, MEMBER) {
 
         $rootScope.localStoragePollModel = $scope.localStoragePollObject[$scope.pollToBeViewed];
 
+        $scope.initializeUser();
 
     } else {
 
-        initialize();
+        $scope.initialize();
 
         $rootScope.localStoragePollModel.pollId = guid();
         $rootScope.localStoragePollModel.createdBy = $scope.currentUserEmail;
@@ -152,13 +166,14 @@ function PollCtrl($scope, $rootScope, $stateParams, $state, $http, MEMBER) {
 
     $scope.isCurrentUserVoted = function () {
 
-        if ($scope.isVotedTemp == true || $rootScope.localStoragePollModel.pollParticipantList.indexOf($scope.currentUserEmail) != -1) {
+        return (($scope.isVotedTemp == true) ||
+        ($rootScope.localStoragePollModel.pollParticipantList.indexOf($scope.currentUserEmail) != -1));
 
-            return true;
-        } else {
 
-            return false;
-        }
+
+
+
+
 
     };
 
@@ -166,24 +181,31 @@ function PollCtrl($scope, $rootScope, $stateParams, $state, $http, MEMBER) {
 
         if (!$rootScope.localStoragePollModel.pollTitle) {
 
-            alert("You need to enter a title for your poll!")
+            alert("You need to enter a title for your poll!");
             return;
 
         }
 
         if (!$rootScope.localStoragePollModel.pollDescription) {
 
-            alert("You need to enter a description for your poll!")
+            alert("You need to enter a description for your poll!");
             return;
 
         }
 
         if ($scope.isObjectEmpty($rootScope.localStoragePollModel.pollOptions)) {
 
-            alert("You need to add options for your poll!")
+            alert("You need to add options for your poll!");
             return;
 
         }
+
+        var saveAfterLoad = function(data, polls){
+            polls.push($rootScope.localStoragePollModel);
+            data.$save();
+            $scope.mainCtrl.currentUserData.$save();
+        };
+        var data = fireFactoryForPoll.loadPolls(saveAfterLoad);
 
         var pollList = getPollListFromLocalStorage();
         pollList[$rootScope.localStoragePollModel.pollId] = $rootScope.localStoragePollModel;
@@ -211,11 +233,13 @@ function PollCtrl($scope, $rootScope, $stateParams, $state, $http, MEMBER) {
 
         } else {
 
-            if (($scope.currentUserEmail == $scope.localStoragePollObject[$scope.pollToBeViewed].createdBy) || $scope.currentUserIsAdmin) {
-                return false;
-            } else {
-                return true;
-            }
+            return !(($scope.currentUserEmail == $scope.localStoragePollObject[$scope.pollToBeViewed].createdBy) || $scope.currentUserIsAdmin);
+
+
+
+
+
+
         }
 
     };
@@ -225,6 +249,7 @@ function PollCtrl($scope, $rootScope, $stateParams, $state, $http, MEMBER) {
     };
 
     $scope.getTagContext = function (val) {
+
 
         return $http.get('https://www.googleapis.com/freebase/v1/search', {
             params: {
@@ -238,7 +263,8 @@ function PollCtrl($scope, $rootScope, $stateParams, $state, $http, MEMBER) {
 
             var scores = [];
             var contexts = [];
-            $scope.getDataDeneme = []; //TODO remove
+
+
 
             angular.forEach(tagContextRawData, function (item) {
 
@@ -251,11 +277,13 @@ function PollCtrl($scope, $rootScope, $stateParams, $state, $http, MEMBER) {
             var scoreTag = scoreAverage - scoreStandardDeviation / 2;
 
             var tagContextFilteredData = tagContextRawData.filter(function (contextFilter) {
+
                 if (contextFilter.hasOwnProperty('notable') && contextFilter.notable.name != '') {
 
                     return (contextFilter.name != '') && (contextFilter.score >= scoreTag);
 
                 }
+
             });
 
             angular.forEach(tagContextFilteredData, function (item) {
@@ -270,10 +298,12 @@ function PollCtrl($scope, $rootScope, $stateParams, $state, $http, MEMBER) {
                     $scope.pollTagTempList[tagId] = {
                         tagId: tagId,
                         tagName: item.name,
-                        tagContext: item.notable.name
+                        tagContext: item.notable.name,
+                        tagContextParentDomain: getTagContextParentDomain(item.notable.id),
+                        tagContextChildDomain: getTagContextChildDomain(item.notable.id)
                     };
 
-                    $scope.getDataDeneme.push(item.notable.name); //TODO remove
+
 
                 }
             });
@@ -284,23 +314,31 @@ function PollCtrl($scope, $rootScope, $stateParams, $state, $http, MEMBER) {
 
     };
 
-    $scope.getTagContextDetail = function (currentTopic) {
+    /*    $scope.getTagContextDetail = function (currentTopic) {
 
-        var topic_id = currentTopic;
 
-        return $http.get('https://www.googleapis.com/freebase/v1/topic' + topic_id, {
-            params: {
-                key: 'AIzaSyBfJNRIjAao3J0PZeO9ALipSJ_k9NjETwc',
-                filter: '/location'
-            }
-        }).then(function (result) {
 
-            $scope.denemeData1 = result.data;
+     return $http.get('https://www.googleapis.com/freebase/v1/topic' + currentTopic, {
+     params: {
 
-            return $scope.denemeData1;
 
-        });
-    };
+
+
+     }
+
+
+
+
+
+     }).then(function (result) {
+
+     $scope.denemeData1 = result.data;
+
+     return $scope.denemeData1;
+
+     });
+     };*/
+
 
 
     $scope.addPollTag = function (tagId) {
@@ -323,14 +361,16 @@ function PollCtrl($scope, $rootScope, $stateParams, $state, $http, MEMBER) {
 
     };
 
-    $scope.addManualPollTag = function(tagName, tagContext){
+    $scope.addManualPollTag = function (tagName, tagContext, tagContextParentDomain, tagContextChildDomain) {
 
         var tagId = guid();
 
         $scope.pollTagTempList[tagId] = {
             tagId: tagId,
             tagName: tagName,
-            tagContext: tagContext
+            tagContext: tagContext,
+            tagContextParentDomain: tagContextParentDomain,
+            tagContextChildDomain: tagContextChildDomain
         };
 
         $rootScope.localStoragePollModel.pollTags[tagId] = $scope.pollTagTempList[tagId];
@@ -400,7 +440,7 @@ function PollCtrl($scope, $rootScope, $stateParams, $state, $http, MEMBER) {
         // Note that this doesn't handle
         // toString and valueOf enumeration bugs in IE < 9
         for (var key in obj) {
-            if (hasOwnProperty.call(obj, key)) return false;
+            if (obj.hasOwnProperty(key)) return false;
         }
 
         return true;
@@ -602,14 +642,16 @@ function calculateStandardDeviation(values) {
 
     var squareDiffs = values.map(function (value) {
         var diff = value - avg;
-        var sqrDiff = diff * diff;
-        return sqrDiff;
+        return diff * diff;
+
+
     });
 
     var avgSquareDiff = calculateAverage(squareDiffs);
 
-    var stdDev = Math.sqrt(avgSquareDiff);
-    return stdDev;
+    return Math.sqrt(avgSquareDiff);
+
+
 }
 
 function calculateAverage(data) {
@@ -617,8 +659,9 @@ function calculateAverage(data) {
         return sum + value;
     }, 0);
 
-    var avg = sum / data.length;
-    return avg;
+    return sum / data.length;
+
+
 }
 
 function dateDifference(date) {
@@ -633,8 +676,14 @@ function dateDifference(date) {
 
 }
 
-function saveTempData(pollId, pollData, pollAttribute) {
+function getTagContextParentDomain(notableId) {
+    return notableId.split("/")[1];
+}
 
+
+
+function getTagContextChildDomain(notableId) {
+    return notableId.split("/")[2];
 }
 
 
@@ -660,4 +709,26 @@ angular
             "pollRoles": []
         };
 
-    }]);
+    }])
+    .factory('fireFactoryForPoll', ['$firebaseObject',
+        function fireFactory($firebaseObject) {
+            var helperFactory = {};
+            helperFactory.firebaseRef = function (path) {
+                var baseUrl = "https://resplendent-fire-2746.firebaseio.com";
+                path = (path !== '' && path) ?  baseUrl + '/' + path : baseUrl;
+                return new Firebase(path);
+            };
+            helperFactory.getData = function () {
+                return $firebaseObject(helperFactory.firebaseRef().child('data'));
+            };
+            helperFactory.loadPolls = function (callback) {
+                var data = helperFactory.getData();
+                data.$loaded().then(function(loadedData){
+                    if(!loadedData.polls){
+                        loadedData.polls = [];
+                    }
+                    callback(loadedData,loadedData.polls);
+                })
+            };
+            return helperFactory;
+        }]);
