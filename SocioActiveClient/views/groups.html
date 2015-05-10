@@ -2,12 +2,11 @@
     <div class="col-lg-6">
         <div class="ibox float-e-margins">
             <div class="ibox-content">
-                <div class="feed-activity-list" ng-repeat="group in data.groups">
-                    <div class="feed-element">
-                        <div class="media-body ">
-                            <strong>{{group.owner.email}}</strong> posted a new group => {{group.title}} <br><button class="btn btn-primary" ng-click="show(group)">show</button>
-                        </div>
-                    </div>
+                <div class="list-group">
+                    <a ng-repeat="group in data.groups" ng-class="group.class" ng-click="show(group)" href="">
+                        <h3 class="list-group-item-heading">{{group.ownerData.userName}}'s group : {{group.title}}</h3>
+                        <p class="list-group-item-text">{{group.description }}</p>
+                    </a>
                 </div>
             </div>
         </div>
@@ -22,9 +21,9 @@
             <div>
                 <script type="text/ng-template" id="field_renderer.html">
                     <div ui-tree-handle class="tree-node tree-node-content">
-                        <a class="pull-right btn btn-white btn-xs" data-nodrag ng-click="addContent(node)"><span class="fa fa-plus"></span></a>
-                        <div >{{node.name}}(Type:{{node.type.name}})</div>
-                        <button class="btn btn-primary" ng-click="addButtonClick(node.type.id)">Add</button>
+                        <a class="pull-right btn btn-white btn-xs" data-nodrag ng-click="addButtonClick(node.type.id)"><span class="fa fa-plus"></span></a>
+                        <a class="btn btn-primary btn-xs" data-nodrag ng-click="toggle(this)"><span class="fa" ng-class="{'fa-angle-down': collapsed, 'fa-angle-right': !collapsed}"></span></a>
+                        {{node.name}}(Type:{{node.type.name}})
                     </div>
                 </script>
                 <div ui-tree id="tree-root">

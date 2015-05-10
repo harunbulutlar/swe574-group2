@@ -8,7 +8,7 @@ function MainCtrl( $window, fireFactory) {
     }
     this.userId = this.authData.uid;
     this.isAdmin = false;
-    this.email = this.authData.password;
+    this.email = this.authData.password.email;
     this.currentUserData = fireFactory.getUserData(this.userId);
     this.logout = function () {
         fireFactory.firebaseRef().unauth();
@@ -52,7 +52,6 @@ function CustomTypesCtrl($scope, $rootScope, fireFactory) {
     };
 
     $scope.saveChanges = function () {
-
 
         if ($scope.createdGroup.title == '') {
             alert('Group has no title');
@@ -220,10 +219,38 @@ function CurrentGroupsCtrl($scope, $state,fireFactory) {
 
     fireFactory.loadData(function(loadedData){
         $scope.data = loadedData;
+
+        $scope.$watch('data.groups', function(newVal, oldVal){
+            var foundSelected = false;
+            if(!newVal){
+                return;
+            }
+            for(var i = 0; i<newVal.length; i++)
+            {
+                if($scope.selectedGroup != null && newVal[i].id == $scope.selectedGroup.id){
+                    newVal[i].class = "list-group-item active";
+                    foundSelected = true;
+                }
+                else{
+                    newVal[i].class = "list-group-item";
+                }
+               newVal[i].ownerData = fireFactory.getUserData(newVal[i].owner);
+            }
+            if(!foundSelected){
+                $scope.selectedGroup = $scope.data.groups[0];
+                $scope.selectedGroup.class = "list-group-item active";
+            }
+        }, true);
+
     });
     $scope.selectedGroup = null;
     $scope.show = function (group) {
+        $scope.selectedGroup.class = "list-group-item";
+        group.class = "list-group-item active";
         $scope.selectedGroup = group;
+    };
+    $scope.showGroupOwner = function(group){
+
     };
 
     $scope.addContent = function (node) {
@@ -234,23 +261,46 @@ function CurrentGroupsCtrl($scope, $state,fireFactory) {
     }
 }
 
-function GroupAddCtrl($scope, $state, $stateParams) {
+function GroupAddCtrl($scope, $state, $stateParams,fireFactory) {
     $scope.userFields = null;
+
     $scope.load = function () {
+        $scope.mainCtrl = this.main;
+
         var groupId = $stateParams.groupId;
         var typeId = $stateParams.typeId;
-        var groups = JSON.parse(localStorage.getItem('groups'));
-        $scope.currentGroups = fireFactory.getData().groups;
-        for (var i = 0, len = groups.length; i < len; i++) {
-            if (groups[i].id == groupId) {
-                $scope.userFields = groups[i].fields;
-                for (var y = 0, lenFields = $scope.userFields.length; y < lenFields; y++) {
-                    if ($scope.userFields[y].type.id == typeId) {
-                        $scope.customType = $scope.userFields[y].type;
-                        break;
+        var showGroups = function(data,groups) {
+            $scope.data = data;
+            var currentGroups = groups;
+            for (var i = 0, len =  currentGroups.length; i < len; i++) {
+                if (groups[i].id == groupId) {
+                    $scope.currentGroup = groups[i];
+                    $scope.userFields = $scope.currentGroup.fields;
+                    for (var y = 0, lenFields = $scope.userFields.length; y < lenFields; y++) {
+                        if ($scope.userFields[y].type.id == typeId) {
+                            $scope.customType = $scope.userFields[y].type;
+                            break;
+                        }
                     }
                 }
             }
+        };
+        fireFactory.loadGroups(showGroups);
+    };
+
+    $scope.saveChanges = function(){
+        if($scope.data){
+            if($scope.currentGroup.content == null)
+            {
+                $scope.currentGroup.content = [];
+            }
+            $scope.currentGroup.content.push({
+                id: guid(),
+                owner: $scope.mainCtrl.userId,
+                data:   $scope.customType.data
+
+            });
+            $scope.data.$save();
         }
     };
     $scope.load();
