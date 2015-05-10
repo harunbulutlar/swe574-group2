@@ -249,6 +249,9 @@ function CurrentGroupsCtrl($scope, $state,fireFactory) {
         }, true);
 
     });
+    $scope.toggle = function(scope) {
+        scope.toggle();
+    };
     $scope.selectedGroup = null;
     $scope.show = function (group) {
         $scope.selectedGroup.class = "list-group-item";
@@ -259,7 +262,8 @@ function CurrentGroupsCtrl($scope, $state,fireFactory) {
 
     };
 
-    $scope.addContent = function (node) {
+    $scope.showContent = function (node) {
+        $state.go('create.asd', {groupId: $scope.selectedGroup.id, contentId: node.id});
     };
 
     $scope.addButtonClick = function (selectedTypeId) {
@@ -268,11 +272,9 @@ function CurrentGroupsCtrl($scope, $state,fireFactory) {
 }
 
 function GroupAddCtrl($scope, $state, $stateParams,fireFactory) {
-    $scope.userFields = null;
-
     $scope.load = function () {
         $scope.mainCtrl = this.main;
-
+        $scope.userField = null;
         var groupId = $stateParams.groupId;
         var typeId = $stateParams.typeId;
         var showGroups = function(data,groups) {
@@ -281,10 +283,11 @@ function GroupAddCtrl($scope, $state, $stateParams,fireFactory) {
             for (var i = 0, len =  currentGroups.length; i < len; i++) {
                 if (groups[i].id == groupId) {
                     $scope.currentGroup = groups[i];
-                    $scope.userFields = $scope.currentGroup.fields;
-                    for (var y = 0, lenFields = $scope.userFields.length; y < lenFields; y++) {
-                        if ($scope.userFields[y].type.id == typeId) {
-                            $scope.customType = $scope.userFields[y].type;
+                    var userFields = $scope.currentGroup.fields;
+                    for (var y = 0, lenFields = userFields.length; y < lenFields; y++) {
+                        if (userFields[y].type.id == typeId) {
+                            $scope.userField = userFields[y];
+                            $scope.customType =angular.copy(userFields[y].type);
                             break;
                         }
                     }
@@ -296,22 +299,57 @@ function GroupAddCtrl($scope, $state, $stateParams,fireFactory) {
 
     $scope.saveChanges = function(){
         if($scope.data){
-            if($scope.currentGroup.content == null)
+            var userData = fireFactory.getUserData($scope.mainCtrl.userId);
+            if($scope.userField.content == null)
             {
-                $scope.currentGroup.content = [];
+                $scope.userField.content = [];
             }
-            $scope.currentGroup.content.push({
-                id: guid(),
-                owner: $scope.mainCtrl.userId,
-                data:   $scope.customType.data
+            userData.$loaded().then(function(data){
+                $scope.userField.content.push({
+                    id: guid(),
+                    ownerId: $scope.mainCtrl.userId,
+                    owner: data.userName,
+                    data:   $scope.customType.data
 
+                });
+                $scope.data.$save();
             });
-            $scope.data.$save();
+
         }
     };
     $scope.load();
 }
 
+function GroupViewCtrl($scope, $state, $stateParams,fireFactory) {
+    $scope.load = function () {
+        $scope.mainCtrl = this.main;
+        $scope.userField = null;
+        var groupId = $stateParams.groupId;
+        var contentId = $stateParams.contentId;
+        var showGroups = function(data,groups) {
+            $scope.data = data;
+            for (var i = 0, len =  groups.length; i < len; i++) {
+                if (groups[i].id == groupId) {
+                    $scope.currentGroup = groups[i];
+                    var userFields = $scope.currentGroup.fields;
+                    for (var y = 0, lenFields = userFields.length; y < lenFields; y++) {
+                        var content = userFields[y].content;
+                        if(!content){continue;}
+                        for (var x = 0, lenContent = content.length; x < lenContent; x++) {
+                            if (content[y].id == contentId) {
+                                $scope.contentData = content[y].data;
+                                break;
+                            }
+                        }
+                    }
+                }
+            }
+        };
+        fireFactory.loadGroups(showGroups);
+    };
+
+    $scope.load();
+}
 function PictureUploadCtrl($scope) {
     $scope.files = [];
     $scope.uploadPicture = function(){
@@ -329,6 +367,7 @@ angular
     .controller('NodeInfoCtrl', NodeInfoCtrl)
     .controller('CurrentGroupsCtrl', CurrentGroupsCtrl)
     .controller('GroupAddCtrl', GroupAddCtrl)
+    .controller('GroupViewCtrl', GroupViewCtrl)
     .controller('PictureUploadCtrl', PictureUploadCtrl)
     .run(["$templateCache", "$rootScope", function ($templateCache, $rootScope) {
         $rootScope.primitiveTypes = [
@@ -355,13 +394,20 @@ angular
         $templateCache.put("integer.html", "<div><input type='text' class='form-control' data-mask='99999' ng-model='nodeValue.nodeData'><span class='help-block'>0 to 99999</span></div>");
         $templateCache.put("float.html", "<div><input type='text' class='form-control' data-mask='99999.99999' ng-model='nodeValue.nodeData'><span class='help-block'>0 to 99999.99999</span></div>");
         $templateCache.put("text.html", "<div><input type='text' class='form-control' ng-model='nodeValue.nodeData'></div>");
+        $templateCache.put("text_view.html", "<div><input type='text' class='form-control' ng-disabled='true' ng-model='nodeValue.nodeData'></div>");
         $templateCache.put("place.html", "<div>Latitude: {{nodeValue.nodeData.position.D}} Longitude: {{nodeValue.nodeData.position.k}}  Place: {{nodeValue.specialData.place.name}}<button class='btn btn-primary' ng-click='openMap(lg,this)'>Select Place</button></div>");
         $templateCache.put("time.html", "<div class='input-group date'><input type='time' class='form-control' ng-model='nodeValue.nodeData'><span class='input-group-addon'><i class='fa fa-clock-o'></i></span></div>");
+        $templateCache.put("time_view.html", "<div class='input-group date'><input type='time' class='form-control' ng-model='nodeValue.nodeData'><span class='input-group-addon'><i class='fa fa-clock-o'></i></span></div>");
         $templateCache.put("date.html", "<div class='input-group date'><input type='date' class='form-control' ng-model='nodeValue.nodeData'><span class='input-group-addon'><i class='fa fa-calendar'></i></span></div>");
+        $templateCache.put("date_view.html", "<div class='input-group date'><input type='date' class='form-control' ng-model='nodeValue.nodeData'><span class='input-group-addon'><i class='fa fa-calendar'></i></span></div>");
         $templateCache.put("dateandtime.html", "<div class='input-group date'><input type='datetime' class='form-control' date-time ng-model='nodeValue.nodeData' view='date'><span class='input-group-addon'><i class='fa fa-calendar'></i></span></div>");
+        $templateCache.put("dateandtime_view.html", "<div class='input-group date'><input type='datetime' ng-disabled='true' class='form-control' date-time ng-model='nodeValue.nodeData' view='date'><span class='input-group-addon'><i class='fa fa-calendar'></i></span></div>");
         $templateCache.put("phone.html", "<div><input type='text' class='form-control' data-mask='(999) 999-9999' ng-model='nodeValue.nodeData'><span class='help-block'>(999) 999-9999</span></div>");
+        $templateCache.put("phone_view.html", "<div><input type='text' class='form-control' data-mask='(999) 999-9999' ng-disabled='true' ng-model='nodeValue.nodeData'><span class='help-block'>(999) 999-9999</span></div>");
         $templateCache.put("currency.html", "<div><input type='text' class='form-control' data-mask='$ 999,999,999.99' ng-model='nodeValue.nodeData'><span class='help-block'>$ 999,999,999.99</span></div>");
+        $templateCache.put("currency_view.html", "<div><input type='text' class='form-control' data-mask='$ 999,999,999.99' ng-disabled='true' ng-model='nodeValue.nodeData'><span class='help-block'>$ 999,999,999.99</span></div>");
         $templateCache.put("ipv4.html", "<div><input type='text' class='form-control' data-mask='999.999.999.9999' ng-model='nodeValue.nodeData'><span class='help-block'>192.168.100.200</span></div>");
+        $templateCache.put("ipv4_view.html", "<div><input type='text' class='form-control' data-mask='999.999.999.9999' ng-disabled='true' ng-model='nodeValue.nodeData'><span class='help-block'>192.168.100.200</span></div>");
     }])
     .factory('fireFactory', ['$firebaseObject',
         function fireFactory($firebaseObject) {
