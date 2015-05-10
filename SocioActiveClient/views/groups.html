@@ -14,17 +14,26 @@
     <div class="col-lg-6">
         <div class="ibox float-e-margins">
             <div class="ibox-content">
-                <div class="form-group"><label>{{selectedGroup.title}}</label></div>
-                <div class="form-group"><label>{{selectedGroup.description}}</label></div>
-
+                <div class="form-group"><label>{{selectedGroup.title}}'s fields</label></div>
             </div>
-            <div>
+            <div class="ibox-content">
+
+                <script type="text/ng-template" id="content_renderer.html">
+                    <div ui-tree-handle class="tree-node tree-node-content">
+                        <a class="pull-right btn btn-white btn-xs" data-nodrag ng-click="showContent(node)"><span class="fa fa-eye"></span></a>
+                        {{node.owner}}'s content
+                    </div>
+                </script>
                 <script type="text/ng-template" id="field_renderer.html">
                     <div ui-tree-handle class="tree-node tree-node-content">
                         <a class="pull-right btn btn-white btn-xs" data-nodrag ng-click="addButtonClick(node.type.id)"><span class="fa fa-plus"></span></a>
                         <a class="btn btn-primary btn-xs" data-nodrag ng-click="toggle(this)"><span class="fa" ng-class="{'fa-angle-down': collapsed, 'fa-angle-right': !collapsed}"></span></a>
                         {{node.name}}(Type:{{node.type.name}})
                     </div>
+                    <ol ui-tree-nodes="" ng-model="node.content" ng-class="{hidden: collapsed}">
+                        <li ng-repeat="node in node.content" ui-tree-node ng-include="'content_renderer.html'">
+                        </li>
+                    </ol>
                 </script>
                 <div ui-tree id="tree-root">
                     <ol ui-tree-nodes ng-model="selectedGroup.fields">
