@@ -221,7 +221,7 @@ function arrayObjectIndexOf(myArray, searchTerm, property) {
     }
     return -1;
 }
-function CurrentGroupsCtrl($scope, $state,fireFactory) {
+function CurrentGroupsCtrl($scope, $state, fireFactory) {
 
     fireFactory.loadData(function(loadedData){
         $scope.data = loadedData;
@@ -249,6 +249,7 @@ function CurrentGroupsCtrl($scope, $state,fireFactory) {
         }, true);
 
     });
+
     $scope.selectedGroup = null;
     $scope.show = function (group) {
         $scope.selectedGroup.class = "list-group-item";
