@@ -15,7 +15,7 @@
                 <div class="form-group"><label>User Field Name</label> <input type="text" ng-model="userFieldName" placeholder="Enter User Field Name" class="form-control"></div>
 
                 <div class="checkbox"><label> <input icheck type="checkbox" ng-click="updateSelection($event)">Use Custom Types</label></div>
-                <select chosen id="types" class="chosen-select" style="width:350px;" tabindex="4" ng-model="userFieldType" ng-options="value.name for (key,value) in types">
+                <select chosen id="types" class="chosen-select" style="width:350px;" tabindex="4" ng-model="userFieldType" ng-options="value.name for value in types">
                 </select>
                 <button class="btn btn-primary" ng-click="createUserField()">Create Group User Addable Field</button>
                 <div>
@@ -27,7 +27,7 @@
                     </script>
                     <div ui-tree id="tree-root">
                         <ol ui-tree-nodes ng-model="createdGroup.fields">
-                            <li ng-repeat="(key, node) in createdGroup.fields" ui-tree-node ng-include="'field_renderer.html'"></li>
+                            <li ng-repeat=" node in createdGroup.fields" ui-tree-node ng-include="'field_renderer.html'"></li>
                         </ol>
                     </div>
                 </div>
@@ -41,7 +41,7 @@
                 </div>
                 <div class="ibox-content" >
                     <tabset>
-                        <tab ng-repeat="(key, value) in $root.customTypes">
+                        <tab ng-repeat=" value in $root.customTypes">
                             <tab-heading>
                                 {{value.name}}<a class="pull-right btn btn-white btn-xs" data-nodrag ng-click="removeTab(value)"><span class="fa fa-trash"></span></a>
                             </tab-heading>

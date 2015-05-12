@@ -6,8 +6,8 @@
             </div>
         </script>
         <div ui-tree id="tree-root">
-            <ol ui-tree-nodes ng-model="contentData">
-                <li ng-repeat="node in contentData" ui-tree-node ng-include="'view_renderer.html'"></li>
+            <ol ui-tree-nodes ng-model="content">
+                <li ng-repeat="node in content.data" ui-tree-node ng-include="'view_renderer.html'"></li>
             </ol>
         </div>
     </div>
