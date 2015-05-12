@@ -301,14 +301,34 @@ function GroupViewCtrl($scope, $stateParams, fireFactory) {
     })
 }
 
-function PictureUploadCtrl($scope) {
+function PictureUploadCtrl($scope,resizeService,$rootScope) {
     $scope.image = null;
     $scope.imageFileName = '';
     $scope.uploadImage = function () {
+
         $scope.fileReader = new FileReader();
         $scope.fileReader.readAsDataURL(this.$flow.files[0].file);
         $scope.fileReader.onloadend = function () {
-        }
+            resizeService.resizeImage($scope.fileReader.result, {size: 100, sizeScale: 'ko', otherOptions: '',height:128,width:128}, function(err, image){
+                if(err) {
+                    console.error(err);
+                    return;
+                }
+                $scope.bigImage = image;
+                $rootScope.MainCtrlRef.currentUserData.userImage = $scope.bigImage;
+                $rootScope.MainCtrlRef.currentUserData.$save();
+            });
+            resizeService.resizeImage($scope.fileReader.result, {size: 100, sizeScale: 'ko', otherOptions: '',height:48,width:48}, function(err, image){
+                if(err) {
+                    console.error(err);
+                    return;
+                }
+                $scope.smallImage = image;
+                $rootScope.MainCtrlRef.currentUserData.userImageSmall = $scope.smallImage;
+                $rootScope.MainCtrlRef.currentUserData.$save();
+            });
+        };
+
     };
 }
 angular

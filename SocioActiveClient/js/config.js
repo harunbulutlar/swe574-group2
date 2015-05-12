@@ -300,6 +300,11 @@ function config($stateProvider, $urlRouterProvider, $ocLazyLoadProvider) {
                         {
                             name:'flow',
                             files: ['js/plugins/ngFlow/ng-flow-standalone.js']
+
+                        },
+                        {
+                            name:'images-resizer',
+                            files: ['js/plugins/imageresize/imageresize.js']
                         }
                     ]);
                 }
