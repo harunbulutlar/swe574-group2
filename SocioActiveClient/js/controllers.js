@@ -1,4 +1,4 @@
-function MainCtrl( $window, fireFactory) {
+function MainCtrl( $window, fireFactory,$rootScope) {
 
     this.authData = fireFactory.firebaseRef().getAuth();
     if (this.authData) {
@@ -9,7 +9,7 @@ function MainCtrl( $window, fireFactory) {
     this.userId = this.authData.uid;
     this.isAdmin = false;
     this.email = this.authData.password;
-    this.currentUserData = fireFactory.getUserData(this.userId);
+    this.currentUserData = fireFactory.getUserObject(this.userId);
 
     this.email = this.authData.password.email;
     this.logout = function () {
@@ -19,6 +19,7 @@ function MainCtrl( $window, fireFactory) {
 
     this.userName = this.currentUserData.userName;
     this.userIsAdmin = this.currentUserData.isAdmin;
+    $rootScope.MainCtrlRef = this;
 
 }
 
@@ -29,8 +30,8 @@ function CustomTypesCtrl($scope, $rootScope, fireFactory) {
             name: "New Type",
             data: []
         };
-        $rootScope.customTypes.push(customType);
-        $scope.customTypeTabs[customType.id] = true;
+
+        $rootScope.customTypes[customType.id] =  customType;
 
     };
     $scope.updateSelection = function ($event) {
@@ -38,23 +39,23 @@ function CustomTypesCtrl($scope, $rootScope, fireFactory) {
         $scope.types = (checkbox.checked ? $rootScope.customTypes : $rootScope.primitiveTypes);
 
     };
-    $scope.removeTab = function (customType) {
-        var index = arrayObjectIndexOf($rootScope.customTypes, customType.id, "id");
-        delete $scope.customTypeTabs[customType.id];
-        $rootScope.customTypes.splice(index, 1);
 
-    };
+    $scope.removeTab = function (customType) {
+        delete $rootScope.customTypes[customType.id];
+};
+
     $scope.removeUserField = function (userField) {
-        var index = arrayObjectIndexOf($scope.createdGroup.fields, userField.id, "id");
-        $scope.createdGroup.fields.splice(index, 1);
+        delete $scope.createdGroup.fields[userField.id];
     };
 
     $scope.createUserField = function () {
-        $scope.createdGroup.fields.push({
+        var userField = {
             id: guid(),
             name: $scope.userFieldName,
             type: $scope.userFieldType
-        });
+        };
+
+        $scope.createdGroup.fields[userField.id] = userField;
     };
 
     $scope.saveChanges = function () {
@@ -67,43 +68,31 @@ function CustomTypesCtrl($scope, $rootScope, fireFactory) {
             alert('Group has no description');
             return;
         }
-        if ($scope.createdGroup.fields.length == 0) {
-            alert('You do not have any fields for your group');
+        if (isEmpty($scope.createdGroup.fields)) {
+            alert('You did not create any fields yet');
             return;
         }
-        var saveAfterLoad = function(data, groups){
-            groups.push($scope.createdGroup);
-            data.$save();
-            $scope.mainCtrl.currentUserData.$save();
-        };
-        var data = fireFactory.loadGroups(saveAfterLoad);
+        $rootScope.customTypes.$save();
+        var fireBaseObj = fireFactory.getGroupsRef().push($scope.createdGroup);
+        if(!$rootScope.MainCtrlRef.currentUserData.createdGroups){
+            $rootScope.MainCtrlRef.currentUserData.createdGroups = {};
+        }
+        $rootScope.MainCtrlRef.currentUserData.createdGroups[fireBaseObj.key()] = true;
+        $rootScope.MainCtrlRef.currentUserData.$save();
 
     };
 
-    $scope.createdGroup = {};
     $scope.userFieldType = '';
     $scope.types = $rootScope.primitiveTypes;
     $scope.userFieldName = '';
-    $scope.customTypeTabs = {};
-    // at the bottom of your controller
+
     $scope.initPage = function () {
-        var returnObject = this.main.currentUserData;
-        if (!returnObject.customTypes) {
-            returnObject.customTypes = [];
-        }
-        $rootScope.customTypes = returnObject.customTypes;
-        angular.forEach($rootScope.customTypes, function (event) {
-            $scope.customTypeTabs[event.id] = true;
-        });
-        $scope.createdGroup = {
-            id: guid(),
-            owner: this.main.userId,
-            title: '',
-            description: '',
-            fields: [],
-            content: null
-        };
-        $scope.mainCtrl = this.main;
+        $rootScope.customTypes = fireFactory.getCustomTypesObjectOfUser($rootScope.MainCtrlRef.userId);
+        $scope.createdGroup = {};
+        $scope.createdGroup["owner"] = $rootScope.MainCtrlRef.userId;
+        $scope.createdGroup["title"] = '';
+        $scope.createdGroup["description"] = '';
+        $scope.createdGroup["fields"] = {};
 
     };
     $scope.initPage();
@@ -139,6 +128,26 @@ function TypeTemplateCtrl($scope, $rootScope) {
     };
     $scope.typeParameterName = "";
     $scope.typeParameterType = "";
+}
+
+function isEmpty(obj) {
+
+    // null and undefined are "empty"
+    if (obj == null) return true;
+
+    // Assume if it has a length property with a non-zero value
+    // that that property is correct.
+    if (obj.length > 0)    return false;
+    if (obj.length === 0)  return true;
+
+    // Otherwise, does it have any properties of its own?
+    // Note that this doesn't handle
+    // toString and valueOf enumeration bugs in IE < 9
+    for (var key in obj) {
+        if (Object.prototype.hasOwnProperty.call(obj, key)) return false;
+    }
+
+    return true;
 }
 
 function NodeInfoCtrl($scope, $rootScope) {
@@ -211,7 +220,7 @@ function guid() {
             .substring(1);
     }
 
-    return s4() + s4() + '-' + s4() + '-' + s4() + '-' +
+    return 'id:' + s4() + s4() + '-' + s4() + '-' + s4() + '-' +
         s4() + '-' + s4() + s4() + s4();
 }
 
@@ -240,7 +249,7 @@ function CurrentGroupsCtrl($scope, $state,fireFactory) {
                 else{
                     newVal[i].class = "list-group-item";
                 }
-               newVal[i].ownerData = fireFactory.getUserData(newVal[i].owner);
+               newVal[i].ownerData = fireFactory.getUserObject(newVal[i].owner);
             }
             if(!foundSelected){
                 $scope.selectedGroup = $scope.data.groups[0];
@@ -299,7 +308,7 @@ function GroupAddCtrl($scope, $state, $stateParams,fireFactory) {
 
     $scope.saveChanges = function(){
         if($scope.data){
-            var userData = fireFactory.getUserData($scope.mainCtrl.userId);
+            var userData = fireFactory.getUserObject($scope.mainCtrl.userId);
             if($scope.userField.content == null)
             {
                 $scope.userField.content = [];
@@ -336,8 +345,8 @@ function GroupViewCtrl($scope, $state, $stateParams,fireFactory) {
                         var content = userFields[y].content;
                         if(!content){continue;}
                         for (var x = 0, lenContent = content.length; x < lenContent; x++) {
-                            if (content[y].id == contentId) {
-                                $scope.contentData = content[y].data;
+                            if (content[x].id == contentId) {
+                                $scope.contentData = content[x].data;
                                 break;
                             }
                         }
@@ -370,25 +379,26 @@ angular
     .controller('GroupViewCtrl', GroupViewCtrl)
     .controller('PictureUploadCtrl', PictureUploadCtrl)
     .run(["$templateCache", "$rootScope", function ($templateCache, $rootScope) {
-        $rootScope.primitiveTypes = [
-            {name: 'Enumeration'},
-            {name: 'List'},
-            {name: 'Integer'},
-            {name: 'Float'},
-            {name: 'Text'},
-            {name: 'Place'},
-            {name: 'Time'},
-            {name: 'Date'},
-            {name: 'DateAndTime'},
-            {name: 'Phone'},
-            {name: 'Currency'},
-            {name: 'IPV4'}
-        ];
+        $rootScope.primitiveTypes = {
+            Enumeration: {name:'Enumeration'},
+            List: {name: 'List'},
+            Integer: {name: 'Integer'},
+            Float: {name: 'Float'},
+            Text: {name: 'Text'},
+            Place: {name: 'Place'},
+            Time: {name: 'Time'},
+            Date: {name: 'Date'},
+            DateAndTime: {name: 'DateAndTime'},
+            Phone: {name: 'Phone'},
+            Currency: {name: 'Currency'},
+            IPV4: {name: 'IPV4'}
+        };
 
-        $rootScope.customTypes = [];
+        $rootScope.customTypes = {};
 
         $templateCache.put("enumeration.html", '<div><tags-input ng-model="nodeValue.nodeOptions"></tags-input> <select chosen class="form-control" style="width:350px;" tabindex="4" ng-model="nodeValue.nodeData" ng-options="s.text for s in nodeValue.nodeOptions"/> </div>');
         $templateCache.put("enumeration_edit.html", '<div><select chosen class="form-control" style="width:350px;" tabindex="4" ng-model="nodeValue.nodeData" ng-options="s.text for s in nodeValue.nodeOptions"/> </div>');
+        $templateCache.put("enumeration_view.html",  "<div><input type='text' class='form-control' ng-disabled='true' ng-model='nodeValue.nodeData'></div>");
         $templateCache.put("list.html", '<div class="checkbox"><label> <input icheck type="checkbox" ng-click="updateSelection($event)">Use Custom Types</label></div><select chosen class="chosen-select" style="width:350px;" tabindex="4" ng-model="nodeValue.nodeData" ng-options="s as s.name for s in listTypes"></select>');
         $templateCache.put("list_edit.html", '<a class="pull-right btn btn-white btn-xs" data-nodrag ng-click="newSubItem(nodeValue)"><span class="fa fa-plus"></span></a><div ui-tree id="tree-root"><ol ui-tree-nodes ng-model="nodeValue.nodeContent"><li ng-repeat="subNode in nodeValue.nodeContent" ui-tree-node ng-include="\'list_renderer.html\'"></li></ol></div>');
         $templateCache.put("integer.html", "<div><input type='text' class='form-control' data-mask='99999' ng-model='nodeValue.nodeData'><span class='help-block'>0 to 99999</span></div>");
@@ -417,9 +427,16 @@ angular
                 path = (path !== '' && path) ? baseUrl + '/' + path : baseUrl;
                 return new Firebase(path);
             };
-            helperFactory.getUserData = function (uid) {
-                return $firebaseObject(helperFactory.firebaseRef().child('users').child(uid));
+            helperFactory.getUserRef = function (uid) {
+                return helperFactory.firebaseRef().child('users').child(uid);
             };
+
+            helperFactory.getUserObject = function (uid) {
+                return $firebaseObject(helperFactory.getUserRef(uid));
+            };
+
+
+
             helperFactory.getData = function () {
                 return $firebaseObject(helperFactory.firebaseRef().child('data'));
             };
@@ -428,13 +445,27 @@ angular
                 data.$loaded().then(callback)
             };
             helperFactory.loadGroups = function (callback) {
-                var data = helperFactory.getData();
+                var data = $firebaseObject(helperFactory.firebaseRef().child('data').child('groups'));
                 data.$loaded().then(function(loadedData){
-                    if(!loadedData.groups){
-                        loadedData.groups = [];
-                    }
-                    callback(loadedData,loadedData.groups);
+                    callback(loadedData);
                 })
+            };
+            helperFactory.getGroupRef = function (uid) {
+                return helperFactory.firebaseRef().child('data').child('groups').child(uid);
+            };
+            helperFactory.getGroupObject = function (uid) {
+                return $firebaseObject(helperFactory.getGroupRef(uid));
+            };
+
+            helperFactory.getGroupsRef = function () {
+                return helperFactory.firebaseRef().child('data').child('groups');
+            };
+            helperFactory.getGroupsObject = function () {
+                return $firebaseObject(helperFactory.getGroupsRef());
+            };
+
+            helperFactory.getCustomTypesObjectOfUser = function (uid) {
+                return $firebaseObject(helperFactory.firebaseRef().child('users').child(uid).child('customTypes'));
             };
             return helperFactory;
 

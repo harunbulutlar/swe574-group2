@@ -1,7 +1,13 @@
 <div ng-controller="CurrentGroupsCtrl">
     <div class="col-lg-6">
         <div class="ibox float-e-margins">
+            <div class="ibox-title">
+                <h3>Groups
+                    <small>every group you can find</small>
+                </h3>
+            </div>
             <div class="ibox-content">
+
                 <div class="list-group">
                     <a ng-repeat="group in data.groups" ng-class="group.class" ng-click="show(group)" href="">
                         <h3 class="list-group-item-heading">{{group.ownerData.userName}}'s group : {{group.title}}</h3>
@@ -13,11 +19,14 @@
     </div>
     <div class="col-lg-6">
         <div class="ibox float-e-margins">
-            <div class="ibox-content">
-                <div class="form-group"><label>{{selectedGroup.title}}'s fields</label></div>
+            <div class="ibox-title">
+                <h3>Group Content
+                    <small>content of the group you select</small>
+                </h3>
             </div>
             <div class="ibox-content">
 
+                <div class="form-group"><label>{{selectedGroup.title}}'s fields</label></div>
                 <script type="text/ng-template" id="content_renderer.html">
                     <div ui-tree-handle class="tree-node tree-node-content">
                         <a class="pull-right btn btn-white btn-xs" data-nodrag ng-click="showContent(node)"><span class="fa fa-eye"></span></a>
