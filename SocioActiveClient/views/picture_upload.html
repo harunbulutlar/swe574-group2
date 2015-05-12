@@ -11,7 +11,7 @@
 
     </div>
 </div>
-<div class="wrapper wrapper-content animated fadeIn" ng-controller="PictureUploadCtrl">
+<div class="wrapper wrapper-content animated fadeIn">
     <div class="row">
         <div class="col-lg-12">
             <div class="ibox float-e-margins">
@@ -20,21 +20,26 @@
 
                     <div ibox-tools></div>
                 </div>
-                <div flow-init="{target: '/upload'}"
-                     flow-files-submitted="$flow.upload()"
-                     flow-file-success="$file.msg = $message">
-
-                    <input type="file" flow-btn/>
-                    Input OR Other element as upload button
-                    <span class="btn" flow-btn>Upload File</span>
-
-                    <table>
-                        <tr ng-repeat="file in $flow.files">
-                            <td>{{$index+1}}</td>
-                            <td>{{file.name}}</td>
-                            <td>{{file.msg}}</td>
-                        </tr>
-                    </table>
+                <div flow-init="{singleFile:true}" flow-file-added="!!{png:1,gif:1,jpg:1,jpeg:1}[$file.getExtension()]" class="ng-scope" ng-controller="PictureUploadCtrl">
+                    <h3>
+                        <a name="image-example" class="anchor" href="#image-example"><span class="octicon octicon-link"></span></a>Single Image upload</h3>
+                    <div class="thumbnail ng-hide" ng-show="!$flow.files.length">
+                        <img src="http://www.placehold.it/200x150/EFEFEF/AAAAAA&amp;text=no+image">
+                    </div>
+                    <div class="thumbnail" ng-show="$flow.files.length">
+                        <img flow-img="$flow.files[0]">
+                    </div>
+                    <div>
+                        <span class="btn btn-primary ng-hide" ng-show="!$flow.files.length" flow-btn="">Select image<input type="file" style="visibility: hidden; position: absolute;"></span>
+                        <button class="btn btn-primary" ng-click="uploadImage()">Upload</button>
+                        <span class="btn btn-info" ng-show="$flow.files.length" flow-btn="">Change<input type="file" style="visibility: hidden; position: absolute;"></span>
+  <span class="btn btn-danger" ng-show="$flow.files.length" ng-click="$flow.cancel()">
+    Remove
+  </span>
+                    </div>
+                    <p>
+                        Only PNG,GIF,JPG,JEPG files allowed.
+                    </p>
                 </div>
             </div>
         </div>

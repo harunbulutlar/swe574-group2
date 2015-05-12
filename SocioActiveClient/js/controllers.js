@@ -235,7 +235,7 @@ function arrayObjectIndexOf(myArray, searchTerm, property) {
 }
 function CurrentGroupsCtrl($scope, $state, fireFactory) {
     $scope.hideGroupContent = true;
-    $scope.selectedGroupId = null
+    $scope.selectedGroupId = null;
     $scope.groups = fireFactory.getGroupsObject();
     $scope.toggle = function (scope) {
         scope.toggle();
@@ -302,10 +302,14 @@ function GroupViewCtrl($scope, $stateParams, fireFactory) {
 }
 
 function PictureUploadCtrl($scope) {
-    $scope.files = [];
-    $scope.uploadPicture = function () {
-        $scope.files;
-    }
+    $scope.image = null;
+    $scope.imageFileName = '';
+    $scope.uploadImage = function () {
+        $scope.fileReader = new FileReader();
+        $scope.fileReader.readAsDataURL(this.$flow.files[0].file);
+        $scope.fileReader.onloadend = function () {
+        }
+    };
 }
 angular
     .module('socioactive')
