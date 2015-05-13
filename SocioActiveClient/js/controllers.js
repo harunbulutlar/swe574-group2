@@ -24,7 +24,8 @@ function MainCtrl($window, fireFactory, $rootScope) {
 
 }
 
-function CustomTypesCtrl($scope, $rootScope, fireFactory) {
+function CustomTypesCtrl($state, $scope,$window, $rootScope, fireFactory) {
+    $scope.loading = false;
     $scope.addCustomType = function () {
         var customType = {
             name: "New Type",
@@ -82,7 +83,12 @@ function CustomTypesCtrl($scope, $rootScope, fireFactory) {
             $rootScope.MainCtrlRef.currentUserData.createdGroups = {};
         }
         $rootScope.MainCtrlRef.currentUserData.createdGroups[fireBaseObj.key()] = true;
-        $rootScope.MainCtrlRef.currentUserData.$save();
+        $scope.loading = true;
+        $rootScope.MainCtrlRef.currentUserData.$save().then(function(){
+            $scope.loading = false;
+            $state.go('activity.groups');
+
+        });
     };
 
     $scope.userFieldType = '';
@@ -273,8 +279,8 @@ function CurrentGroupsCtrl($scope, $state, fireFactory) {
     }
 }
 
-function GroupAddCtrl($scope,$rootScope, $stateParams, fireFactory) {
-
+function GroupAddCtrl($scope,$state, $rootScope,$window, $stateParams, fireFactory) {
+    $scope.loading = false;
     $scope.userField = fireFactory.getFieldObject($stateParams.groupId,$stateParams.typeId);
     $scope.userField.$loaded().then(function(loadedData){
         $scope.customType = angular.copy(loadedData.type);
@@ -289,7 +295,11 @@ function GroupAddCtrl($scope,$rootScope, $stateParams, fireFactory) {
             owner: $rootScope.MainCtrlRef.currentUserData.userName,
             data: angular.fromJson(angular.toJson($scope.customType.data))
         });
-        $scope.userField.$save();
+        $scope.loading = true;
+        $scope.userField.$save().then(function(){
+            $scope.loading = false;
+            $state.go('activity.groups');
+        });
     };
 }
 
