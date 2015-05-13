@@ -30,12 +30,16 @@
             <li ui-sref-active="index">
                 <a ui-sref="index.picture_upload"><i class="fa fa-diamond"></i> <span class="nav-label">Picture Upload</span></a>
             </li>
-            <li ng-class="{active: $state.includes('activity')}">
+			<li ui-sref-active="index">
+                <a ui-sref="index.search"><i class="fa fa-search"></i> <span class="nav-label">Search</span></a>
+            </li>
+			<li ng-class="{active: $state.includes('activity')}">
                 <a ui-sref="inbox"><i class="fa fa-globe"></i> <span class="nav-label">Activity</span><span
                         class="label label-warning pull-right">5</span></a>
                 <ul class="nav nav-second-level" ng-class="{in: $state.includes('activity')}" dropdown>
                     <li ui-sref-active="active"><a ui-sref="activity.groups">Groups</a></li>
                     <li ui-sref-active="active"><a ui-sref="activity.events">Events</a></li>
+                    <li ui-sref-active="active"><a ui-sref="activity.pollsv2">Polls</a></li>
 
 
                     <li><a class="dropdown-toggle" dropdown-toggle href>

@@ -8,7 +8,8 @@ function MainCtrl( $window, fireFactory) {
     }
     this.userId = this.authData.uid;
     this.isAdmin = false;
-    this.email = this.authData.password;
+	
+	
     this.currentUserData = fireFactory.getUserData(this.userId);
 
     this.email = this.authData.password.email;
@@ -356,6 +357,43 @@ function PictureUploadCtrl($scope) {
         $scope.files;
     }
 }
+
+function SearchCtrl($scope, $firebaseObject, $filter) {
+    $scope.searchTerm = '';
+    var helperFactory = {};
+    helperFactory.firebaseRef = function (path) {
+        var baseUrl = "https://resplendent-fire-2746.firebaseio.com";
+        path = (path !== '' && path) ? baseUrl + '/' + path : baseUrl;
+        return new Firebase(path);
+    };
+    $scope.pollsFiltered = [];
+    $scope.$watch('searchTerm', function () {
+
+        var keepGoing = true;
+        $scope.pollsFiltered = [];
+        angular.forEach($scope.polls, function(value, key) {
+                if(value.hasOwnProperty('pollTags')) {
+                    angular.forEach(value.pollTags, function(value2, key2) {
+                        if(keepGoing) {
+                            if (value2.tagContext.search($scope.searchTerm) > -1) {
+                                $scope.pollsFiltered.push(value);
+                                keepGoing = false;
+                            }
+                        }
+                    });
+                }
+                //result[key] = value;
+        });
+
+        //$scope.polls =filterFilter($scope.polls, {pollDescription: $scope.searchTerm});
+       //console.log($scope.polls);
+    });
+
+    $scope.polls = $firebaseObject(helperFactory.firebaseRef().child('data').child('polls'));
+
+    //console.log($scope.polls);
+}
+
 angular
     .module('socioactive')
     .directive('addNodeInfo', addNodeInfo)
@@ -369,6 +407,7 @@ angular
     .controller('GroupAddCtrl', GroupAddCtrl)
     .controller('GroupViewCtrl', GroupViewCtrl)
     .controller('PictureUploadCtrl', PictureUploadCtrl)
+	.controller('SearchCtrl', SearchCtrl)
     .run(["$templateCache", "$rootScope", function ($templateCache, $rootScope) {
         $rootScope.primitiveTypes = [
             {name: 'Enumeration'},

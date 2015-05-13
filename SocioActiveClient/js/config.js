@@ -336,6 +336,26 @@ function config($stateProvider, $urlRouterProvider, $ocLazyLoadProvider) {
                 }
             }
         })
+		
+		.state('index.search', {
+            url: "/search",
+            templateUrl: "views/search.html",
+            data: { pageTitle: 'Search' },
+
+
+
+
+            resolve: {
+                loadPlugin: function ($ocLazyLoad) {
+                    return $ocLazyLoad.load([
+                        {
+                            name:'flow',
+                            files: ['js/plugins/ngFlow/ng-flow-standalone.js']
+                        }
+                    ]);
+                }
+            }
+        })
 }
 angular
     .module('socioactive')
