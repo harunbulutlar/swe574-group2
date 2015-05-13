@@ -29,15 +29,20 @@
                 <!--Continually expanded and constantly improved Inspinia Admin Them (IN+)-->
             </p>
             <p>Login in. To see it in action.</p>
-            <form class="m-t" role="form" ng-submit="submit()" ng-controller="LoginCtrl">
-                <div class="form-group">
+            <form  class="m-t" role="form" ng-submit="submit()" ng-controller="LoginCtrl">
+                <div ng-class="{'form-group': true, 'has-error': isInError(emailErrorMessage)}">
                     <input type="email" ng-model="$root.model.email" class="form-control" placeholder="Username" required="">
+                    <p class="help-block">{{emailErrorMessage}}</p>
                 </div>
-                <div class="form-group">
+                <div ng-class="{'form-group': true,'has-error': isInError(passwordErrorMessage)}">
                     <input type="password" ng-model="$root.model.password" class="form-control" placeholder="Password" required="">
+                    <p class="help-block">{{passwordErrorMessage}}</p>
                 </div>
                 <button id="login" type="submit" class="btn btn-primary block full-width m-b">Login</button>
-
+                <div ng-show="loading" class="sk-spinner sk-spinner-double-bounce">
+                    <div class="sk-double-bounce1"></div>
+                    <div class="sk-double-bounce2"></div>
+                </div>
                 <a href="#"><small>Forgot password?</small></a>
                 <p class="text-muted text-center"><small>Do not have an account?</small></p>
                 <a class="btn btn-sm btn-white btn-block" href="register.html">Create an account</a>

@@ -4,52 +4,95 @@
 })();
 function LoginCtrl($scope, $window, $rootScope,fireFactory) {
     var ref = fireFactory.firebaseRef();
-    var authData = ref.getAuth();
 
+    var authData = ref.getAuth();
     if (authData) {
         console.log("User " + authData.uid + " is logged in with " + authData.provider);
         $window.location.href = 'index.html';
     } else {
         console.log("User is logged out");
     }
-
-    $scope.submit = function () {
-        var ref = fireFactory.firebaseRef();
-        ref.authWithPassword({
-            email    : $rootScope.model.email,
-            password : $rootScope.model.password
-        }, function(error, authData) {
-            if (error) {
-                console.log("Error getting user:", error);
-            } else {
-                console.log("Successfully got user account with uid:", authData.uid);
-                $window.location.href = 'index.html';
-            }
-        }, {
-            remember: "sessionOnly"
-        });
+    $scope.emailErrorMessage= '';
+    $scope.passwordErrorMessage = '';
+    $scope.emailError = function(error) {
+        $scope.emailErrorMessage = error.message;
+    };
+    $scope.passwordError = function(error) {
+        $scope.passwordErrorMessage = error.message;
     };
 
+    $scope.errorFunction = {};
+    $scope.errorFunction["INVALID_USER"] = $scope.emailError;
+    $scope.errorFunction["INVALID_EMAIL"] = $scope.emailError;
+    $scope.errorFunction["INVALID_PASSWORD"] = $scope.passwordError;
+    $scope.isInError = function(errorString){
+        return !(!errorString || errorString == null || errorString == '');
+    };
+
+    $scope.submit = function () {
+        $scope.loading = true;
+        $scope.loginCB = function (error){
+            $scope.emailErrorMessage= '';
+            $scope.passwordErrorMessage = '';
+            $scope.loading = false;
+            if (error) {
+                if($scope.errorFunction[error.code]){
+                    $scope.$apply($scope.errorFunction[error.code](error));
+                } else {
+                    console.log("Unknown error occurred: ", error);
+                }
+            }
+        };
+        fireFactory.loginAndRedirect($rootScope.model, 'index.html',$scope.loginCB);
+
+    };
 }
 
 function RegisterCtrl($scope, $window,fireFactory, $rootScope, MEMBER) {
 
-    $scope.registerClick = function(){
-        fireFactory.firebaseRef().createUser({
-            email    : $rootScope.model.email,
-            password : $rootScope.model.password
-        }, function(error, userData) {
-            if (error) {
-                console.log("Error creating user:", error);
+    $scope.emailErrorMessage= '';
+    $scope.passwordErrorMessage = '';
+    $scope.emailError = function(error) {
+        $scope.emailErrorMessage = error.message;
+    };
+    $scope.passwordError = function(error) {
+        $scope.passwordErrorMessage = error.message;
+    };
+    $scope.isInError = function(errorString){
+        return !(!errorString || errorString == null || errorString == '');
+    };
+    $scope.errorFunction = {};
+    $scope.errorFunction["INVALID_USER"] = $scope.emailError;
+    $scope.errorFunction["INVALID_EMAIL"] = $scope.emailError;
+    $scope.errorFunction["EMAIL_TAKEN"] = $scope.emailError;
+    $scope.errorFunction["INVALID_PASSWORD"] = $scope.passwordError;
+
+    $scope.registerCB = function(error, userData){
+        $scope.emailErrorMessage= '';
+        $scope.passwordErrorMessage = '';
+        if (error) {
+            if($scope.errorFunction[error.code]){
+                $scope.$apply($scope.errorFunction[error.code](error));
+                $scope.loading = false;
             } else {
-                var createdUserData = fireFactory.getUserData(userData.uid);
-                $rootScope.model.userName = $scope.getName($rootScope.model.email);
-                angular.copy($rootScope.model, createdUserData);
-                createdUserData.$save();
-                console.log("Successfully created user account with uid:", userData.uid);
-                $window.location.href = 'login.html';
+                console.log("Unknown error occurred: ", error);
             }
-        });
+        } else {
+            var createdUserData = fireFactory.getUserData(userData.uid);
+            $rootScope.model.userName = $scope.getName($rootScope.model.email);
+            angular.copy($rootScope.model, createdUserData);
+            createdUserData.$save();
+            console.log("Successfully created user account with uid:", userData.uid);
+            fireFactory.loginAndRedirect($rootScope.model, 'index.html',function(){$scope.loading = false;});
+        }
+    };
+    $scope.submit = function(){
+        $scope.loading = true;
+        var registerData = {
+            email: $rootScope.model.email,
+            password: $rootScope.model.password
+        };
+        fireFactory.firebaseRef().createUser(registerData, $scope.registerCB);
     };
     $scope.getName = function(authData) {
         return authData.replace(/@.*/, '');
@@ -83,8 +126,8 @@ angular
     }])
     .controller('RegisterCtrl', RegisterCtrl)
     .controller('LoginCtrl', LoginCtrl)
-    .factory('fireFactory', [ '$firebaseObject',
-        function fireFactory($firebaseObject) {
+    .factory('fireFactory', [ '$firebaseObject','$window',
+        function fireFactory($firebaseObject,$window) {
             var helperFactory = {};
             helperFactory.firebaseRef = function (path) {
                 var baseUrl = "https://resplendent-fire-2746.firebaseio.com";
@@ -99,6 +142,25 @@ angular
             };
             helperFactory.getGroups= function () {
                 return $firebaseObject(helperFactory.firebaseRef().child('groups'));
+            };
+            helperFactory.loginAndRedirect= function (model,redirection,callback) {
+                var ref = helperFactory.firebaseRef();
+                ref.authWithPassword({
+                    email    : model.email,
+                    password : model.password
+                }, function(error, authData) {
+                   if(callback){
+                       callback(error);
+                   }
+                    if (error) {
+                        console.log("Error in login: ", error);
+                    } else {
+                        console.log("Authenticated successfully with payload:", authData);
+                        $window.location.href =redirection;
+                    }
+                }, {
+                    remember: "sessionOnly"
+                });
             };
             return helperFactory;
 

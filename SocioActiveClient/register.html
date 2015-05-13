@@ -29,24 +29,26 @@
         <h3>Register to SocioActive</h3>
         <p>Create account to see it in action.</p>
         <form class="m-t" role="form" ng-submit="submit()" ng-controller="RegisterCtrl">
-            <div class="form-group">
+
+            <div  ng-class="{'form-group': true,'has-error': isInError(passwordErrorMessage)}">
                 <input type="email" class="form-control" ng-model="$root.model.email" placeholder="Email" required="">
-            </div>
-            <div class="form-group">
-
-                <select class="form-control" required="" placeholder="Role" ng-model="$root.model.role"
-                        ng-options="roles for roles in memberRoles">
-                </select>
-
+                <p class="help-block">{{emailErrorMessage}}</p>
             </div>
 
             <div class="form-group">
-                <input type="password" class="form-control" ng-model="$root.model.password" placeholder="Password"
-                       required="">
+                <select class="form-control" required="" placeholder="Role" ng-model="$root.model.role" ng-options="roles for roles in memberRoles"></select>
             </div>
 
-            <button id="register" ng-click="registerClick()" class="btn btn-primary block full-width m-b">Register</button>
+            <div  ng-class="{'form-group': true,'has-error': isInError(passwordErrorMessage)}">
+                <input type="password" class="form-control" ng-model="$root.model.password" placeholder="Password" required="">
+                <p class="help-block">{{passwordErrorMessage}}</p>
+            </div>
 
+            <button id="register" type="submit" class="btn btn-primary block full-width m-b">Register</button>
+            <div ng-show="loading" class="sk-spinner sk-spinner-double-bounce">
+                <div class="sk-double-bounce1"></div>
+                <div class="sk-double-bounce2"></div>
+            </div>
             <p class="text-muted text-center">
                 <small>Already have an account?</small>
             </p>

@@ -1,10 +1,16 @@
 <div ng-controller="CurrentGroupsCtrl">
     <div class="col-lg-6">
         <div class="ibox float-e-margins">
+            <div class="ibox-title">
+                <h3>Groups
+                    <small>every group you can find</small>
+                </h3>
+            </div>
             <div class="ibox-content">
+
                 <div class="list-group">
-                    <a ng-repeat="group in data.groups" ng-class="group.class" ng-click="show(group)" href="">
-                        <h3 class="list-group-item-heading">{{group.ownerData.userName}}'s group : {{group.title}}</h3>
+                    <a ng-repeat="(key,group) in groups" ng-class="getClass(group)" ng-click="show(group,key)" href="">
+                        <h3 class="list-group-item-heading">{{group.ownerName}}'s group : {{group.title}}</h3>
                         <p class="list-group-item-text">{{group.description }}</p>
                     </a>
                 </div>
@@ -13,31 +19,34 @@
     </div>
     <div class="col-lg-6">
         <div class="ibox float-e-margins">
-            <div class="ibox-content">
-                <div class="form-group"><label>{{selectedGroup.title}}'s fields</label></div>
+            <div class="ibox-title">
+                <h3>Group Content
+                    <small>content of the group you select</small>
+                </h3>
             </div>
-            <div class="ibox-content">
+            <div class="ibox-content" ng-hide="hideGroupContent">
 
+                <div class="form-group"><label>{{selectedGroup.title}}'s fields</label></div>
                 <script type="text/ng-template" id="content_renderer.html">
                     <div ui-tree-handle class="tree-node tree-node-content">
-                        <a class="pull-right btn btn-white btn-xs" data-nodrag ng-click="showContent(node)"><span class="fa fa-eye"></span></a>
+                        <a class="pull-right btn btn-white btn-xs" data-nodrag ng-click="showContent(fieldKey, contentKey)"><span class="fa fa-eye"></span></a>
                         {{node.owner}}'s content
                     </div>
                 </script>
                 <script type="text/ng-template" id="field_renderer.html">
                     <div ui-tree-handle class="tree-node tree-node-content">
-                        <a class="pull-right btn btn-white btn-xs" data-nodrag ng-click="addButtonClick(node.type.id)"><span class="fa fa-plus"></span></a>
+                        <a class="pull-right btn btn-white btn-xs" data-nodrag ng-click="addButtonClick(fieldKey)"><span class="fa fa-plus"></span></a>
                         <a class="btn btn-primary btn-xs" data-nodrag ng-click="toggle(this)"><span class="fa" ng-class="{'fa-angle-down': collapsed, 'fa-angle-right': !collapsed}"></span></a>
                         {{node.name}}(Type:{{node.type.name}})
                     </div>
                     <ol ui-tree-nodes="" ng-model="node.content" ng-class="{hidden: collapsed}">
-                        <li ng-repeat="node in node.content" ui-tree-node ng-include="'content_renderer.html'">
+                        <li ng-repeat="(contentKey, node) in node.content" ui-tree-node ng-include="'content_renderer.html'">
                         </li>
                     </ol>
                 </script>
                 <div ui-tree id="tree-root">
                     <ol ui-tree-nodes ng-model="selectedGroup.fields">
-                        <li ng-repeat="node in selectedGroup.fields" ui-tree-node ng-include="'field_renderer.html'"></li>
+                        <li ng-repeat="(fieldKey,node) in selectedGroup.fields" ui-tree-node ng-include="'field_renderer.html'"></li>
                     </ol>
                 </div>
             </div>
