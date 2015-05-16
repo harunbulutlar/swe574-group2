@@ -5,6 +5,7 @@
 /** @namespace contextFilter.notable */
 
 
+
 function PollCtrl($scope, $rootScope, $stateParams, $state, $http, MEMBER, fireFactoryForPoll) {
 
 
@@ -114,7 +115,7 @@ function PollCtrl($scope, $rootScope, $stateParams, $state, $http, MEMBER, fireF
             "commentId": commentId,
             "commentBody": $scope.pollCommentTempList.commentBody,
             "commentUserEmail": $scope.currentUserEmail,
-            "commentUserName": $scope.currentUserName, /*TODO Bunu kullanýcýya baðla*/
+            "commentUserName": $scope.currentUserName, /*TODO Bunu kullanï¿½cï¿½ya baï¿½la*/
             "commentDateTime": new Date().getTime()
         };
 
