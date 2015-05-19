@@ -442,7 +442,7 @@ function EventCtrl($scope, fireFactory, $stateParams, $firebaseObject) {
         var strippedEvents = angular.fromJson(angular.toJson($scope.createdEvent));
 
         var fireBaseObj = fireFactory.getEventsRef().push(strippedEvents);
-
+        alert("Event is created.");
 
     }
 
