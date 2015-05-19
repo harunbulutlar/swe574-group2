@@ -615,7 +615,6 @@ angular
                     angular.forEach(tagContextFilteredData, function (item) {
                         if (item.hasOwnProperty('notable')) {
                             var tagId = guid();
-                            console.log(item.notable.name);
                             contexts.push({
                                 tagId: tagId,
                                 name: item.name + '<p style= "font-style: italic" class="pull-right">' + item.notable.name,
