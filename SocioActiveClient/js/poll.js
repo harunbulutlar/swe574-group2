@@ -5,17 +5,18 @@
 /** @namespace contextFilter.notable */
 
 
+function PollCtrl($scope, $rootScope, $stateParams, $state, contextFactory, MEMBER, fireFactoryForPoll) {
 
-function PollCtrl($scope, $rootScope, $stateParams, $state, contextFactory, MEMBER, fireFactoryForPoll, semanticTagFactory) {
     $scope.isVotedTemp = false;
     $scope.getPollTags = contextFactory.getTagContext;
     $scope.pollOptionTempList = [];
     $scope.pollCommentTempList = [];
-    $scope.pollTagTempList = [];
     $rootScope.pollTagTempList = [];
-    $scope.pollTagTempId = '';
+    $scope.tags = '';
+    $scope.manualTags = '';
 
     $scope.pollRoles = MEMBER.MEMBER_ROLES;
+
     $scope.pollToBeViewed = $stateParams.pollToBeViewed;
 
     $scope.initializePoll = function () {
@@ -75,10 +76,7 @@ function PollCtrl($scope, $rootScope, $stateParams, $state, contextFactory, MEMB
 
     $scope.addPollComment = function () {
 
-        var commentId = guid();
-
         $scope.createdPoll.pollComments.push({
-            "commentId": commentId,
             "commentBody": $scope.pollCommentTempList.commentBody,
             "commentUserEmail": $scope.currentUserId,
             "commentUserName": $scope.currentUserName,
@@ -108,56 +106,10 @@ function PollCtrl($scope, $rootScope, $stateParams, $state, contextFactory, MEMB
     };
 
     $scope.isCurrentUserVoted = function () {
+
         return (($scope.isVotedTemp == true) ||
         ($scope.createdPoll.pollParticipantList.indexOf($scope.currentUserId) != -1));
 
-    };
-
-    $scope.savePollData = function () {
-        if (!$rootScope.localStoragePollModel.pollTitle) {
-            alert("You need to enter a title for your poll!");
-            return;
-        }
-
-        if (!$rootScope.localStoragePollModel.pollDescription) {
-            alert("You need to enter a description for your poll!");
-            return;
-        }
-
-        if ($scope.isObjectEmpty($rootScope.localStoragePollModel.pollOptions)) {
-            alert("You need to add options for your poll!");
-            return;
-        }
-
-        var saveAfterLoad = function (data, polls) {
-            polls.push($rootScope.localStoragePollModel);
-            data.$save();
-            $scope.mainCtrl.currentUserData.$save();
-        };
-        var data = fireFactoryForPoll.loadPolls(saveAfterLoad);
-
-        var pollList = getPollListFromLocalStorage();
-        pollList[$rootScope.localStoragePollModel.pollId] = $rootScope.localStoragePollModel;
-        localStorage.setItem('pollData', JSON.stringify(pollList));
-        if ($scope.pollToBeViewed == null) {
-
-            alert("Your poll created!");
-            $state.go('activity.polls', {'pollToBeViewed': $rootScope.localStoragePollModel.pollId});
-
-        } else {
-
-            alert("Your changes are saved!");
-            $scope.reloadState();
-        }
-    };
-
-    $scope.isPollDisabled = function () {
-        if ($scope.pollToBeViewed == null) {
-            return false;
-
-        } else {
-            return !(($scope.currentUserEmail == $scope.localStoragePollObject[$scope.pollToBeViewed].createdBy) || $scope.currentUserIsAdmin);
-        }
     };
 
     $scope.reloadState = function () {
@@ -165,65 +117,63 @@ function PollCtrl($scope, $rootScope, $stateParams, $state, contextFactory, MEMB
     };
 
     $scope.addPollTag = function (context) {
-        $rootScope.localStoragePollModel.pollTags[context.tagId] = context;
-        if ($scope.pollToBeViewed != null) {
-            /*saveData($rootScope.localStoragePollModel.pollId, $rootScope.localStoragePollModel);*/
-            var pollList = getPollListFromLocalStorage();
-            var tempPoll = pollList[$rootScope.localStoragePollModel.pollId];
-            tempPoll.pollTags[tagId] = $rootScope.localStoragePollModel.pollTags[tagId];
-            pollList[$rootScope.localStoragePollModel.pollId] = tempPoll;
-            localStorage.setItem('pollData', JSON.stringify(pollList));
-        }
+
+        $scope.createdPoll.pollTags.push(context);
+
+        $scope.tags = '';
+        $scope.manualTags = '';
+
     };
 
-    $scope.addManualPollTag = function (context) {
-        //$rootScope.localStoragePollModel.pollTags[context.tagId] = $scope.pollTagTempList[tagId];
-        //if ($scope.pollToBeViewed != null) {
-        //    /*saveData($rootScope.localStoragePollModel.pollId, $rootScope.localStoragePollModel);*/
-        //    var pollList = getPollListFromLocalStorage();
-        //    var tempPoll = pollList[$rootScope.localStoragePollModel.pollId];
-        //    tempPoll.pollTags[tagId] = $rootScope.localStoragePollModel.pollTags[tagId];
-        //    pollList[$rootScope.localStoragePollModel.pollId] = tempPoll;
-        //    localStorage.setItem('pollData', JSON.stringify(pollList));
-        //}
-    };
+    $scope.addManualPollTag = function (tagName, tagContext) {
 
+        var context = {};
+        var tagId = guid();
+
+        context[tagId] = ({
+            tagId: tagId,
+            name: tagName + '<p style= "font-style: italic" class="pull-right">' + tagContext,
+            tagName: tagName,
+            tagContext: tagContext,
+            tagContextParentDomain: '',
+            tagContextChildDomain: '',
+            score: ''
+        });
+
+        $scope.createdPoll.pollTags.push(context[tagId]);
+
+        $scope.tags = '';
+        $scope.manualTags = '';
+
+    };
 
     $scope.removeTag = function (tagToBeRemoved) {
-        delete $rootScope.localStoragePollModel.pollTags[tagToBeRemoved];
+
+
+        var index = arrayObjectIndexOf($scope.createdPoll.pollTags, tagToBeRemoved, "tagId");
+
+        $scope.createdPoll.pollTags.splice(index, 1);
+
         if ($scope.pollToBeViewed != null) {
-            /*saveData($rootScope.localStoragePollModel.pollId, $rootScope.localStoragePollModel);*/
+
+            /*saveData($scope.createdPoll.pollId, $scope.createdPoll);*/
+
             var pollList = getPollListFromLocalStorage();
-            var tempPoll = pollList[$rootScope.localStoragePollModel.pollId];
-            tempPoll.pollTags = $rootScope.localStoragePollModel.pollTags;
-            pollList[$rootScope.localStoragePollModel.pollId] = tempPoll;
+            var tempPoll = pollList[$scope.createdPoll.pollId];
+            tempPoll.pollTags = $scope.createdPoll.pollTags;
+            pollList[$scope.createdPoll.pollId] = tempPoll;
             localStorage.setItem('pollData', JSON.stringify(pollList));
+
         }
+
     };
 
     $scope.pollCommentDateDifference = function (date) {
-        if (dateDifference(date) < 60) {
-            return dateDifference(date) + " mins";
-        } else if (dateDifference(date) < 1440) {
-            return Math.round(dateDifference(date) / (60)) + " hours";
-        } else {
-            return Math.round(dateDifference(date) / (60 * 24)) + " days";
-        }
+
+        return dateDifference(date);
+
     };
-    $scope.isObjectEmpty = function (obj) {
-        // null and undefined are "empty"
-        if (obj == null) return true;
-        // Assume if it has a length property with a non-zero value
-        // that that property is correct.
-        if (obj.length > 0)    return false;
-        if (obj.length === 0)  return true;
-        // Otherwise, does it have any properties of its own?
-        // Note that this doesn't handle
-        // toString and valueOf enumeration bugs in IE < 9
-        for (var key in obj) {
-            if (obj.hasOwnProperty(key)) return false;
-        }
-    };
+
     $scope.isPollObjectEmpty = function (obj) {
 
         return isObjectEmpty(obj);
@@ -296,23 +246,38 @@ function PollTabCtrl($scope) {
     var tabs = 1;
 
     $scope.selectTab = function (setTab) {
+
         tabs = setTab;
+
     };
 
     $scope.isSelected = function (checkTab) {
+
         return tabs == checkTab;
+
     };
 
 }
 
-function CurrentPollsCtrl($scope, $rootScope, $state, MEMBER, fireFactoryForPoll, $http) {
+function CurrentPollsCtrl($scope, $rootScope, $state, MEMBER, fireFactoryForPoll, contextFactory) {
 
+    $scope.getPollTagsForView = contextFactory.getTagContext;
     $scope.currentUserId = $rootScope.MainCtrlRef.userId;
+    $scope.currentUserName = $rootScope.MainCtrlRef.currentUserData.userName;
     $scope.pollRoles = MEMBER.MEMBER_ROLES;
     $scope.hidePollContent = true;
     $scope.selectedPollId = null;
     $scope.polls = fireFactoryForPoll.getPollsObject();
     $scope.pollTagTempId = '';
+    $scope.pollCommentTempList = [];
+
+    $scope.tagContextList = ["Professional Sports Team",
+        "College/University",
+        "Place with local areas",
+        "Airport",
+        "Newspaper",
+        "Event"
+    ];
 
     $scope.toggle = function (scope) {
         scope.toggle();
@@ -425,71 +390,113 @@ function CurrentPollsCtrl($scope, $rootScope, $state, MEMBER, fireFactoryForPoll
 
     $scope.addPollOption = function () {
 
-        fireFactoryForPoll.getPollOptionArray($scope.selectedPollId).$loaded().then(function (loadedData) {
+        if (!$scope.selectedPollPristineState.pollOptions){
+            $scope.selectedPollPristineState.pollOptions=[];
 
-            loadedData.$add({
+        }
 
-                "optionName": $scope.pollOptionTempList.optionName,
-                "optionDetail": $scope.pollOptionTempList.optionDetail,
-                "optionVoteCount": 0
+        $scope.selectedPollPristineState.pollOptions.push({
 
-            })
-
+            "optionName": $scope.pollOptionTempList.optionName,
+            "optionDetail": $scope.pollOptionTempList.optionDetail,
+            "optionVoteCount": 0
 
         });
+
+        $scope.selectedPollPristineState.$save();
+
+        $scope.pollOptionTempList.optionName = '';
+        $scope.pollOptionTempList.optionDetail = '';
 
     };
 
     $scope.removePollOption = function (optionToBeRemoved) {
 
-        fireFactoryForPoll.getPollOptionArray($scope.selectedPollId).$loaded().then(function (loadedData) {
+        $scope.selectedPollPristineState.pollOptions.splice(optionToBeRemoved, 1);
 
-            loadedData.$remove(optionToBeRemoved)
-
-        });
+        $scope.selectedPollPristineState.$save();
 
     };
 
-    $scope.addPollTagForView = function (tagId) {
+    $scope.addPollTagForView = function (context) {
 
-        fireFactoryForPoll.getPollTagArray($scope.selectedPollId).$loaded().then(function (loadedData) {
 
-            loadedData.$add($rootScope.pollTagTempList[tagId])
+        if (!$scope.selectedPollPristineState.pollTags){
+            $scope.selectedPollPristineState.pollTags=[];
 
-        });
+        }
 
-        $scope.pollTagTempId = '';
+        $scope.selectedPollPristineState.pollTags.push(context);
+
+        $scope.tags = '';
+        $scope.manualTags = '';
+
+        $scope.selectedPollPristineState.$save();
+
     };
 
-    $scope.addManualPollTagForView = function (tagName, tagContext, tagContextParentDomain, tagContextChildDomain) {
+    $scope.addManualPollTagForView = function (tagName, tagContext) {
 
+        var context = {};
         var tagId = guid();
 
-        $rootScope.pollTagTempList[tagId] = {
+        context[tagId] = ({
             tagId: tagId,
+            name: tagName + '<p style= "font-style: italic" class="pull-right">' + tagContext,
             tagName: tagName,
             tagContext: tagContext,
             tagContextParentDomain: '',
-            tagContextChildDomain: ''
-        };
-
-        fireFactoryForPoll.getPollTagArray($scope.selectedPollId).$loaded().then(function (loadedData) {
-
-            loadedData.$add($rootScope.pollTagTempList[tagId])
-
+            tagContextChildDomain: '',
+            score: ''
         });
 
-        $scope.pollTagTempId = '';
+        if (!$scope.selectedPollPristineState.pollTags){
+            $scope.selectedPollPristineState.pollTags=[];
+
+        }
+
+        $scope.selectedPollPristineState.pollTags.push(context[tagId]);
+
+        $scope.tags = '';
+        $scope.manualTags = '';
+
+        $scope.selectedPollPristineState.$save();
+
+
 
     };
 
     $scope.removeTagForView = function (tagToBeRemoved) {
 
-        fireFactoryForPoll.getPollTagArray($scope.selectedPollId).$loaded().then(function (loadedData) {
+        $scope.selectedPollPristineState.pollTags.splice(tagToBeRemoved, 1);
 
-            loadedData.$remove(tagToBeRemoved);
+        $scope.selectedPollPristineState.$save();
 
+    };
+
+    $scope.addPollCommentForView = function () {
+
+        if (!$scope.selectedPollPristineState.pollComments){
+            $scope.selectedPollPristineState.pollComments=[];
+
+        }
+
+        $scope.selectedPollPristineState.pollComments.push({
+            "commentBody": $scope.pollCommentTempList.commentBody,
+            "commentUserEmail": $scope.currentUserId,
+            "commentUserName": $scope.currentUserName,
+            "commentDateTime": new Date().getTime()
         });
+
+        $scope.pollCommentTempList.commentBody = '';
+
+
+        $scope.selectedPollPristineState.$save();
+    };
+
+    $scope.pollCommentDateDifference = function (date) {
+
+        return dateDifference(date);
 
     };
 
@@ -500,23 +507,6 @@ function CurrentPollsCtrl($scope, $rootScope, $state, MEMBER, fireFactoryForPoll
     $scope.addButtonClick = function (selectedTypeId) {
         $state.go('activity.group_add_content', {pollIdId: $scope.selectedPollId, typeId: selectedTypeId});
     }
-
-}
-
-function calculateStandardDeviation(values) {
-    var avg = calculateAverage(values);
-
-    var squareDiffs = values.map(function (value) {
-        var diff = value - avg;
-        return diff * diff;
-
-
-    });
-
-    var avgSquareDiff = calculateAverage(squareDiffs);
-
-    return Math.sqrt(avgSquareDiff);
-
 
 }
 
@@ -551,33 +541,55 @@ function isObjectEmpty(obj) {
 }
 
 function dateDifference(date) {
+
     var curDate = new Date();
+
     var diff = Math.abs(curDate.getTime() - date);  // difference in milliseconds
+
     diff = Math.round(diff / (1000 * 60));
-    return diff;
+
+    if (diff < 60) {
+
+        return diff + " mins";
+
+    } else if (diff< 1440) {
+
+        return Math.round(diff / (60)) + " hours";
+
+    } else {
+
+        return Math.round(diff / (60 * 24)) + " days";
+    }
+
 }
+
+function getTagContextParentDomain(notableId) {
+    return notableId.split("/")[1];
+}
+
+
+function getTagContextChildDomain(notableId) {
+    return notableId.split("/")[2];
+}
+
+function calculateStandardDeviation(values) {
+ var avg = calculateAverage(values);
+
+ var squareDiffs = values.map(function (value) {
+ var diff = value - avg;
+ return diff * diff;
+
+ });
+
+ var avgSquareDiff = calculateAverage(squareDiffs);
+
+ return Math.sqrt(avgSquareDiff);
+
+ }
+
 
 angular
     .module('socioactive')
-    .factory('semanticTagFactory', ['$http', function semanticFactory($http) {
-
-        var helperFactory = {};
-
-        helperFactory.getTagContext = function (val) {
-            $http.get('https://www.googleapis.com/freebase/v1/search', {
-                params: {
-                    query: val,
-                    key: 'AIzaSyBfJNRIjAao3J0PZeO9ALipSJ_k9NjETwc',
-                    limit: 50
-                }
-            }).success(function (result) {
-
-                return result.result;
-            });
-
-        };
-        return helperFactory;
-    }])
     .controller('PollCtrl', PollCtrl)
     .controller('PollTabCtrl', PollTabCtrl)
     .controller('CurrentPollsCtrl', CurrentPollsCtrl)
@@ -591,17 +603,13 @@ angular
                 path = (path !== '' && path) ? baseUrl + '/' + path : baseUrl;
                 return new Firebase(path);
             };
-            helperFactory.getData = function () {
-                return $firebaseObject(helperFactory.firebaseRef().child('data'));
+
+            helperFactory.getUserRef = function (uid) {
+                return helperFactory.firebaseRef().child('users').child(uid);
             };
-            helperFactory.loadPolls = function (callback) {
-                var data = helperFactory.getData();
-                data.$loaded().then(function (loadedData) {
-                    if (!loadedData.polls) {
-                        loadedData.polls = [];
-                    }
-                    callback(loadedData, loadedData.polls);
-                })
+
+            helperFactory.getUserObject = function (uid) {
+                return $firebaseObject(helperFactory.getUserRef(uid));
             };
 
             helperFactory.getPollRef = function (uid) {
