@@ -463,6 +463,7 @@ angular
     .controller('GroupViewCtrl', GroupViewCtrl)
     .controller('PictureUploadCtrl', PictureUploadCtrl)
 	.controller('SearchCtrl', SearchCtrl)
+    .controller('EventCtrl', EventCtrl)
     .run(["$templateCache", "$rootScope", function ($templateCache, $rootScope) {
         $rootScope.primitiveTypes = [
             {name: 'Enumeration'},
