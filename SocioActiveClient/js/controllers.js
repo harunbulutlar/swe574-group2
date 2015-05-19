@@ -308,8 +308,20 @@ function CurrentGroupsCtrl($rootScope,$scope, contextFactory, $state, fireFactor
         if (!$rootScope.MainCtrlRef.currentUserData.joinedGroups) {
             $rootScope.MainCtrlRef.currentUserData.joinedGroups = {};
         }
+
+        var contextGroupsRef = fireFactory.getGroupsInContextRef(tag.tagContext);
+        var groupLinkObject = {};
+        groupLinkObject[$scope.selectedGroupId] = $scope.selectedGroup.contexts[tag.tagContext].length;
+        contextGroupsRef.update(groupLinkObject);
+        if(!$rootScope.MainCtrlRef.currentUserData.contexts[tag.tagContext]){
+            $rootScope.MainCtrlRef.currentUserData.contexts[tag.tagContext] = 1;
+        } else {
+            $rootScope.MainCtrlRef.currentUserData.contexts[tag.tagContext]++;
+        }
+
+
         $rootScope.MainCtrlRef.currentUserData.joinedGroups[$scope.selectedGroupId] = true;
-        $rootScope.MainCtrlRef.currentUserData.$save()
+        $rootScope.MainCtrlRef.currentUserData.$save();
 
     };
 
