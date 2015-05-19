@@ -594,11 +594,12 @@ angular
                     angular.forEach(tagContextFilteredData, function (item) {
                         if (item.hasOwnProperty('notable')) {
                             var tagId = guid();
+                            console.log(item.notable.name);
                             contexts.push({
                                 tagId: tagId,
                                 name: item.name + '<p style= "font-style: italic" class="pull-right">' + item.notable.name,
                                 tagName: item.name,
-                                tagContext: item.notable.name,
+                                tagContext: (item.notable.name).split("/").join("-"),
                                 tagContextParentDomain: helperFactory.getTagContextParentDomain(item.notable.id),
                                 tagContextChildDomain: helperFactory.getTagContextChildDomain(item.notable.id),
                                 score: item.score
