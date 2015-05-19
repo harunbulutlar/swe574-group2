@@ -40,31 +40,6 @@
                     <li ui-sref-active="active"><a ui-sref="activity.groups">Groups</a></li>
                     <li ui-sref-active="active"><a ui-sref="activity.events">Events</a></li>
                     <li ui-sref-active="active"><a ui-sref="activity.pollsv2">Polls</a></li>
-
-
-                    <li><a class="dropdown-toggle" dropdown-toggle href>
-                            <span class="clear">
-                                <span class="block m-t-xs">
-                                    <strong class="font-bold">Poll</strong>
-                             </span>
-                            </span>
-                    </a></li>
-                    <ul ng-controller="PollNavigationCtrl" class="dropdown-menu animated fadeInRight m-t-xs">
-                        <div ng-repeat="polls in localStoragePollObjectForNavigation">
-                            <li><a ui-sref="activity.polls({pollToBeViewed: polls.pollId})">{{polls.pollTitle}}</a></li>
-                        </div>
-
-                    </ul>
-
-
-                    <!--<li id="pollAccordion"><a data-toggle="collapse" data-parent="#pollAccordion" href="#collapsePoll">Polls</a>
-                    </li>
-
-                    <div id="collapsePoll" class="panel-collapse collapse" ng-controller="PollNavigationCtrl">
-                        <div class="panel-body" ng-repeat="polls in localStoragePollObjectForNavigation">
-                            <a ui-sref="activity.polls({pollToBeViewed: polls.pollId})">{{polls.pollTitle}}</a>
-                        </div>
-                    </div>-->
                     <li ui-sref-active="active"><a ui-sref="activity.instantaneous">Instantaneous</a></li>
                 </ul>
             </li>
