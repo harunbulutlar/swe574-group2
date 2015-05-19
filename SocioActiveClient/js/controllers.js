@@ -549,8 +549,8 @@ angular
         }]
 
     )
-    .factory('contextFactory', ['$http',
-        function contextFactory($http) {
+    .factory('contextFactory', ['$http', '$rootScope',
+        function contextFactory($http, $rootScope) {
             var helperFactory = {};
             helperFactory.getTagContext = function (val) {
                 var onResult = function (result) {
