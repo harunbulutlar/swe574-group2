@@ -89,7 +89,7 @@ function PollCtrl($scope, $rootScope, $stateParams, $state, contextFactory, MEMB
 
 
     //TODO Remove voting in create poll
-    $scope.votePoll = function (optionId, optionName, optionDetail, optionVoteCount) {
+    /*$scope.votePoll = function (optionId, optionName, optionDetail, optionVoteCount) {
 
         $scope.createdPoll.pollOptions[optionId] = {
 
@@ -110,7 +110,7 @@ function PollCtrl($scope, $rootScope, $stateParams, $state, contextFactory, MEMB
         return (($scope.isVotedTemp == true) ||
         ($scope.createdPoll.pollParticipantList.indexOf($scope.currentUserId) != -1));
 
-    };
+    };*/
 
     $scope.reloadState = function () {
         $state.reload();
@@ -376,7 +376,12 @@ function CurrentPollsCtrl($scope, $rootScope, $state, MEMBER, fireFactoryForPoll
                 if (!$rootScope.MainCtrlRef.currentUserData.interactedPolls) {
                     $rootScope.MainCtrlRef.currentUserData.interactedPolls = {};
                 }
+                if (!$rootScope.MainCtrlRef.currentUserData.votedPolls) {
+                    $rootScope.MainCtrlRef.currentUserData.votedPolls = {};
+                }
+
                 $rootScope.MainCtrlRef.currentUserData.interactedPolls[$scope.selectedPollId] = true;
+                $rootScope.MainCtrlRef.currentUserData.votedPolls[$scope.selectedPollId] = true;
                 $rootScope.MainCtrlRef.currentUserData.$save().then(function () {
                     $scope.loading = false;
 
@@ -394,12 +399,12 @@ function CurrentPollsCtrl($scope, $rootScope, $state, MEMBER, fireFactoryForPoll
 
         if ($scope.selectedPoll != null) {
 
-            if (!$rootScope.MainCtrlRef.currentUserData.interactedPolls) {
+            if (!$rootScope.MainCtrlRef.currentUserData.votedPolls) {
 
                 return false;
             }
 
-            return $rootScope.MainCtrlRef.currentUserData.interactedPolls[$scope.selectedPollId];
+            return $rootScope.MainCtrlRef.currentUserData.votedPolls[$scope.selectedPollId];
         }
 
     };
@@ -589,31 +594,6 @@ function dateDifference(date) {
     }
 
 }
-
-function getTagContextParentDomain(notableId) {
-    return notableId.split("/")[1];
-}
-
-
-function getTagContextChildDomain(notableId) {
-    return notableId.split("/")[2];
-}
-
-function calculateStandardDeviation(values) {
-    var avg = calculateAverage(values);
-
-    var squareDiffs = values.map(function (value) {
-        var diff = value - avg;
-        return diff * diff;
-
-    });
-
-    var avgSquareDiff = calculateAverage(squareDiffs);
-
-    return Math.sqrt(avgSquareDiff);
-
-}
-
 
 angular
     .module('socioactive')

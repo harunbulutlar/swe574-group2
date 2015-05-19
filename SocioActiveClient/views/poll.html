@@ -18,8 +18,7 @@
                     <div class="form-group"><label>Detail</label> <textarea
                             ng-model="createdPoll.pollDescription"
                             placeholder="Enter some description for your poll"
-                            class="form-control"
-                            ng-disabled="isPollDisabled()"></textarea>
+                            class="form-control"></textarea>
                     </div>
 
                     <div class="form-group"><label>Just For: </label>
@@ -27,18 +26,15 @@
                         <div class="radio"><label> <input type="radio" value="friends" id="friendsRadio"
                                                           ng-checked="true"
                                                           name="privacyRadios"
-                                                          ng-model="createdPoll.pollPrivacy"
-                                                          ng-disabled="isPollDisabled()">Friends</label>
+                                                          ng-model="createdPoll.pollPrivacy">Friends</label>
                         </div>
                         <div class=" radio"><label> <input type="radio" value="public" id="publicRadio"
                                                            name="privacyRadios"
-                                                           ng-model="createdPoll.pollPrivacy"
-                                                           ng-disabled="isPollDisabled()">Public</label>
+                                                           ng-model="createdPoll.pollPrivacy">Public</label>
                         </div>
                         <select class="form-control MultiSelect" data-placeholder="Roles"
                                 ng-model="createdPoll.pollRoles"
-                                ng-options="roles for roles in pollRoles" multiple="multiple" multiselect-dropdown
-                                ng-disabled="isPollDisabled()">
+                                ng-options="roles for roles in pollRoles" multiple="multiple" multiselect-dropdown>
                         </select>
                     </div>
 
@@ -46,7 +42,6 @@
 
                         <div class='input-group date'><input type='datetime' class='form-control' date-time
                                                              ng-model='createdPoll.endDate' view='date'
-                                                             ng-disabled="isPollDisabled()"
                                                              required=""><span
                                 class='input-group-addon'><i class='fa fa-calendar'></i></span></div>
 
@@ -72,16 +67,12 @@
                                                         class="fa fa-trash"></span></a>
 
                                                 <a class="btn btn-xs btn-white pull-right"
-                                                   ng-click="votePoll(option.optionId, option.optionName, option.optionDetail, option.optionVoteCount)"
-                                                   ng-hide="isCurrentUserVoted()"><i
-                                                        class="fa fa-thumbs-up"></i>Vote</a>
-
-                                                <a class="btn btn-xs btn-white pull-right"
                                                    ng-class=" {disabled: isCurrentUserVoted()}"
                                                    ng-show="isCurrentUserVoted()"><i
                                                         class="fa fa-thumbs-up"></i>{{ option.optionVoteCount }}</a>
 
                                             </form>
+
                                             <b>{{ option.optionName }}</b> | {{ option.optionDetail }}
 
 
@@ -94,8 +85,7 @@
                                 </div>
                             </div>
 
-                            <div class="form-group"
-                                 ng-hide="isPollDisabled()">
+                            <div class="form-group">
 
                                 <form name='addOption' ng-submit="addPollOption()">
 
