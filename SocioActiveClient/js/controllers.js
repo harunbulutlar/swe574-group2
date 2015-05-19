@@ -34,19 +34,22 @@ function CustomTypesCtrl($state, $scope, contextFactory, $rootScope, fireFactory
             name: "New Type",
             data: []
         };
-
-        $rootScope.customTypes.push(customType);
+        if(!$rootScope.MainCtrlRef.currentUserData.customTypes)
+        {
+            $rootScope.MainCtrlRef.currentUserData.customTypes = [];
+        }
+        $rootScope.MainCtrlRef.currentUserData.customTypes.push(customType);
 
     };
     $scope.updateSelection = function ($event) {
         var checkbox = $event.target;
-        $scope.types = (checkbox.checked ? $rootScope.customTypes : $rootScope.primitiveTypes);
+        $scope.types = (checkbox.checked ? $rootScope.MainCtrlRef.currentUserData.customTypes : $rootScope.primitiveTypes);
 
     };
 
     $scope.removeTab = function (customType) {
-        var index = $rootScope.customTypes.indexOf(customType);
-        $rootScope.customTypes.splice(index, 1);
+        var index = $rootScope.MainCtrlRef.currentUserData.customTypes.indexOf(customType);
+        $rootScope.MainCtrlRef.currentUserData.customTypes.splice(index, 1);
     };
 
     $scope.removeUserField = function (userField) {
@@ -128,7 +131,6 @@ function CustomTypesCtrl($state, $scope, contextFactory, $rootScope, fireFactory
     $scope.userFieldName = '';
 
     $scope.initPage = function () {
-        $rootScope.customTypes = $rootScope.MainCtrlRef.currentUserData.customTypes;
         $scope.createdGroup = {};
         $scope.createdGroup["owner"] = $rootScope.MainCtrlRef.userId;
         $scope.createdGroup["ownerName"] = $rootScope.MainCtrlRef.currentUserData.userName;
@@ -272,10 +274,11 @@ function arrayObjectIndexOf(myArray, searchTerm, property) {
     return -1;
 }
 
-function CurrentGroupsCtrl($scope, $state, fireFactory) {
+function CurrentGroupsCtrl($scope, contextFactory, $state, fireFactory) {
     $scope.hideGroupContent = true;
     $scope.selectedGroupId = null;
     $scope.groups = fireFactory.getGroupsObject();
+    $scope.getGroupTagContext = contextFactory.getTagContext;
     $scope.toggle = function (scope) {
         scope.toggle();
     };
@@ -292,6 +295,16 @@ function CurrentGroupsCtrl($scope, $state, fireFactory) {
         }
     });
 
+    $scope.addGroupTag = function (tag) {
+        if (!$scope.createdGroup.contexts) {
+            $scope.createdGroup.contexts = {};
+        }
+        if(!$scope.selectedGroup.contexts[tag.tagContext]){
+            $scope.createdGroup.contexts[tag.tagContext] = [];
+        }
+        $scope.createdGroup.contexts[tag.tagContext].push(tag);
+    };
+
     $scope.show = function (group,key) {
         $scope.selectedGroup = group;
         $scope.selectedGroupId = key;
@@ -304,7 +317,7 @@ function CurrentGroupsCtrl($scope, $state, fireFactory) {
         return "list-group-item";
     };
     $scope.showContent = function (fieldKey,contentKey) {
-        $state.go('create.asd', {groupId: $scope.selectedGroupId, fieldId:fieldKey , contentId: contentKey});
+        $state.go('activity.group_add_content', {groupId: $scope.selectedGroupId, fieldId:fieldKey , contentId: contentKey});
     };
 
     $scope.addButtonClick = function (selectedTypeId) {
@@ -312,7 +325,7 @@ function CurrentGroupsCtrl($scope, $state, fireFactory) {
     }
 }
 
-function GroupAddCtrl($scope, $state, $rootScope, $window, $stateParams, fireFactory) {
+function GroupAddCtrl($scope, $state, $rootScope, $stateParams, fireFactory) {
     $scope.loading = false;
     $scope.userField = fireFactory.getFieldObject($stateParams.groupId,$stateParams.typeId);
     $scope.userField.$loaded().then(function(loadedData){
@@ -330,9 +343,17 @@ function GroupAddCtrl($scope, $state, $rootScope, $window, $stateParams, fireFac
         });
         $scope.loading = true;
         $scope.userField.$save().then(function(){
-            $scope.loading = false;
-            $state.go('activity.groups');
+            if (!$rootScope.MainCtrlRef.currentUserData.joinedGroups) {
+                $rootScope.MainCtrlRef.currentUserData.joinedGroups = {};
+            }
+            $rootScope.MainCtrlRef.currentUserData.joinedGroups[$stateParams.groupId] = true;
+            $rootScope.MainCtrlRef.currentUserData.$save().then(function(){
+                $scope.loading = false;
+                $state.go('activity.groups');
+
+            });
         });
+
     };
 }
 

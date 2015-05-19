@@ -27,6 +27,19 @@
             <div class="ibox-content" ng-hide="hideGroupContent">
 
                 <div class="form-group"><label>{{selectedGroup.title}}'s fields</label></div>
+
+                <div class="ibox-content" ng-repeat="(key,value) in selectedGroup.contexts">
+                    <h2>{{key}}</h2>
+                    <button ng-repeat="tag in value" class="btn btn-w-m btn-info">{{tag.tagName}}</button>
+                </div>
+
+                <input type="text" ng-model="tags"
+                       typeahead="contextHead.id as contextHead.name for contextHead in getGroupTagContext($viewValue)"
+                       class="form-control" typeahead-loading="loadingLocations" typeahead-min-length="3"
+                       typeahead-wait-ms="300" typeahead-on-select="addGroupTag($item)"
+                       id="semanticTagName" placeholder="Enter tag...">
+
+
                 <script type="text/ng-template" id="content_renderer.html">
                     <div ui-tree-handle class="tree-node tree-node-content">
                         <a class="pull-right btn btn-white btn-xs" data-nodrag ng-click="showContent(fieldKey, contentKey)"><span class="fa fa-eye"></span></a>

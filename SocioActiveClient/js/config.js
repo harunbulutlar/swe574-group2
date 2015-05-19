@@ -297,7 +297,7 @@ function config($stateProvider, $urlRouterProvider, $ocLazyLoadProvider) {
                 }
             }
         })
-        .state('create.asd', {
+        .state('activity.group_view_content', {
             url: "/:groupId?fieldId?contentId",
             templateUrl: "views/group_view_content.html",
             data: { pageTitle: 'View Content' },
