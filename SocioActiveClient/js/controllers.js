@@ -26,8 +26,9 @@ function MainCtrl($window, fireFactory, $rootScope) {
 
 }
 
-function CustomTypesCtrl($state, $scope, $window, $rootScope, fireFactory) {
+function CustomTypesCtrl($state, $scope, contextFactory, $rootScope, fireFactory) {
     $scope.loading = false;
+    $scope.getGroupTagContext = contextFactory.getTagContext;
     $scope.addCustomType = function () {
         var customType = {
             name: "New Type",
@@ -64,6 +65,16 @@ function CustomTypesCtrl($state, $scope, $window, $rootScope, fireFactory) {
         $scope.createdGroup.fields.push(userField);
     };
 
+    $scope.addGroupTag = function (tag) {
+        if (!$scope.createdGroup.contexts) {
+            $scope.createdGroup.contexts = {};
+        }
+        if(!$scope.createdGroup.contexts[tag.tagContext]){
+            $scope.createdGroup.contexts[tag.tagContext] = [];
+        }
+        $scope.createdGroup.contexts[tag.tagContext].push(tag);
+    };
+
     $scope.saveChanges = function () {
 
         if ($scope.createdGroup.title == '') {
@@ -85,6 +96,16 @@ function CustomTypesCtrl($state, $scope, $window, $rootScope, fireFactory) {
             $rootScope.MainCtrlRef.currentUserData.createdGroups = {};
         }
         $rootScope.MainCtrlRef.currentUserData.createdGroups[fireBaseObj.key()] = true;
+        if (!$rootScope.MainCtrlRef.currentUserData.contexts) {
+            $rootScope.MainCtrlRef.currentUserData.contexts = {};
+        }
+        angular.forEach($scope.createdGroup.contexts, function(value, key) {
+            if(!$rootScope.MainCtrlRef.currentUserData.contexts[key]){
+                $rootScope.MainCtrlRef.currentUserData.contexts[key] = 1;
+                return;
+            }
+            $rootScope.MainCtrlRef.currentUserData.contexts[key]++;
+        });
         $scope.loading = true;
         $rootScope.MainCtrlRef.currentUserData.$save().then(function(){
             $scope.loading = false;
