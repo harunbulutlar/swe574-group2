@@ -1,5 +1,5 @@
 function MainCtrl($window, fireFactory, $rootScope) {
-
+ 
     this.authData = fireFactory.firebaseRef().getAuth();
     if (this.authData) {
         console.log("User " + this.authData.uid + " is logged in with " + this.authData.provider);
@@ -442,7 +442,7 @@ function EventCtrl($scope, fireFactory, $stateParams, $firebaseObject) {
         var strippedEvents = angular.fromJson(angular.toJson($scope.createdEvent));
 
         var fireBaseObj = fireFactory.getEventsRef().push(strippedEvents);
-
+        alert("Event is created.");
 
     }
 
@@ -463,6 +463,7 @@ angular
     .controller('GroupViewCtrl', GroupViewCtrl)
     .controller('PictureUploadCtrl', PictureUploadCtrl)
 	.controller('SearchCtrl', SearchCtrl)
+    .controller('EventCtrl', EventCtrl)
     .run(["$templateCache", "$rootScope", function ($templateCache, $rootScope) {
         $rootScope.primitiveTypes = [
             {name: 'Enumeration'},
@@ -593,11 +594,12 @@ angular
                     angular.forEach(tagContextFilteredData, function (item) {
                         if (item.hasOwnProperty('notable')) {
                             var tagId = guid();
+                            console.log(item.notable.name);
                             contexts.push({
                                 tagId: tagId,
                                 name: item.name + '<p style= "font-style: italic" class="pull-right">' + item.notable.name,
                                 tagName: item.name,
-                                tagContext: item.notable.name,
+                                tagContext: (item.notable.name).split("/").join("-"),
                                 tagContextParentDomain: helperFactory.getTagContextParentDomain(item.notable.id),
                                 tagContextChildDomain: helperFactory.getTagContextChildDomain(item.notable.id),
                                 score: item.score
