@@ -34,23 +34,26 @@ function CustomTypesCtrl($state, $scope, contextFactory, $rootScope, fireFactory
             name: "New Type",
             data: []
         };
-
-        $rootScope.customTypes.push(customType);
+        if(!$rootScope.MainCtrlRef.currentUserData.customTypes)
+        {
+            $rootScope.MainCtrlRef.currentUserData.customTypes = [];
+        }
+        $rootScope.MainCtrlRef.currentUserData.customTypes.push(customType);
 
     };
     $scope.updateSelection = function ($event) {
         var checkbox = $event.target;
-        $scope.types = (checkbox.checked ? $rootScope.customTypes : $rootScope.primitiveTypes);
+        $scope.types = (checkbox.checked ? $rootScope.MainCtrlRef.currentUserData.customTypes : $rootScope.primitiveTypes);
 
     };
 
     $scope.removeTab = function (customType) {
-        var index = $rootScope.customTypes.indexOf(customType);
-        $rootScope.customTypes.splice(index, 1);
+        var index = $rootScope.MainCtrlRef.currentUserData.customTypes.indexOf(customType);
+        $rootScope.MainCtrlRef.currentUserData.customTypes.splice(index, 1);
     };
 
     $scope.removeUserField = function (userField) {
-        var index = $rootScope.createdGroup.fields.indexOf(userField);
+        var index = $scope.createdGroup.fields.indexOf(userField);
         $scope.createdGroup.fields.splice(index, 1);
     };
 
@@ -128,7 +131,6 @@ function CustomTypesCtrl($state, $scope, contextFactory, $rootScope, fireFactory
     $scope.userFieldName = '';
 
     $scope.initPage = function () {
-        $rootScope.customTypes = $rootScope.MainCtrlRef.currentUserData.customTypes;
         $scope.createdGroup = {};
         $scope.createdGroup["owner"] = $rootScope.MainCtrlRef.userId;
         $scope.createdGroup["ownerName"] = $rootScope.MainCtrlRef.currentUserData.userName;
@@ -272,16 +274,18 @@ function arrayObjectIndexOf(myArray, searchTerm, property) {
     return -1;
 }
 
-function CurrentGroupsCtrl($scope, $state, fireFactory) {
+function CurrentGroupsCtrl($rootScope,$scope, contextFactory, $state, fireFactory) {
     $scope.hideGroupContent = true;
     $scope.selectedGroupId = null;
-    $scope.groups = fireFactory.getGroupsObject();
+    var syncObject = fireFactory.getGroupsObject();
+    syncObject.$bindTo($scope, "groups");
+
+    $scope.getGroupTagContext = contextFactory.getTagContext;
     $scope.toggle = function (scope) {
         scope.toggle();
     };
-    $scope.selectedGroup = null;
 
-    $scope.groups.$watch(function(){
+    $scope.$watch('groups',function(){
         if($scope.selectedGroupId != null){
             if(!$scope.groups.hasOwnProperty($scope.selectedGroupId)){
                 $scope.hideGroupContent = true;
@@ -290,7 +294,36 @@ function CurrentGroupsCtrl($scope, $state, fireFactory) {
             }
 
         }
-    });
+    },true);
+    $scope.selectedGroup = null;
+
+    $scope.addGroupTag = function (tag) {
+        if (!$scope.selectedGroup.contexts) {
+            $scope.selectedGroup.contexts = {};
+        }
+        if(!$scope.selectedGroup.contexts[tag.tagContext]){
+            $scope.selectedGroup.contexts[tag.tagContext] = [];
+        }
+        $scope.selectedGroup.contexts[tag.tagContext].push(tag);
+        if (!$rootScope.MainCtrlRef.currentUserData.joinedGroups) {
+            $rootScope.MainCtrlRef.currentUserData.joinedGroups = {};
+        }
+
+        var contextGroupsRef = fireFactory.getGroupsInContextRef(tag.tagContext);
+        var groupLinkObject = {};
+        groupLinkObject[$scope.selectedGroupId] = $scope.selectedGroup.contexts[tag.tagContext].length;
+        contextGroupsRef.update(groupLinkObject);
+        if(!$rootScope.MainCtrlRef.currentUserData.contexts[tag.tagContext]){
+            $rootScope.MainCtrlRef.currentUserData.contexts[tag.tagContext] = 1;
+        } else {
+            $rootScope.MainCtrlRef.currentUserData.contexts[tag.tagContext]++;
+        }
+
+
+        $rootScope.MainCtrlRef.currentUserData.joinedGroups[$scope.selectedGroupId] = true;
+        $rootScope.MainCtrlRef.currentUserData.$save();
+
+    };
 
     $scope.show = function (group,key) {
         $scope.selectedGroup = group;
@@ -304,7 +337,7 @@ function CurrentGroupsCtrl($scope, $state, fireFactory) {
         return "list-group-item";
     };
     $scope.showContent = function (fieldKey,contentKey) {
-        $state.go('create.asd', {groupId: $scope.selectedGroupId, fieldId:fieldKey , contentId: contentKey});
+        $state.go('activity.group_add_content', {groupId: $scope.selectedGroupId, fieldId:fieldKey , contentId: contentKey});
     };
 
     $scope.addButtonClick = function (selectedTypeId) {
@@ -312,7 +345,7 @@ function CurrentGroupsCtrl($scope, $state, fireFactory) {
     }
 }
 
-function GroupAddCtrl($scope, $state, $rootScope, $window, $stateParams, fireFactory) {
+function GroupAddCtrl($scope, $state, $rootScope, $stateParams, fireFactory) {
     $scope.loading = false;
     $scope.userField = fireFactory.getFieldObject($stateParams.groupId,$stateParams.typeId);
     $scope.userField.$loaded().then(function(loadedData){
@@ -330,9 +363,17 @@ function GroupAddCtrl($scope, $state, $rootScope, $window, $stateParams, fireFac
         });
         $scope.loading = true;
         $scope.userField.$save().then(function(){
-            $scope.loading = false;
-            $state.go('activity.groups');
+            if (!$rootScope.MainCtrlRef.currentUserData.joinedGroups) {
+                $rootScope.MainCtrlRef.currentUserData.joinedGroups = {};
+            }
+            $rootScope.MainCtrlRef.currentUserData.joinedGroups[$stateParams.groupId] = true;
+            $rootScope.MainCtrlRef.currentUserData.$save().then(function(){
+                $scope.loading = false;
+                $state.go('activity.groups');
+
+            });
         });
+
     };
 }
 
@@ -594,7 +635,6 @@ angular
                     angular.forEach(tagContextFilteredData, function (item) {
                         if (item.hasOwnProperty('notable')) {
                             var tagId = guid();
-                            console.log(item.notable.name);
                             contexts.push({
                                 tagId: tagId,
                                 name: item.name + '<p style= "font-style: italic" class="pull-right">' + item.notable.name,

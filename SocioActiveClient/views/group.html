@@ -23,13 +23,6 @@
                        typeahead-wait-ms="300" typeahead-on-select="addGroupTag($item)"
                        id="semanticTagName" placeholder="Enter tag...">
 
-                <ul class="tag-list" style="padding: 0">
-                    <li><a href=""><i class="fa fa-tag"></i> asdasdsadasdasd in qweqweqweqwq<i class="fa fa-times"></i></a></li>
-                    <li class="btn btn-w-m btn-info"><i class="fa fa-tag"></i> Lorem ipsum</li>
-                    <li><a href=""><i class="fa fa-tag"></i> Passages</a></li>
-                    <li><a href=""><i class="fa fa-tag"></i> Variations</a></li>
-                </ul>
-
                 <div class="form-group"><label>User Field Name</label> <input type="text" ng-model="userFieldName" placeholder="Enter User Field Name" class="form-control"></div>
 
                 <div class="checkbox"><label> <input icheck type="checkbox" ng-click="updateSelection($event)">Use Custom Types</label></div>
@@ -59,7 +52,7 @@
                 </div>
                 <div class="ibox-content" >
                     <tabset>
-                        <tab ng-repeat=" value in $root.customTypes">
+                        <tab ng-repeat=" value in $root.MainCtrlRef.currentUserData.customTypes">
                             <tab-heading>
                                 {{value.name}}<a class="pull-right btn btn-white btn-xs" data-nodrag ng-click="removeTab(value)"><span class="fa fa-trash"></span></a>
                             </tab-heading>

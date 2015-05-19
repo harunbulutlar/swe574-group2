@@ -234,7 +234,32 @@ function config($stateProvider, $urlRouterProvider, $ocLazyLoadProvider) {
             url: "/create_event",
             templateUrl: "views/event.html",
             controller: 'EventCtrl',
-            data: { pageTitle: 'Create Event' }
+            data: { pageTitle: 'Create Event' },
+            resolve: {
+                loadPlugin: function ($ocLazyLoad) {
+                    return $ocLazyLoad.load([
+                        {
+                            name: 'datePicker',
+                            files: ['css/plugins/datapicker/angular-datapicker.css','js/plugins/datapicker/datePicker.js']
+                        },
+                        {
+                            files: ['js/plugins/jasny/jasny-bootstrap.min.js']
+                        },
+                        {
+                            name: 'ui.tree',
+                            files: ['css/plugins/uiTree/angular-ui-tree.min.css','js/plugins/uiTree/angular-ui-tree.min.js']
+                        },
+                        {
+                            name: 'ngTagsInput',
+                            files: ['css/plugins/ngTags/ng-tags-input.css','js/plugins/ngTags/ng-tags-input.js']
+                        },
+                        {
+                            name: 'ui.select',
+                            files: ['css/plugins/ui-select/select.css','js/plugins/ui-select/select.js']
+                        }
+                    ]);
+                }
+            }
         })
         .state('create.poll', {
             url: "/create_poll",
@@ -297,7 +322,7 @@ function config($stateProvider, $urlRouterProvider, $ocLazyLoadProvider) {
                 }
             }
         })
-        .state('create.asd', {
+        .state('activity.group_view_content', {
             url: "/:groupId?fieldId?contentId",
             templateUrl: "views/group_view_content.html",
             data: { pageTitle: 'View Content' },
