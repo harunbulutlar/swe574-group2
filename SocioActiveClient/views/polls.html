@@ -30,23 +30,20 @@
             <div class="ibox-content" ng-hide="hidePollContent">
 
 
-                <div class="form-group"><label>Just For: </label>
+                <div class="form-group" ng-hide="isPollDisabled()"><label>Just For: </label>
 
                     <div class="radio"><label> <input type="radio" value="friends" id="friendsRadio"
                                                       ng-checked="true"
                                                       name="privacyRadios"
-                                                      ng-model="selectedPoll.pollPrivacy"
-                                                      ng-disabled="isPollDisabled()">Friends</label>
+                                                      ng-model="selectedPoll.pollPrivacy">Friends</label>
                     </div>
                     <div class=" radio"><label> <input type="radio" value="public" id="publicRadio"
                                                        name="privacyRadios"
-                                                       ng-model="selectedPoll.pollPrivacy"
-                                                       ng-disabled="isPollDisabled()">Public</label>
+                                                       ng-model="selectedPoll.pollPrivacy">Public</label>
                     </div>
                     <select class="form-control MultiSelect" data-placeholder="Roles"
                             ng-model="selectedPoll.pollRoles"
-                            ng-options="roles for roles in pollRoles" multiple="multiple" multiselect-dropdown
-                            ng-disabled="isPollDisabled()">
+                            ng-options="roles for roles in pollRoles" multiple="multiple" multiselect-dropdown>
                     </select>
                 </div>
 
@@ -61,9 +58,7 @@
 
                 </div>
 
-
                 <div class="form-poll"><label>Options</label>
-
 
                     <div class="form-group">
                         <div class="panel pre-scrollable"
@@ -127,20 +122,22 @@
 
                 <div class="form-poll"><label>Tags</label>
 
-                    <div class="form-group">
-                        <tabset>
-                            <tab ng-repeat="(key,tag) in selectedPollPristineState.pollTags">
-                                <tab-heading>
-                                    <h3>{{tag.tagName}}</h3>
+                    <div class="form-group pre-scrollable">
 
-                                    <p style="color: grey; font-style: italic">{{tag.tagContext}}<a
-                                            class="pull-right btn btn-white btn-xs" data-nodrag
-                                            ng-click="removeTagForView(key)"><span class="fa fa-trash"></span></a>
-                                        <br>
+                        <div class="ibox-content" ng-repeat="(key,value) in selectedPollPristineState.pollTagContext">
 
-                                </tab-heading>
-                            </tab>
-                        </tabset>
+                            <h4>{{key}}</h4>
+
+                            <div ng-repeat="tag in value" style="display: inline">
+                                <button class="btn btn-w-m btn-info"><i
+                                        class="fa fa-tag pull-left"></i>{{tag.tagName}} <i
+                                        class="fa fa-trash pull-right " data-nodrag
+                                        ng-click="removeTagForView(key, tag.tagId)"></i>
+                                </button> &nbsp;
+                            </div>
+
+                        </div>
+
                     </div>
 
                     <div class="form-poll">

@@ -115,20 +115,22 @@
 
                     <div class="form-poll"><label>Tags</label>
 
-                        <div class="form-group">
-                            <tabset>
-                                <tab ng-repeat="tag in createdPoll.pollTags">
-                                    <tab-heading>
-                                        <h3>{{tag.tagName}}</h3>
+                        <div class="form-group pre-scrollable">
 
-                                        <p style="color: grey; font-style: italic">{{tag.tagContext}}<a
-                                                class="pull-right btn btn-white btn-xs" data-nodrag
-                                                ng-click="removeTag(tag.tagId)"><span class="fa fa-trash"></span></a>
-                                            <br>
+                            <div class="ibox-content" ng-repeat="(key,value) in createdPoll.pollTagContext">
 
-                                    </tab-heading>
-                                </tab>
-                            </tabset>
+                                <h4>{{key}}</h4>
+
+                                <div ng-repeat="tag in value" style="display: inline">
+                                    <button class="btn btn-w-m btn-info"><i
+                                            class="fa fa-tag pull-left"></i>{{tag.tagName}} <i
+                                            class="fa fa-trash pull-right " data-nodrag
+                                            ng-click="removeTag(key, tag.tagId)"></i>
+                                    </button> &nbsp;
+                                </div>
+
+                            </div>
+
                         </div>
 
                         <div class="form-poll">
@@ -146,15 +148,11 @@
 
                         </div>
 
-
                     </div>
-
 
                 </div>
 
-
                 <section ng-controller="PollTabCtrl">
-
 
                     <div class="ibox-content">
                         <tabset>
