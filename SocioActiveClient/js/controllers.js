@@ -1,5 +1,5 @@
 function MainCtrl($window, fireFactory, $rootScope) {
-
+ 
     this.authData = fireFactory.firebaseRef().getAuth();
     if (this.authData) {
         console.log("User " + this.authData.uid + " is logged in with " + this.authData.provider);
