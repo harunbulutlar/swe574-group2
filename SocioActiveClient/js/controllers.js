@@ -53,7 +53,7 @@ function CustomTypesCtrl($state, $scope, contextFactory, $rootScope, fireFactory
     };
 
     $scope.removeUserField = function (userField) {
-        var index = $rootScope.createdGroup.fields.indexOf(userField);
+        var index = $scope.createdGroup.fields.indexOf(userField);
         $scope.createdGroup.fields.splice(index, 1);
     };
 
@@ -274,17 +274,18 @@ function arrayObjectIndexOf(myArray, searchTerm, property) {
     return -1;
 }
 
-function CurrentGroupsCtrl($scope, contextFactory, $state, fireFactory) {
+function CurrentGroupsCtrl($rootScope,$scope, contextFactory, $state, fireFactory) {
     $scope.hideGroupContent = true;
     $scope.selectedGroupId = null;
-    $scope.groups = fireFactory.getGroupsObject();
+    var syncObject = fireFactory.getGroupsObject();
+    syncObject.$bindTo($scope, "groups");
+
     $scope.getGroupTagContext = contextFactory.getTagContext;
     $scope.toggle = function (scope) {
         scope.toggle();
     };
-    $scope.selectedGroup = null;
 
-    $scope.groups.$watch(function(){
+    $scope.$watch('groups',function(){
         if($scope.selectedGroupId != null){
             if(!$scope.groups.hasOwnProperty($scope.selectedGroupId)){
                 $scope.hideGroupContent = true;
@@ -293,16 +294,23 @@ function CurrentGroupsCtrl($scope, contextFactory, $state, fireFactory) {
             }
 
         }
-    });
+    },true);
+    $scope.selectedGroup = null;
 
     $scope.addGroupTag = function (tag) {
-        if (!$scope.createdGroup.contexts) {
-            $scope.createdGroup.contexts = {};
+        if (!$scope.selectedGroup.contexts) {
+            $scope.selectedGroup.contexts = {};
         }
         if(!$scope.selectedGroup.contexts[tag.tagContext]){
-            $scope.createdGroup.contexts[tag.tagContext] = [];
+            $scope.selectedGroup.contexts[tag.tagContext] = [];
         }
-        $scope.createdGroup.contexts[tag.tagContext].push(tag);
+        $scope.selectedGroup.contexts[tag.tagContext].push(tag);
+        if (!$rootScope.MainCtrlRef.currentUserData.joinedGroups) {
+            $rootScope.MainCtrlRef.currentUserData.joinedGroups = {};
+        }
+        $rootScope.MainCtrlRef.currentUserData.joinedGroups[$scope.selectedGroupId] = true;
+        $rootScope.MainCtrlRef.currentUserData.$save()
+
     };
 
     $scope.show = function (group,key) {
