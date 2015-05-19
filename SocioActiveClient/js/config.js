@@ -210,6 +210,10 @@ function config($stateProvider, $urlRouterProvider, $ocLazyLoadProvider) {
                             files: ['js/plugins/jasny/jasny-bootstrap.min.js']
                         },
                         {
+                            name: 'ngTagsInput',
+                            files: ['css/plugins/ngTags/ng-tags-input.css','js/plugins/ngTags/ng-tags-input.js']
+                        },
+                        {
                             name: 'ui.tree',
                             files: ['css/plugins/uiTree/angular-ui-tree.min.css','js/plugins/uiTree/angular-ui-tree.min.js']
                         },

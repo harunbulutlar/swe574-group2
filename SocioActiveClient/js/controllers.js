@@ -481,4 +481,79 @@ angular
             return helperFactory;
 
         }]
-);
+
+    )
+    .factory('contextFactory', ['$http',
+        function contextFactory($http) {
+            var helperFactory = {};
+            helperFactory.getTagContext = function (val) {
+                var onResult = function (result) {
+                    var tagContextRawData = result.data.result;
+                    var scores = [];
+                    var contexts = [];
+                    angular.forEach(tagContextRawData, function (item) {
+                        scores.push(item.score);
+                    });
+                    var scoreTag = helperFactory.calculateAverage(scores) - helperFactory.calculateStandardDeviation(scores) / 2;
+
+                    var tagContextFilteredData = tagContextRawData.filter(function (contextFilter) {
+                        if (contextFilter.hasOwnProperty('notable') && contextFilter.notable.name != '') {
+                            return (contextFilter.name != '') && (contextFilter.score >= scoreTag);
+                        }
+                    });
+
+                    angular.forEach(tagContextFilteredData, function (item) {
+                        if (item.hasOwnProperty('notable')) {
+                            var tagId = guid();
+                            contexts.push({
+                                tagId: tagId,
+                                name: item.name + '<p style= "font-style: italic" class="pull-right">' + item.notable.name,
+                                tagName: item.name,
+                                tagContext: item.notable.name,
+                                tagContextParentDomain: helperFactory.getTagContextParentDomain(item.notable.id),
+                                tagContextChildDomain: helperFactory.getTagContextChildDomain(item.notable.id),
+                                score: item.score
+                            });
+                        }
+                    });
+                    return contexts;
+                };
+
+                return $http.get('https://www.googleapis.com/freebase/v1/search', {
+                    params: {
+                        query: val,
+                        key: 'AIzaSyBfJNRIjAao3J0PZeO9ALipSJ_k9NjETwc',
+                        limit: 50
+                    }
+                }).then(onResult);
+            };
+
+            helperFactory.calculateStandardDeviation = function(values) {
+                var avg = helperFactory.calculateAverage(values);
+                var squareDiffs = values.map(function (value) {
+                    var diff = value - avg;
+                    return diff * diff;
+                });
+                var avgSquareDiff = calculateAverage(squareDiffs);
+                return Math.sqrt(avgSquareDiff);
+            };
+
+            helperFactory.calculateAverage = function(data) {
+                var sum = data.reduce(function (sum, value) {
+                    return sum + value;
+                }, 0);
+
+                return sum / data.length;
+            };
+
+            helperFactory.getTagContextParentDomain = function(notableId) {
+                return notableId.split("/")[1];
+            };
+
+            helperFactory.getTagContextChildDomain  = function(notableId) {
+                return notableId.split("/")[2];
+            };
+
+            return helperFactory;
+        }]
+    );
