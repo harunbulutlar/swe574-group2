@@ -6,7 +6,7 @@
 
 
 
-function PollCtrl($scope, $rootScope, $stateParams, $state, contextFactory, MEMBER, fireFactoryForPoll , semanticTagFactory) {
+function PollCtrl($scope, $rootScope, $stateParams, $state, contextFactory, MEMBER, fireFactoryForPoll, semanticTagFactory) {
     $scope.isVotedTemp = false;
     $scope.getPollTags = contextFactory.getTagContext;
     $scope.pollOptionTempList = [];
@@ -109,7 +109,6 @@ function PollCtrl($scope, $rootScope, $stateParams, $state, contextFactory, MEMB
 
     $scope.isCurrentUserVoted = function () {
         return (($scope.isVotedTemp == true) ||
-        ($rootScope.localStoragePollModel.pollParticipantList.indexOf($scope.currentUserEmail) != -1));
         ($scope.createdPoll.pollParticipantList.indexOf($scope.currentUserId) != -1));
 
     };
@@ -130,7 +129,7 @@ function PollCtrl($scope, $rootScope, $stateParams, $state, contextFactory, MEMB
             return;
         }
 
-        var saveAfterLoad = function(data, polls){
+        var saveAfterLoad = function (data, polls) {
             polls.push($rootScope.localStoragePollModel);
             data.$save();
             $scope.mainCtrl.currentUserData.$save();
@@ -223,7 +222,8 @@ function PollCtrl($scope, $rootScope, $stateParams, $state, contextFactory, MEMB
         // toString and valueOf enumeration bugs in IE < 9
         for (var key in obj) {
             if (obj.hasOwnProperty(key)) return false;
-
+        }
+    };
     $scope.isPollObjectEmpty = function (obj) {
 
         return isObjectEmpty(obj);
@@ -239,7 +239,6 @@ function PollCtrl($scope, $rootScope, $stateParams, $state, contextFactory, MEMB
             return;
 
         }
-        return true;
 
         if (!$scope.createdPoll.pollDescription) {
 
@@ -597,11 +596,11 @@ angular
             };
             helperFactory.loadPolls = function (callback) {
                 var data = helperFactory.getData();
-                data.$loaded().then(function(loadedData){
-                    if(!loadedData.polls){
+                data.$loaded().then(function (loadedData) {
+                    if (!loadedData.polls) {
                         loadedData.polls = [];
                     }
-                    callback(loadedData,loadedData.polls);
+                    callback(loadedData, loadedData.polls);
                 })
             };
 
