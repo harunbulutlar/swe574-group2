@@ -402,6 +402,44 @@ function SearchCtrl($scope, $firebaseObject, $filter) {
     //console.log($scope.polls);
 }
 
+function EventCtrl($scope, fireFactory, $stateParams, $firebaseObject) {
+
+    $scope.eventTitle = '';
+    $scope.eventDesc = '';
+    $scope.eventDate = '';
+    $scope.eventLocation = '';
+
+
+
+    $scope.events =  $firebaseObject(fireFactory.getEventsRef());
+    console.log( $scope.events);
+
+
+    $scope.saveEventData = function () {
+        console.log("Event saved!");
+        var eventTitle = $scope.eventTitle.trim();
+        var eventDesc = $scope.eventDesc.trim();
+        var eventDate = $scope.eventDate;
+        var eventLocation = $scope.eventLocation;
+
+
+        $scope.createdEvent = {};
+        $scope.createdEvent["eventTitle"] = eventTitle;
+        $scope.createdEvent["eventDesc"] = eventDesc;
+        $scope.createdEvent["eventDate"] = eventDate;
+        $scope.createdEvent["eventLocation"] = eventLocation;
+        $scope.createdEvent["users"] = [];
+
+        var strippedEvents = angular.fromJson(angular.toJson($scope.createdEvent));
+
+        var fireBaseObj = fireFactory.getEventsRef().push(strippedEvents);
+
+
+    }
+
+
+}
+
 angular
     .module('socioactive')
     .directive('addNodeInfo', addNodeInfo)
@@ -502,7 +540,11 @@ angular
             helperFactory.getContentObject = function (groupId, fieldId,contentId) {
                 return $firebaseObject(helperFactory.getGroupsRef().child(groupId).child('fields').child(fieldId).child('content').child(contentId));
             };
+            helperFactory.getEventsRef = function () {
+                return helperFactory.firebaseRef().child('data').child('events');
+            };
             return helperFactory;
+
 
         }]
 

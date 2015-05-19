@@ -15,24 +15,29 @@
                 </div>
                 <div class="ibox-content">
                     <div class=" form-group"><label>Event Title</label> <input type="text"
-                                                                         placeholder="Enter a Title for your event"
-                                                                         class="form-control"
-                                                                         required="">
-                    </div>
-                    <div class=" form-group"><label>Details</label> <input type="text"
-                                                                               placeholder="Enter a details for your event"
+                                                                               ng-model="eventTitle"
+                                                                               placeholder="Enter a Title for your event"
                                                                                class="form-control"
                                                                                required="">
                     </div>
-                    <div class=" form-group"><label>Location</label> <input type="text"
-                                                                               placeholder="Enter a location for your event"
-                                                                               class="form-control"
-                                                                               required="">
+                    <div class=" form-group"><label>Event Details</label>
+                                                                    <textarea
+                                                                            placeholder="Enter a details for your event"
+                                                                            ng-model="eventDesc"
+                                                                            class="form-control"></textarea>
                     </div>
-                    <div class=" form-group"><label>Time</label> <input type="text"
-                                                                               placeholder="Enter a time for your event"
-                                                                               class="form-control"
-                                                                               required="">
+                    <div class=" form-group"><label>Event Location</label> <input type="text"
+                                                                                  placeholder="Enter a location for your event"
+                                                                                  ng-model="eventLocation"
+                                                                                  class="form-control"
+                                                                                  required="">
+                    </div>
+                    <div class=" form-group"><label>Event Time</label> <div class='input-group date'>
+                        <input type='datetime' class='form-control' date-time
+                               view='date'
+                               ng-model="eventDate"
+                               required=""><span
+                            class='input-group-addon'><i class='fa fa-calendar'></i></span></div>
                     </div>
                 </div>
             </div>
@@ -40,7 +45,10 @@
     </div>
 </div>
 
-
+<form class="col-lg-12" ng-submit="saveEventData()">
+    <button type="submit" class="btn btn-primary btn-sm btn-block"><i class="fa fa-save"></i> Save Your Changes
+    </button>
+</form>
 
 </body>
 </html>
