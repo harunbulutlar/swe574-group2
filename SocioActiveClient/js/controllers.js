@@ -7,24 +7,26 @@ function MainCtrl($window, fireFactory, $rootScope) {
         $window.location.href = 'login.html';
     }
     this.userId = this.authData.uid;
-    this.isAdmin = false;
-    this.email = this.authData.password;
+    this.email = this.authData.password.email;
+
     this.currentUserData = fireFactory.getUserObject(this.userId);
+
     this.currentUserData.$loaded().then(function (loadedData) {
         if (!loadedData.customTypes) {
             loadedData.customTypes = [];
         }
     });
-    this.email = this.authData.password.email;
+
     this.logout = function () {
         fireFactory.firebaseRef().unauth();
         $window.location.href = 'login.html';
     };
+
     $rootScope.MainCtrlRef = this;
 
 }
 
-function CustomTypesCtrl($state, $scope,$window, $rootScope, fireFactory) {
+function CustomTypesCtrl($state, $scope, $window, $rootScope, fireFactory) {
     $scope.loading = false;
     $scope.addCustomType = function () {
         var customType = {
@@ -229,7 +231,7 @@ function guid() {
             .substring(1);
     }
 
-    return 'id:' + s4() + s4() + '-' + s4() + '-' + s4() + '-' +
+    return s4() + s4() + '-' + s4() + '-' + s4() + '-' +
         s4() + '-' + s4() + s4() + s4();
 }
 
@@ -239,6 +241,7 @@ function arrayObjectIndexOf(myArray, searchTerm, property) {
     }
     return -1;
 }
+
 function CurrentGroupsCtrl($scope, $state, fireFactory) {
     $scope.hideGroupContent = true;
     $scope.selectedGroupId = null;
@@ -279,7 +282,7 @@ function CurrentGroupsCtrl($scope, $state, fireFactory) {
     }
 }
 
-function GroupAddCtrl($scope,$state, $rootScope,$window, $stateParams, fireFactory) {
+function GroupAddCtrl($scope, $state, $rootScope, $window, $stateParams, fireFactory) {
     $scope.loading = false;
     $scope.userField = fireFactory.getFieldObject($stateParams.groupId,$stateParams.typeId);
     $scope.userField.$loaded().then(function(loadedData){
