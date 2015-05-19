@@ -2,9 +2,8 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="6a07af13-8214-492b-aa93-403c8598cf81" name="Default" comment="">
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/SocioActiveClient/js/config.js" afterPath="$PROJECT_DIR$/SocioActiveClient/js/config.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/SocioActiveClient/js/controllers.js" afterPath="$PROJECT_DIR$/SocioActiveClient/js/controllers.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/SocioActiveClient/views/event.html" afterPath="$PROJECT_DIR$/SocioActiveClient/views/event.html" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/SocioActiveClient/views/event_view.html" afterPath="$PROJECT_DIR$/SocioActiveClient/views/event_view.html" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
     </list>
     <ignored path="SocioActive12.iws" />
     <ignored path=".idea/workspace.xml" />
@@ -44,20 +43,30 @@
             <state vertical-scroll-proportion="-9.931034" vertical-offset="8875" max-vertical-offset="10727">
               <caret line="539" column="48" selection-start-line="539" selection-start-column="48" selection-end-line="539" selection-end-column="48" />
               <folding>
-                <marker date="1432048353798" expanded="true" signature="15626:15638" placeholder="..." />
-                <marker date="1432048353798" expanded="true" signature="15847:15859" placeholder="..." />
-                <marker date="1432048353798" expanded="true" signature="16334:16346" placeholder="..." />
-                <marker date="1432048353798" expanded="true" signature="24279:24297" placeholder="..." />
+                <marker date="1432049403817" expanded="true" signature="15626:15638" placeholder="..." />
+                <marker date="1432049403817" expanded="true" signature="15847:15859" placeholder="..." />
+                <marker date="1432049403817" expanded="true" signature="16334:16346" placeholder="..." />
+                <marker date="1432049403817" expanded="true" signature="24305:24323" placeholder="..." />
               </folding>
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="config.js" pinned="false" current-in-tab="true">
+      <file leaf-file-name="config.js" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/SocioActiveClient/js/config.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.45503598" vertical-offset="1430" max-vertical-offset="6494">
+            <state vertical-scroll-proportion="-3.4482758" vertical-offset="1583" max-vertical-offset="6494">
               <caret line="99" column="41" selection-start-line="99" selection-start-column="41" selection-end-line="99" selection-end-column="41" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="event_view.html" pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/SocioActiveClient/views/event_view.html">
+          <provider selected="true" editor-type-id="text-editor">
+            <state vertical-scroll-proportion="0.21794872" vertical-offset="0" max-vertical-offset="867">
+              <caret line="7" column="0" selection-start-line="7" selection-start-column="0" selection-end-line="7" selection-end-column="0" />
               <folding />
             </state>
           </provider>
@@ -74,6 +83,7 @@
         <option value="$PROJECT_DIR$/SocioActiveClient/views/event.html" />
         <option value="$PROJECT_DIR$/SocioActiveClient/js/controllers.js" />
         <option value="$PROJECT_DIR$/SocioActiveClient/js/config.js" />
+        <option value="$PROJECT_DIR$/SocioActiveClient/views/event_view.html" />
       </list>
     </option>
   </component>
@@ -185,8 +195,41 @@
   <component name="PropertiesComponent">
     <property name="WebServerToolWindowFactoryState" value="false" />
     <property name="HbShouldOpenHtmlAsHb" value="" />
+    <property name="DefaultHtmlFileTemplate" value="Html5" />
   </component>
   <component name="RunManager">
+    <configuration default="true" type="DartUnitRunConfigurationType" factoryName="DartUnit">
+      <method />
+    </configuration>
+    <configuration default="true" type="DartCommandLineRunConfigurationType" factoryName="Dart Command Line Application">
+      <method />
+    </configuration>
+    <configuration default="true" type="JSTestDriver:ConfigurationType" factoryName="JsTestDriver">
+      <setting name="configLocationType" value="CONFIG_FILE" />
+      <setting name="settingsFile" value="" />
+      <setting name="serverType" value="INTERNAL" />
+      <setting name="preferredDebugBrowser" value="Chrome" />
+      <method />
+    </configuration>
+    <configuration default="true" type="JavaScriptTestRunnerKarma" factoryName="Karma" config-file="">
+      <envs />
+      <method />
+    </configuration>
+    <configuration default="true" type="JavascriptDebugType" factoryName="JavaScript Debug">
+      <method />
+    </configuration>
+    <configuration default="true" type="NodeJSConfigurationType" factoryName="Node.js" working-dir="">
+      <method />
+    </configuration>
+    <configuration default="true" type="cucumber.js" factoryName="Cucumber.js">
+      <option name="cucumberJsArguments" value="" />
+      <option name="executablePath" />
+      <option name="filePath" />
+      <method />
+    </configuration>
+    <configuration default="true" type="js.build_tools.gulp" factoryName="Gulp.js">
+      <method />
+    </configuration>
     <list size="0" />
   </component>
   <component name="ShelveChangesManager" show_recycled="false" />
@@ -200,7 +243,7 @@
     <servers />
   </component>
   <component name="ToolWindowManager">
-    <frame x="-8" y="-8" width="1382" height="744" extended-state="7" />
+    <frame x="-8" y="-8" width="1382" height="744" extended-state="6" />
     <editor active="true" />
     <layout>
       <window_info id="Changes" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="-1" side_tool="false" content_ui="tabs" />
@@ -257,18 +300,26 @@
         <state vertical-scroll-proportion="-9.931034" vertical-offset="8875" max-vertical-offset="10727">
           <caret line="539" column="48" selection-start-line="539" selection-start-column="48" selection-end-line="539" selection-end-column="48" />
           <folding>
-            <marker date="1432048353798" expanded="true" signature="15626:15638" placeholder="..." />
-            <marker date="1432048353798" expanded="true" signature="15847:15859" placeholder="..." />
-            <marker date="1432048353798" expanded="true" signature="16334:16346" placeholder="..." />
-            <marker date="1432048353798" expanded="true" signature="24279:24297" placeholder="..." />
+            <marker date="1432049403817" expanded="true" signature="15626:15638" placeholder="..." />
+            <marker date="1432049403817" expanded="true" signature="15847:15859" placeholder="..." />
+            <marker date="1432049403817" expanded="true" signature="16334:16346" placeholder="..." />
+            <marker date="1432049403817" expanded="true" signature="24305:24323" placeholder="..." />
           </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/SocioActiveClient/js/config.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.45503598" vertical-offset="1430" max-vertical-offset="6494">
+        <state vertical-scroll-proportion="-3.4482758" vertical-offset="1583" max-vertical-offset="6494">
           <caret line="99" column="41" selection-start-line="99" selection-start-column="41" selection-end-line="99" selection-end-column="41" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/SocioActiveClient/views/event_view.html">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.21794872" vertical-offset="0" max-vertical-offset="867">
+          <caret line="7" column="0" selection-start-line="7" selection-start-column="0" selection-end-line="7" selection-end-column="0" />
           <folding />
         </state>
       </provider>
