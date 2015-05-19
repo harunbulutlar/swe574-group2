@@ -1,338 +1,283 @@
-<div>
-
-    <div class="col-lg-6">
-        <div class="ibox float-e-margins">
-            <div class="ibox-title">
-                <h3>Polls
-                    <small>The list of the polls that you have interacted with!</small>
-                </h3>
-            </div>
-            <div class="ibox-content">
-
-                <div class="list-group">
-                    <a ng-repeat="(key,poll) in polls" ng-class="getClass(poll)" ng-click="show(poll,key)" href="">
-                        <h3 class="list-group-item-heading">{{poll.createdBy}}'s group : {{poll.pollTitle}}</h3>
-
-                        <p class="list-group-item-text">{{poll.pollDescription }}</p>
-                    </a>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div class="col-lg-6">
-        <div class="ibox float-e-margins">
-            <div class="ibox-title">
-                <h3>{{selectedPoll.pollTitle}}
-                    <small>{{selectedPoll.pollDescription}}</small>
-                </h3>
-            </div>
-            <div class="ibox-content" ng-hide="hidePollContent">
-
-
-                <div class="form-group" ng-hide="isPollDisabled()"><label>Just For: </label>
-
-                    <div class="radio"><label> <input type="radio" value="friends" id="friendsRadio"
-                                                      ng-checked="true"
-                                                      name="privacyRadios"
-                                                      ng-model="selectedPoll.pollPrivacy">Friends</label>
+<div class="row">
+    <div class="col-lg-12">
+        <div class="wrapper wrapper-content">
+            <div class="col-lg-6">
+                <div class="ibox float-e-margins">
+                    <div class="ibox-title">
+                        <h3>Polls
+                            <small>The list of the polls that you have interacted with!</small>
+                        </h3>
                     </div>
-                    <div class=" radio"><label> <input type="radio" value="public" id="publicRadio"
-                                                       name="privacyRadios"
-                                                       ng-model="selectedPoll.pollPrivacy">Public</label>
+                    <div class="ibox-content">
+
+                        <div class="list-group">
+                            <a ng-repeat="(key,poll) in polls" ng-class="getClass(poll)" ng-click="show(poll,key)"
+                               href="">
+                                <h3 class="list-group-item-heading">{{poll.createdBy}}'s group : {{poll.pollTitle}}</h3>
+
+                                <p class="list-group-item-text">{{poll.pollDescription }}</p>
+                            </a>
+                        </div>
                     </div>
-                    <select class="form-control MultiSelect" data-placeholder="Roles"
-                            ng-model="selectedPoll.pollRoles"
-                            ng-options="roles for roles in pollRoles" multiple="multiple" multiselect-dropdown>
-                    </select>
                 </div>
+            </div>
+
+            <div class="col-lg-6">
+                <div class="ibox float-e-margins">
+                    <div class="ibox-title">
+                        <h3>{{selectedPoll.pollTitle}}
+                            <small>{{selectedPoll.pollDescription}}</small>
+                        </h3>
+                    </div>
+                    <div class="ibox-content" ng-hide="hidePollContent">
 
 
-                <div class="form-group"><label>End Date</label>
+                        <div class="form-group" ng-hide="isPollDisabled()"><label>Just For: </label>
 
-                    <div class='input-group date'><input type='datetime' class='form-control' date-time
-                                                         ng-model='selectedPoll.endDate' view='date'
-                                                         ng-disabled="isPollDisabled()"
-                                                         required=""><span
-                            class='input-group-addon'><i class='fa fa-calendar'></i></span></div>
-
-                </div>
-
-                <div class="form-poll"><label>Options</label>
-
-                    <div class="form-group">
-                        <div class="panel pre-scrollable"
-                             ng-hide="isPollObjectEmpty(selectedPollPristineState.pollOptions)">
-                            <div class="panel-body">
-                                <ul class="list-group"
-                                    ng-repeat="(key,option) in selectedPollPristineState.pollOptions">
-
-                                    <li class="list-group-item">
-
-                                        <form name='vote'>
-
-                                            <!--<a class="pull-right btn btn-white btn-xs" data-nodrag
-                                               ng-click="removePollOption(key)"><span
-                                                    class="fa fa-trash"></span></a>-->
-
-                                            <a class="btn btn-xs btn-white pull-right"
-                                               ng-click="votePoll(key)"
-                                               ng-hide="isCurrentUserVoted()"><i
-                                                    class="fa fa-thumbs-up"></i>Vote</a>
-
-                                            <a class="btn btn-xs btn-white pull-right"
-                                               ng-class=" {disabled: isCurrentUserVoted()}"
-                                               ng-show="isCurrentUserVoted()"><i
-                                                    class="fa fa-thumbs-up"></i>{{ option.optionVoteCount }}</a>
-
-                                        </form>
-                                        <b>{{ option.optionName }}</b> | {{ option.optionDetail }}
-
-
-                                    </li>
-
-
-                                </ul>
-
-
+                            <div class="radio"><label> <input type="radio" value="friends" id="friendsRadio"
+                                                              ng-checked="true"
+                                                              name="privacyRadios"
+                                                              ng-model="selectedPoll.pollPrivacy">Friends</label>
                             </div>
+                            <div class=" radio"><label> <input type="radio" value="public" id="publicRadio"
+                                                               name="privacyRadios"
+                                                               ng-model="selectedPoll.pollPrivacy">Public</label>
+                            </div>
+                            <select class="form-control MultiSelect" data-placeholder="Roles"
+                                    ng-model="selectedPoll.pollRoles"
+                                    ng-options="roles for roles in pollRoles" multiple="multiple" multiselect-dropdown>
+                            </select>
                         </div>
 
-                        <div class="form-group"
-                             ng-hide="isPollDisabled()">
 
-                            <form name='addOption' ng-submit="addPollOption()">
+                        <div class="form-group"><label>End Date</label>
 
-                                <input type="text" ng-model="pollOptionTempList.optionName"
-                                       placeholder="Add an option for your poll"
-                                       class="form-control" required="">
-                                <input type="text" ng-model="pollOptionTempList.optionDetail"
-                                       placeholder="Add a definiton for your option"
-                                       class="form-control">
-                                <button type="submit" class="btn btn-primary">Add Option</button>
-
-                            </form>
+                            <div class='input-group date'><input type='datetime' class='form-control' date-time
+                                                                 ng-model='selectedPoll.endDate' view='date'
+                                                                 ng-disabled="isPollDisabled()"
+                                                                 required=""><span
+                                    class='input-group-addon'><i class='fa fa-calendar'></i></span></div>
 
                         </div>
 
-                    </div>
+                        <div class="form-poll"><label>Options</label>
 
-                </div>
+                            <div class="form-group">
+                                <div class="panel pre-scrollable"
+                                     ng-hide="isPollObjectEmpty(selectedPollPristineState.pollOptions)">
+                                    <div class="panel-body">
+                                        <ul class="list-group"
+                                            ng-repeat="(key,option) in selectedPollPristineState.pollOptions">
+
+                                            <li class="list-group-item">
+
+                                                <form name='vote'>
+
+                                                    <!--<a class="pull-right btn btn-white btn-xs" data-nodrag
+                                                       ng-click="removePollOption(key)"><span
+                                                            class="fa fa-trash"></span></a>-->
+
+                                                    <a class="btn btn-xs btn-white pull-right"
+                                                       ng-click="votePoll(key)"
+                                                       ng-hide="isCurrentUserVoted()"><i
+                                                            class="fa fa-thumbs-up"></i>Vote</a>
+
+                                                    <a class="btn btn-xs btn-white pull-right"
+                                                       ng-class=" {disabled: isCurrentUserVoted()}"
+                                                       ng-show="isCurrentUserVoted()"><i
+                                                            class="fa fa-thumbs-up"></i>{{ option.optionVoteCount }}</a>
+
+                                                </form>
+                                                <b>{{ option.optionName }}</b> | {{ option.optionDetail }}
 
 
-                <div class="form-poll"><label>Tags</label>
+                                            </li>
 
-                    <div class="form-group pre-scrollable">
 
-                        <div class="ibox-content" ng-repeat="(key,value) in selectedPollPristineState.pollTagContext">
+                                        </ul>
 
-                            <h4>{{key}}</h4>
 
-                            <div ng-repeat="tag in value" style="display: inline">
-                                <button class="btn btn-w-m btn-info"><i
-                                        class="fa fa-tag pull-left"></i>{{tag.tagName}} <i
-                                        class="fa fa-trash pull-right " data-nodrag
-                                        ng-click="removeTagForView(key, tag.tagId)"></i>
-                                </button> &nbsp;
+                                    </div>
+                                </div>
+
+                                <div class="form-group"
+                                     ng-hide="isPollDisabled()">
+
+                                    <form name='addOption' ng-submit="addPollOption()">
+
+                                        <input type="text" ng-model="pollOptionTempList.optionName"
+                                               placeholder="Add an option for your poll"
+                                               class="form-control" required="">
+                                        <input type="text" ng-model="pollOptionTempList.optionDetail"
+                                               placeholder="Add a definiton for your option"
+                                               class="form-control">
+                                        <button type="submit" class="btn btn-primary">Add Option</button>
+
+                                    </form>
+
+                                </div>
+
                             </div>
 
                         </div>
 
-                    </div>
 
-                    <div class="form-poll">
+                        <div class="form-poll"><label>Tags</label>
 
-                        <input type="text" ng-model="tags"
-                               typeahead="contextHead.tagId as contextHead.name for contextHead in getPollTagsForView($viewValue)"
-                               class="form-control" typeahead-loading="loadingLocations" typeahead-min-length="3"
-                               typeahead-wait-ms="300" typeahead-on-select="addPollTagForView($item)"
-                               id="semanticTagName" placeholder="Enter tag...">
+                            <div class="form-group pre-scrollable">
 
-                        <input type="text" ng-model="manualTags"
-                               typeahead="contextHead for contextHead in tagContextList | filter:$viewValue | limitTo:10"
-                               class="form-control" typeahead-on-select="addManualPollTagForView(tags, manualTags)"
-                               placeholder="Enter tag context..." ng-show="tags != ''">
+                                <div class="ibox-content"
+                                     ng-repeat="(key,value) in selectedPollPristineState.pollTagContext">
 
-                    </div>
+                                    <h4>{{key}}</h4>
 
-                </div>
-
-                <section ng-controller="PollTabCtrl">
-
-
-                    <div class="ibox-content">
-                        <tabset>
-                            <tab ng-click="selectTab(1)">
-                                <tab-heading>
-                                    Comments
-                                </tab-heading>
-
-                            </tab>
-
-                            <tab ng-click="selectTab(2)">
-                                <tab-heading>
-                                    Results
-                                </tab-heading>
-
-                            </tab>
-                        </tabset>
-                    </div>
-
-                    <div class="ibox-content">
-
-                        <div class='form-group' ng-show="isSelected(1)">
-
-                            <div class="panel pre-scrollable">
-                                <div class="feed-activity-list"
-                                     ng-repeat="comment in selectedPollPristineState.pollComments">
-
-                                    <div class="feed-element">
-
-                                        <a ui-sref="profile" class="pull-left">
-                                            <img alt="image" class="img-circle" src="img/a5.jpg">
-                                        </a>
-
-                                        <div class="media-body ">
-                                            <small class="pull-right">
-                                                {{pollCommentDateDifference(comment.commentDateTime)}}
-                                                ago
-                                            </small>
-                                            <strong>{{comment.commentUserName}}</strong> posted a message
-                                            <br>
-                                            <small class="text-muted">{{comment.commentDateTime | date:'yyyy-MM-dd
-                                                HH:mm'}}
-                                            </small>
-                                            <div class="well">
-                                                {{comment.commentBody}}
-                                            </div>
-                                        </div>
-
+                                    <div ng-repeat="tag in value" style="display: inline">
+                                        <button class="btn btn-w-m btn-info"><i
+                                                class="fa fa-tag pull-left"></i>{{tag.tagName}} <i
+                                                class="fa fa-trash pull-right " data-nodrag
+                                                ng-click="removeTagForView(key, tag.tagId)"></i>
+                                        </button>
+                                        &nbsp;
                                     </div>
 
                                 </div>
+
                             </div>
 
-                            <form name='addComment' ng-submit="addPollCommentForView()">
+                            <div class="form-poll">
+
+                                <input type="text" ng-model="tags"
+                                       typeahead="contextHead.tagId as contextHead.name for contextHead in getPollTagsForView($viewValue)"
+                                       class="form-control" typeahead-loading="loadingLocations"
+                                       typeahead-min-length="3"
+                                       typeahead-wait-ms="300" typeahead-on-select="addPollTagForView($item)"
+                                       id="semanticTagName" placeholder="Enter tag...">
+
+                                <input type="text" ng-model="manualTags"
+                                       typeahead="contextHead for contextHead in tagContextList | filter:$viewValue | limitTo:10"
+                                       class="form-control"
+                                       typeahead-on-select="addManualPollTagForView(tags, manualTags)"
+                                       placeholder="Enter tag context..." ng-show="tags != ''">
+
+                            </div>
+
+                        </div>
+
+                        <section ng-controller="PollTabCtrl">
+
+
+                            <div class="ibox-content">
+                                <tabset>
+                                    <tab ng-click="selectTab(1)">
+                                        <tab-heading>
+                                            Comments
+                                        </tab-heading>
+
+                                    </tab>
+
+                                    <tab ng-click="selectTab(2)">
+                                        <tab-heading>
+                                            Results
+                                        </tab-heading>
+
+                                    </tab>
+                                </tabset>
+                            </div>
+
+                            <div class="ibox-content">
+
+                                <div class='form-group' ng-show="isSelected(1)">
+
+                                    <div class="panel pre-scrollable">
+                                        <div class="feed-activity-list"
+                                             ng-repeat="comment in selectedPollPristineState.pollComments">
+
+                                            <div class="feed-element">
+
+                                                <a ui-sref="profile" class="pull-left">
+                                                    <img alt="image" class="img-circle" src="img/a5.jpg">
+                                                </a>
+
+                                                <div class="media-body ">
+                                                    <small class="pull-right">
+                                                        {{pollCommentDateDifference(comment.commentDateTime)}}
+                                                        ago
+                                                    </small>
+                                                    <strong>{{comment.commentUserName}}</strong> posted a message
+                                                    <br>
+                                                    <small class="text-muted">{{comment.commentDateTime |
+                                                        date:'yyyy-MM-dd
+                                                        HH:mm'}}
+                                                    </small>
+                                                    <div class="well">
+                                                        {{comment.commentBody}}
+                                                    </div>
+                                                </div>
+
+                                            </div>
+
+                                        </div>
+                                    </div>
+
+                                    <form name='addComment' ng-submit="addPollCommentForView()">
 
                                 <textarea ng-model="pollCommentTempList.commentBody"
                                           placeholder="Post anything on your mind!"
                                           class="form-control" required=""></textarea>
 
-                                <button type="submit" class="btn btn-primary">Post Comment</button>
+                                        <button type="submit" class="btn btn-primary">Post Comment</button>
 
-                            </form>
+                                    </form>
 
-                        </div>
+                                </div>
 
-                        <div class='form-group' ng-show="isSelected(2)">
-                            <h4>Results</h4>
-                        </div>
+                                <div class='form-group' ng-show="isSelected(2)">
+                                    <h4>Results</h4>
+                                </div>
+
+
+                            </div>
+
+                        </section>
 
 
                     </div>
 
-                </section>
+
+                </div>
+
+                <div class="form-group"><label>Deneme Sonuc: {{}}</label></div>
 
 
+                <div class="form-group"><label>{{selectedPoll.pollTitle}}'s fields</label></div>
+                <script type="text/ng-template" id="content_renderer.html">
+                    <div ui-tree-handle class="tree-node tree-node-content">
+                        <a class="pull-right btn btn-white btn-xs" data-nodrag
+                           ng-click="showContent(fieldKey, contentKey)"><span class="fa fa-eye"></span></a>
+                        {{node.owner}}'s content
+                    </div>
+                </script>
+                <script type="text/ng-template" id="field_renderer.html">
+                    <div ui-tree-handle class="tree-node tree-node-content">
+                        <a class="pull-right btn btn-white btn-xs" data-nodrag ng-click="addButtonClick(fieldKey)"><span
+                                class="fa fa-plus"></span></a>
+                        <a class="btn btn-primary btn-xs" data-nodrag ng-click="toggle(this)"><span class="fa"
+                                                                                                    ng-class="{'fa-angle-down': collapsed, 'fa-angle-right': !collapsed}"></span></a>
+                        {{node.name}}(Type:{{node.type.name}})
+                    </div>
+                    <ol ui-tree-nodes="" ng-model="node.content" ng-class="{hidden: collapsed}">
+                        <li ng-repeat="(contentKey, node) in node.content" ui-tree-node
+                            ng-include="'content_renderer.html'">
+                        </li>
+                    </ol>
+                </script>
+                <div ui-tree id="tree-root">
+                    <ol ui-tree-nodes ng-model="selectedGroup.fields">
+                        <li ng-repeat="(fieldKey,node) in selectedPoll.fields" ui-tree-node
+                            ng-include="'field_renderer.html'"></li>
+                    </ol>
+                </div>
             </div>
-
-
-        </div>
-
-        <div class="form-group"><label>Deneme Sonuc: {{}}</label></div>
-
-
-        <div class="form-group"><label>{{selectedPoll.pollTitle}}'s fields</label></div>
-        <script type="text/ng-template" id="content_renderer.html">
-            <div ui-tree-handle class="tree-node tree-node-content">
-                <a class="pull-right btn btn-white btn-xs" data-nodrag
-                   ng-click="showContent(fieldKey, contentKey)"><span class="fa fa-eye"></span></a>
-                {{node.owner}}'s content
-            </div>
-        </script>
-        <script type="text/ng-template" id="field_renderer.html">
-            <div ui-tree-handle class="tree-node tree-node-content">
-                <a class="pull-right btn btn-white btn-xs" data-nodrag ng-click="addButtonClick(fieldKey)"><span
-                        class="fa fa-plus"></span></a>
-                <a class="btn btn-primary btn-xs" data-nodrag ng-click="toggle(this)"><span class="fa"
-                                                                                            ng-class="{'fa-angle-down': collapsed, 'fa-angle-right': !collapsed}"></span></a>
-                {{node.name}}(Type:{{node.type.name}})
-            </div>
-            <ol ui-tree-nodes="" ng-model="node.content" ng-class="{hidden: collapsed}">
-                <li ng-repeat="(contentKey, node) in node.content" ui-tree-node ng-include="'content_renderer.html'">
-                </li>
-            </ol>
-        </script>
-        <div ui-tree id="tree-root">
-            <ol ui-tree-nodes ng-model="selectedGroup.fields">
-                <li ng-repeat="(fieldKey,node) in selectedPoll.fields" ui-tree-node
-                    ng-include="'field_renderer.html'"></li>
-            </ol>
         </div>
     </div>
 </div>
-</div>
-</div>
-
-<style>
-    .angular-ui-tree-handle {
-        background: none repeat scroll 0 0 #f3f3f4;
-        border: 1px dashed #e7eaec;
-        color: inherit;
-        padding: 10px;
-        font-weight: normal;
-    }
-
-    .angular-ui-tree-handle:hover {
-        font-weight: bold;
-        cursor: pointer;
-    }
-
-    .angular-ui-tree-placeholder {
-        background: #f0f9ff;
-        border: 1px dashed #bed2db;
-        -webkit-box-sizing: border-box;
-        -moz-box-sizing: border-box;
-        box-sizing: border-box;
-    }
-
-    .group-title {
-        background-color: #687074 !important;
-        color: #FFF !important;
-    }
-
-    .tree-node {
-        background: none repeat scroll 0 0 #f3f3f4;
-        border: 1px dashed #e7eaec;
-        color: inherit;
-        padding: 10px;
-        border-radius: 3px;
-    }
-
-    .tree-node .btn {
-        min-width: 22px;
-        margin-right: 4px;
-    }
-
-    .tree-node-content {
-        margin: 5px 5px 5px 0;
-    }
-
-    .tree-handle {
-        background: none repeat scroll 0 0 #f3f3f4;
-        border: 1px dashed #e7eaec;
-        color: inherit;
-        padding: 10px;
-    }
-
-    .angular-ui-tree-handle:hover {
-    }
-
-    .angular-ui-tree-placeholder {
-        background: #f0f9ff;
-        border: 1px dashed #bed2db;
-        -webkit-box-sizing: border-box;
-        -moz-box-sizing: border-box;
-        box-sizing: border-box;
-    }
-</style>

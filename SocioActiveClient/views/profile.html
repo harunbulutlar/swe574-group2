@@ -1,10 +1,33 @@
-<!DOCTYPE html>
-<html>
-<head lang="en">
-    <meta charset="UTF-8">
-    <title></title>
-</head>
-<body>
+<div class="wrapper wrapper-content">
+    <div class="row animated fadeInRight">
+        <div class="col-lg-4">
+            <div class="ibox float-e-margins">
+                <div class="ibox-title">
+                    <h5>Profile Detail</h5>
+                </div>
+                <div>
+                    <div class="ibox-content no-padding border-left-right">
+                        <img alt="image" class="img-responsive" src="{{main.currentUserData.userImage}}">
+                    </div>
+                    <div class="ibox-content profile-content">
 
-</body>
-</html>
+                        <div class=" form-group"><label>Name</label> <input type="text"
+                                                                             ng-model="main.currentUserData.userName"
+                                                                             placeholder="Your name..."
+                                                                             class="form-control"
+                                                                             required="">
+                        </div>
+
+                        <div class=" form-group"><label>Last Name</label> <input type="text"
+                                                                            ng-model="main.currentUserData.userLastName"
+                                                                            placeholder="Your last name..."
+                                                                            class="form-control"
+                                                                            required="">
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

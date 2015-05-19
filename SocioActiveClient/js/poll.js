@@ -288,6 +288,9 @@ function CurrentPollsCtrl($scope, $rootScope, $state, MEMBER, fireFactoryForPoll
     $scope.pollTagTempId = '';
     $scope.pollCommentTempList = [];
 
+    $scope.tags = '';
+    $scope.manualTags = '';
+
     $scope.tagContextList = ["Professional Sports Team",
         "College/University",
         "Place with local areas",
@@ -330,10 +333,15 @@ function CurrentPollsCtrl($scope, $rootScope, $state, MEMBER, fireFactoryForPoll
         $scope.selectedPoll = poll;
         $scope.selectedPollId = key;
         $scope.hidePollContent = false;
-        $scope.selectedPollPristineState = {};
-        var syncObject = fireFactoryForPoll.getPollObject($scope.selectedPollId);
-        /*Pristine state of the poll!*/
-        syncObject.$bindTo($scope,'selectedPollPristineState');
+
+
+        fireFactoryForPoll.getPollObject($scope.selectedPollId).$loaded().then(function (loadedData) {
+            $scope.selectedPollPristineState = loadedData;
+        });
+
+
+        /*var syncObject = fireFactoryForPoll.getPollObject($scope.selectedPollId);
+        syncObject.$bindTo($scope,'selectedPollPristineState');*/
 
     };
 
@@ -424,6 +432,8 @@ function CurrentPollsCtrl($scope, $rootScope, $state, MEMBER, fireFactoryForPoll
 
         });
 
+        $scope.selectedPollPristineState.$save();
+
         $scope.pollOptionTempList.optionName = '';
         $scope.pollOptionTempList.optionDetail = '';
 
@@ -433,16 +443,23 @@ function CurrentPollsCtrl($scope, $rootScope, $state, MEMBER, fireFactoryForPoll
 
         $scope.selectedPollPristineState.pollOptions.splice(optionToBeRemoved, 1);
 
+        $scope.selectedPollPristineState.$save();
+
     };
 
     $scope.addPollTagForView = function (tag) {
 
+        if (!$scope.selectedPollPristineState.pollTagContext) {
+            $scope.selectedPollPristineState.pollTagContext = {};
+        }
 
         if (!$scope.selectedPollPristineState.pollTagContext[tag.tagContext]) {
             $scope.selectedPollPristineState.pollTagContext[tag.tagContext] = [];
         }
 
         $scope.selectedPollPristineState.pollTagContext[tag.tagContext].push(tag);
+
+        $scope.selectedPollPristineState.$save();
 
         $scope.tags = '';
         $scope.manualTags = '';
@@ -489,11 +506,17 @@ function CurrentPollsCtrl($scope, $rootScope, $state, MEMBER, fireFactoryForPoll
             score: ''
         });
 
+        if (!$scope.selectedPollPristineState.pollTagContext) {
+            $scope.selectedPollPristineState.pollTagContext = {};
+        }
+
         if (!$scope.selectedPollPristineState.pollTagContext[tagContext]) {
             $scope.selectedPollPristineState.pollTagContext[tagContext] = [];
         }
 
         $scope.selectedPollPristineState.pollTagContext[tagContext].push(context[tagId]);
+
+        $scope.selectedPollPristineState.$save();
 
         $scope.tags = '';
         $scope.manualTags = '';
@@ -506,6 +529,7 @@ function CurrentPollsCtrl($scope, $rootScope, $state, MEMBER, fireFactoryForPoll
         var index = arrayObjectIndexOf($scope.selectedPollPristineState.pollTagContext[key], tagToBeRemoved, "tagId");
 
         $scope.selectedPollPristineState.pollTagContext[key].splice(index, 1);
+        $scope.selectedPollPristineState.$save();
 
     };
 
@@ -522,7 +546,7 @@ function CurrentPollsCtrl($scope, $rootScope, $state, MEMBER, fireFactoryForPoll
             "commentUserName": $scope.currentUserName,
             "commentDateTime": new Date().getTime()
         });
-
+        $scope.selectedPollPristineState.$save();
         $scope.pollCommentTempList.commentBody = '';
     };
 
