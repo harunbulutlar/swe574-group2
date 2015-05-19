@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title></title>
+</head>
+<body>
+
+<h2>Events</h2>
+<div class="row" ng-repeat="event in events">
+    <div class="col-sm-8 col-sm-offset-2">
+        <div class="input-group input-group-lg">
+
+            <div class="weather panel panel-primary">
+                <div class="panel-heading">{{event.eventTitle}}</div>
+                <div class="panel-body">
+                    <div>
+                        <p class="lead">
+                            <img ng-src="{{getIconImageUrl(useDayForecast.weather[0].icon)}}" />
+                            {{event.eventDesc}}
+                        </p>
+                        <p>
+                            Location: {{event.eventLocation}}
+
+                        </p>
+                        <p>
+                            Date: {{event.eventDate}}
+                        </p>
+                    </div>
+                </div>
+                <div class="panel-footer">
+                    <span>
+                        <button class="btn btn-default btn-sm" ng-click="doJoin(event.$id)">Katıl&nbsp;&nbsp;<i class="glyphicon glyphicon-plus"></i></button>
+                    </span>
+                </div>
+            </div>
+
+        </div><!-- /input-group -->
+    </div>
+</div>
+
+
+
+
+</body>
+</html>
