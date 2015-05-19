@@ -94,9 +94,10 @@ function config($stateProvider, $urlRouterProvider, $ocLazyLoadProvider) {
             }
         })
         .state('activity.events', {
-            url: "/email_view",
-            templateUrl: "views/main.html",
-            data: { pageTitle: 'Mail detail' }
+            url: "/event_view",
+            controller: 'EventCtrl',
+            templateUrl: "views/event_view.html",
+            data: { pageTitle: 'Events' }
         })
         .state('activity.polls', {
             url: "/view_poll/:pollToBeViewed",
@@ -232,6 +233,7 @@ function config($stateProvider, $urlRouterProvider, $ocLazyLoadProvider) {
         .state('create.event', {
             url: "/create_event",
             templateUrl: "views/event.html",
+            controller: 'EventCtrl',
             data: { pageTitle: 'Create Event' }
         })
         .state('create.poll', {

@@ -92,6 +92,7 @@ function CustomTypesCtrl($state, $scope, contextFactory, $rootScope, fireFactory
 
         var strippedGroups = angular.fromJson(angular.toJson($scope.createdGroup));
         var fireBaseObj = fireFactory.getGroupsRef().push(strippedGroups);
+
         if (!$rootScope.MainCtrlRef.currentUserData.createdGroups) {
             $rootScope.MainCtrlRef.currentUserData.createdGroups = {};
         }
@@ -99,19 +100,27 @@ function CustomTypesCtrl($state, $scope, contextFactory, $rootScope, fireFactory
         if (!$rootScope.MainCtrlRef.currentUserData.contexts) {
             $rootScope.MainCtrlRef.currentUserData.contexts = {};
         }
+
         angular.forEach($scope.createdGroup.contexts, function(value, key) {
+            var contextGroupsRef = fireFactory.getGroupsInContextRef(key);
+            var groupLinkObject = {};
+            groupLinkObject[fireBaseObj.key()] = value.length;
+            contextGroupsRef.update(groupLinkObject);
             if(!$rootScope.MainCtrlRef.currentUserData.contexts[key]){
                 $rootScope.MainCtrlRef.currentUserData.contexts[key] = 1;
                 return;
             }
             $rootScope.MainCtrlRef.currentUserData.contexts[key]++;
         });
+
         $scope.loading = true;
         $rootScope.MainCtrlRef.currentUserData.$save().then(function(){
             $scope.loading = false;
             $state.go('activity.groups');
 
         });
+
+
     };
 
     $scope.userFieldType = '';
@@ -402,6 +411,44 @@ function SearchCtrl($scope, $firebaseObject, $filter) {
     //console.log($scope.polls);
 }
 
+function EventCtrl($scope, fireFactory, $stateParams, $firebaseObject) {
+
+    $scope.eventTitle = '';
+    $scope.eventDesc = '';
+    $scope.eventDate = '';
+    $scope.eventLocation = '';
+
+
+
+    $scope.events =  $firebaseObject(fireFactory.getEventsRef());
+    console.log( $scope.events);
+
+
+    $scope.saveEventData = function () {
+        console.log("Event saved!");
+        var eventTitle = $scope.eventTitle.trim();
+        var eventDesc = $scope.eventDesc.trim();
+        var eventDate = $scope.eventDate;
+        var eventLocation = $scope.eventLocation;
+
+
+        $scope.createdEvent = {};
+        $scope.createdEvent["eventTitle"] = eventTitle;
+        $scope.createdEvent["eventDesc"] = eventDesc;
+        $scope.createdEvent["eventDate"] = eventDate;
+        $scope.createdEvent["eventLocation"] = eventLocation;
+        $scope.createdEvent["users"] = [];
+
+        var strippedEvents = angular.fromJson(angular.toJson($scope.createdEvent));
+
+        var fireBaseObj = fireFactory.getEventsRef().push(strippedEvents);
+
+
+    }
+
+
+}
+
 angular
     .module('socioactive')
     .directive('addNodeInfo', addNodeInfo)
@@ -486,6 +533,7 @@ angular
             helperFactory.getGroupRef = function (uid) {
                 return helperFactory.firebaseRef().child('data').child('groups').child(uid);
             };
+
             helperFactory.getGroupObject = function (uid) {
                 return $firebaseObject(helperFactory.getGroupRef(uid));
             };
@@ -496,13 +544,29 @@ angular
             helperFactory.getGroupsObject = function () {
                 return $firebaseObject(helperFactory.getGroupsRef());
             };
+            helperFactory.getGroupsInContextRef = function (context) {
+                return helperFactory.firebaseRef().child('data').child('contexts').child(context).child('groups');
+            };
+
+            helperFactory.getContextsRef = function () {
+                return helperFactory.firebaseRef().child('data').child('contexts');
+            };
+
+            helperFactory.getContextsObject = function () {
+                return $firebaseObject(helperFactory.getContextsRef());
+            };
+
             helperFactory.getFieldObject = function (groupId, fieldId) {
                 return $firebaseObject(helperFactory.getGroupsRef().child(groupId).child('fields').child(fieldId));
             };
             helperFactory.getContentObject = function (groupId, fieldId,contentId) {
                 return $firebaseObject(helperFactory.getGroupsRef().child(groupId).child('fields').child(fieldId).child('content').child(contentId));
             };
+            helperFactory.getEventsRef = function () {
+                return helperFactory.firebaseRef().child('data').child('events');
+            };
             return helperFactory;
+
 
         }]
 
