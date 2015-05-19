@@ -92,6 +92,7 @@ function CustomTypesCtrl($state, $scope, contextFactory, $rootScope, fireFactory
 
         var strippedGroups = angular.fromJson(angular.toJson($scope.createdGroup));
         var fireBaseObj = fireFactory.getGroupsRef().push(strippedGroups);
+
         if (!$rootScope.MainCtrlRef.currentUserData.createdGroups) {
             $rootScope.MainCtrlRef.currentUserData.createdGroups = {};
         }
@@ -99,19 +100,27 @@ function CustomTypesCtrl($state, $scope, contextFactory, $rootScope, fireFactory
         if (!$rootScope.MainCtrlRef.currentUserData.contexts) {
             $rootScope.MainCtrlRef.currentUserData.contexts = {};
         }
+
         angular.forEach($scope.createdGroup.contexts, function(value, key) {
+            var contextGroupsRef = fireFactory.getGroupsInContextRef(key);
+            var groupLinkObject = {};
+            groupLinkObject[fireBaseObj.key()] = value.length;
+            contextGroupsRef.update(groupLinkObject);
             if(!$rootScope.MainCtrlRef.currentUserData.contexts[key]){
                 $rootScope.MainCtrlRef.currentUserData.contexts[key] = 1;
                 return;
             }
             $rootScope.MainCtrlRef.currentUserData.contexts[key]++;
         });
+
         $scope.loading = true;
         $rootScope.MainCtrlRef.currentUserData.$save().then(function(){
             $scope.loading = false;
             $state.go('activity.groups');
 
         });
+
+
     };
 
     $scope.userFieldType = '';
@@ -486,6 +495,7 @@ angular
             helperFactory.getGroupRef = function (uid) {
                 return helperFactory.firebaseRef().child('data').child('groups').child(uid);
             };
+
             helperFactory.getGroupObject = function (uid) {
                 return $firebaseObject(helperFactory.getGroupRef(uid));
             };
@@ -496,6 +506,18 @@ angular
             helperFactory.getGroupsObject = function () {
                 return $firebaseObject(helperFactory.getGroupsRef());
             };
+            helperFactory.getGroupsInContextRef = function (context) {
+                return helperFactory.firebaseRef().child('data').child('contexts').child(context).child('groups');
+            };
+
+            helperFactory.getContextsRef = function () {
+                return helperFactory.firebaseRef().child('data').child('contexts');
+            };
+
+            helperFactory.getContextsObject = function () {
+                return $firebaseObject(helperFactory.getContextsRef());
+            };
+
             helperFactory.getFieldObject = function (groupId, fieldId) {
                 return $firebaseObject(helperFactory.getGroupsRef().child(groupId).child('fields').child(fieldId));
             };
