@@ -191,6 +191,89 @@ function fileDropzone() {
         }
     };
 }
+
+function addNodeInfo($compile, $templateCache) {
+    return {
+        restrict: 'E',
+        scope: {
+            nodeValue: '=',
+            nodeType: '='
+        },
+        link: function (scope, element) {
+            var nodeData = scope.nodeValue;
+            var cached_element = $templateCache.get(nodeData.type.name.toLowerCase() + "_" + scope.nodeType + ".html");
+            if (cached_element == null || cached_element == '') {
+                cached_element = $templateCache.get(nodeData.type.name.toLowerCase() + ".html");
+            }
+            var compiled_cache = $compile(cached_element)(scope);
+            angular.element(element).append(nodeData.name);
+            angular.element(element).append(compiled_cache);
+        },
+        controller: NodeInfoCtrl
+    }
+}
+
+function typeTemplate() {
+    return {
+        restrict: "E",
+        scope: {
+            typeParameter: '='
+        },
+        templateUrl: 'views/type_template.html'
+    };
+}
+function itemPreview() {
+    return {
+        restrict: "E",
+        scope: {
+            previewedItem: '=',
+            selectedItem: '=',
+            selectedItemId: '=',
+            arrayIterate: '=',
+            selectedItemType: '='
+        },
+        controller: ItemPreviewCtrl,
+        templateUrl: 'views/item_preview_template.html'
+    };
+}
+function freebaseTags() {
+    return {
+        restrict: "E",
+        scope: {
+            tagContext: '=',
+            addManualTagCallback: '=',
+            addTagCallback: '=',
+            removeTagCallback: '='
+        },
+        templateUrl: 'views/tag_template.html'
+    };
+}
+
+function dynamicArea($compile, $http, $controller) {
+    return {
+        restrict: "E",
+        scope: {
+            ngModel: '=',
+            areaType: '=',
+            selectedItemId: '='
+        },
+        replace: true,
+        link: function (scope, element, attrs) {
+            var html, templateCtrl, templateScope;
+            scope.$watch('selectedItemId', function(data) {
+                if(data){
+                    var ctrl = capitalizeFirstLetter(scope.areaType) +"TemplateCtrl";
+                    var templateUrl = "views/" + scope.areaType + "_view_template.html";
+                    var html = '<div ng-controller="'+ ctrl+ '" ng-include="\'' +templateUrl +'\'"></div>';
+                    element.empty();
+                    element.append(html);
+                    $compile( element.contents())( scope );
+                }
+
+            },true);
+        }
+    };
+}
 /**
  *
  * Pass all functions into module
@@ -201,4 +284,9 @@ angular
     .directive('sideNavigation', sideNavigation)
     .directive('iboxTools', iboxTools)
     .directive('minimalizaSidebar', minimalizaSidebar)
-    .directive('fileDropzone',fileDropzone);
+    .directive('fileDropzone',fileDropzone)
+    .directive('addNodeInfo', addNodeInfo)
+    .directive('typeTemplate', typeTemplate)
+    .directive('freebaseTags', freebaseTags)
+    .directive('itemPreview', itemPreview)
+    .directive('dynamicArea', dynamicArea);

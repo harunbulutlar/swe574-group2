@@ -117,57 +117,6 @@ function PollCtrl($scope, $rootScope, $stateParams, $state, contextFactory, MEMB
         $state.reload();
     };
 
-    $scope.addPollTag = function (tag) {
-
-        if (!$scope.createdPoll.pollTagContext[tag.tagContext]) {
-            $scope.createdPoll.pollTagContext[tag.tagContext] = [];
-        }
-
-        $scope.createdPoll.pollTagContext[tag.tagContext].push(tag);
-
-        $scope.tags = '';
-        $scope.manualTags = '';
-
-    };
-
-    $scope.addManualPollTag = function (tagName, tagContext) {
-
-        var context = {};
-        var tagId = guid();
-
-        context[tagId] = ({
-            tagId: tagId,
-            name: tagName + '<p style= "font-style: italic" class="pull-right">' + tagContext,
-            tagName: tagName,
-            tagContext: tagContext,
-            tagContextParentDomain: '',
-            tagContextChildDomain: '',
-            score: ''
-        });
-
-        if (!$scope.createdPoll.pollTagContext[tagContext]) {
-            $scope.createdPoll.pollTagContext[tagContext] = [];
-        }
-
-        $scope.createdPoll.pollTagContext[tagContext].push(context[tagId]);
-
-        $scope.tags = '';
-        $scope.manualTags = '';
-
-    };
-
-    $scope.removeTag = function (key, tagToBeRemoved) {
-
-
-        var index = arrayObjectIndexOf($scope.createdPoll.pollTagContext[key], tagToBeRemoved, "tagId");
-
-        $scope.createdPoll.pollTagContext[key].splice(index, 1);
-
-        if (isObjectEmpty($scope.createdPoll.pollTagContext[key])) {
-            delete $scope.createdPoll.pollTagContext[key];
-        }
-    };
-
     $scope.pollCommentDateDifference = function (date) {
 
         return dateDifference(date);
@@ -248,15 +197,6 @@ function PollCtrl($scope, $rootScope, $stateParams, $state, contextFactory, MEMB
 
     };
 
-    $scope.tagContextList = ["Professional Sports Team",
-        "College/University",
-        "Place with local areas",
-        "Airport",
-        "Newspaper",
-        "Event"
-    ];
-
-
 }
 
 function PollTabCtrl($scope) {
@@ -281,7 +221,7 @@ function PollTemplateCtrl($rootScope, $scope, MEMBER, contextFactory, $state, fi
     $scope.selectedItemId = $scope.$parent.selectedItemId;
     var syncObj = fireFactoryForPoll.getDataTypeObjectById('polls', $scope.selectedItemId);
     syncObj.$bindTo($scope, "selectedItem");
-    $scope.getPollTagsForView = contextFactory.getTagContext;
+
     $scope.currentUserId = $rootScope.MainCtrlRef.userId;
     $scope.currentUserName = $rootScope.MainCtrlRef.currentUserData.userName;
     $scope.pollRoles = MEMBER.MEMBER_ROLES;
@@ -379,16 +319,6 @@ function PollTemplateCtrl($rootScope, $scope, MEMBER, contextFactory, $state, fi
     };
 
     $scope.addPollTagForView = function (tag) {
-        if (!$scope.selectedItem.pollTagContext) {
-            $scope.selectedItem.pollTagContext = {};
-        }
-        if (!$scope.selectedItem.pollTagContext[tag.tagContext]) {
-            $scope.selectedItem.pollTagContext[tag.tagContext] = [];
-        }
-        $scope.selectedItem.pollTagContext[tag.tagContext].push(tag);
-        $scope.tags = '';
-        $scope.manualTags = '';
-
         if (!$rootScope.MainCtrlRef.currentUserData.interactedPolls) {
             $rootScope.MainCtrlRef.currentUserData.interactedPolls = {};
         }
@@ -411,35 +341,6 @@ function PollTemplateCtrl($rootScope, $scope, MEMBER, contextFactory, $state, fi
         $rootScope.MainCtrlRef.currentUserData.$save();
     };
 
-    $scope.addManualPollTagForView = function (tagName, tagContext) {
-        var context = {};
-        var tagId = guid();
-        context[tagId] = ({
-            tagId: tagId,
-            name: tagName + '<p style= "font-style: italic" class="pull-right">' + tagContext,
-            tagName: tagName,
-            tagContext: tagContext,
-            tagContextParentDomain: '',
-            tagContextChildDomain: '',
-            score: ''
-        });
-        if (!$scope.selectedItem.pollTagContext) {
-            $scope.selectedItem.pollTagContext = {};
-        }
-
-        if (!$scope.selectedItem.pollTagContext[tagContext]) {
-            $scope.selectedItem.pollTagContext[tagContext] = [];
-        }
-
-        $scope.selectedItem.pollTagContext[tagContext].push(context[tagId]);
-        $scope.tags = '';
-        $scope.manualTags = '';
-    };
-
-    $scope.removeTagForView = function (key, tagToBeRemoved) {
-        var index = arrayObjectIndexOf($scope.selectedItem.pollTagContext[key], tagToBeRemoved, "tagId");
-        $scope.selectedItem.pollTagContext[key].splice(index, 1);
-    };
 
     $scope.addPollCommentForView = function () {
         if (!$scope.selectedItem.pollComments) {

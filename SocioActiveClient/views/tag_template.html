@@ -1,0 +1,35 @@
+<div class="form-poll" ng-controller="TagContextCtrl"><label>Tags</label>
+
+    <div class="form-group pre-scrollable">
+
+        <div class="ibox-content" ng-repeat="(key,value) in tagContext">
+
+            <h4>{{key}}</h4>
+
+            <div ng-repeat="tag in value" style="display: inline">
+                <button class="btn btn-w-m btn-info"><i
+                        class="fa fa-tag pull-left"></i>{{tag.tagName}} <i
+                        class="fa fa-trash pull-right " data-nodrag
+                        ng-click="removeTag(key, tag.tagId)"></i>
+                </button> &nbsp;
+            </div>
+        </div>
+
+    </div>
+
+    <div class="form-poll">
+
+        <input type="text" ng-model="tags"
+               typeahead="contextHead.tagId as contextHead.name for contextHead in getTagContext($viewValue)"
+               class="form-control" typeahead-loading="loadingLocations" typeahead-min-length="3"
+               typeahead-wait-ms="300" typeahead-on-select="addTag($item)"
+               id="semanticTagName" placeholder="Enter tag...">
+
+        <input type="text" ng-model="manualTags"
+               typeahead="contextHead for contextHead in tagContextList | filter:$viewValue | limitTo:10"
+               class="form-control" typeahead-on-select="addManualTag(tags, manualTags)"
+               placeholder="Enter tag context..." ng-show="tags != ''">
+
+    </div>
+
+</div>

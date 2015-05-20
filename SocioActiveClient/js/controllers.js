@@ -72,15 +72,6 @@ function CustomTypesCtrl($state, $scope, contextFactory, $rootScope, fireFactory
         $scope.createdGroup.fields.push(userField);
     };
 
-    $scope.addGroupTag = function (tag) {
-        if (!$scope.createdGroup.contexts) {
-            $scope.createdGroup.contexts = {};
-        }
-        if (!$scope.createdGroup.contexts[tag.tagContext]) {
-            $scope.createdGroup.contexts[tag.tagContext] = [];
-        }
-        $scope.createdGroup.contexts[tag.tagContext].push(tag);
-    };
 
     $scope.saveChanges = function () {
 
@@ -126,8 +117,6 @@ function CustomTypesCtrl($state, $scope, contextFactory, $rootScope, fireFactory
             $state.go('activity.groups');
 
         });
-
-
     };
 
     $scope.userFieldType = '';
@@ -239,7 +228,6 @@ function isEmpty(obj) {
 
 function NodeInfoCtrl($scope, $rootScope) {
 
-
     $scope.updateSelection = function ($event) {
         var checkbox = $event.target;
         $scope.listTypes = (checkbox.checked ? $rootScope.customTypes : $rootScope.primitiveTypes);
@@ -259,138 +247,33 @@ function NodeInfoCtrl($scope, $rootScope) {
     };
 }
 
-function addNodeInfo($compile, $templateCache) {
-    return {
-        restrict: 'E',
-        scope: {
-            nodeValue: '=',
-            nodeType: '='
-        },
-        link: function (scope, element) {
-            var nodeData = scope.nodeValue;
-            var cached_element = $templateCache.get(nodeData.type.name.toLowerCase() + "_" + scope.nodeType + ".html");
-            if (cached_element == null || cached_element == '') {
-                cached_element = $templateCache.get(nodeData.type.name.toLowerCase() + ".html");
-            }
-            var compiled_cache = $compile(cached_element)(scope);
-            angular.element(element).append(nodeData.name);
-            angular.element(element).append(compiled_cache);
-        },
-        controller: NodeInfoCtrl
-    }
-}
-
-function typeTemplate() {
-    return {
-        restrict: "E",
-        scope: {
-            typeParameter: '='
-        },
-        templateUrl: 'views/type_template.html'
-    };
-}
-function itemPreview() {
-    return {
-        restrict: "E",
-        scope: {
-            previewedItem: '=',
-            selectedItem: '=',
-            selectedItemId: '=',
-            arrayIterate: '=',
-            selectedItemType: '='
-        },
-        controller: ItemPreviewCtrl,
-        templateUrl: 'views/item_preview_template.html'
-    };
-}
-function tagTemplate() {
-    return {
-        restrict: "E",
-        scope: {
-            tagParameter: '='
-        },
-        templateUrl: 'views/tag_template.html'
-    };
-}
-
-function dynamicArea($compile, $http, $controller) {
-    return {
-        restrict: "E",
-        scope: {
-            ngModel: '=',
-            areaType: '=',
-            selectedItemId: '='
-        },
-        replace: true,
-        link: function (scope, element, attrs) {
-            var html, templateCtrl, templateScope;
-            scope.$watch('selectedItemId', function(data) {
-                if(data){
-                    var ctrl = capitalizeFirstLetter(scope.areaType) +"TemplateCtrl";
-                    var templateUrl = "views/" + scope.areaType + "_view_template.html";
-                    var html = '<div ng-controller="'+ ctrl+ '" ng-include="\'' +templateUrl +'\'"></div>';
-                    element.empty();
-                    element.append(html);
-                    $compile( element.contents())( scope );
-                }
-
-            },true);
-        }
-    };
-}
-function guid() {
-    function s4() {
-        return Math.floor((1 + Math.random()) * 0x10000)
-            .toString(16)
-            .substring(1);
-    }
-
-    return s4() + s4() + '-' + s4() + '-' + s4() + '-' +
-        s4() + '-' + s4() + s4() + s4();
-}
-
-function arrayObjectIndexOf(myArray, searchTerm, property) {
-    for (var i = 0, len = myArray.length; i < len; i++) {
-        if (myArray[i][property] === searchTerm) return i;
-    }
-    return -1;
-}
-
-function CurrentGroupsCtrl($rootScope, $scope, contextFactory, $state, fireFactory) {
+function CurrentGroupsCtrl($scope, fireFactory) {
     $scope.groups = fireFactory.getGroupsObject();
 }
+
 function GroupTemplateCtrl($rootScope, $scope, contextFactory, $state, fireFactory) {
     var syncObj = fireFactory.getDataTypeObjectById('groups',$scope.selectedItemId);
     syncObj.$bindTo($scope, "selectedItem");
-    $scope.getGroupTagContext = contextFactory.getTagContext;
     $scope.toggle = function (scope) {
         scope.toggle();
     };
     $scope.selectedItem = $scope.$parent.ngModel;
     $scope.selectedItemId = $scope.$parent.selectedItemId;
+
     $scope.addGroupTag = function (tag) {
-        if (!$scope.selectedItem.contexts) {
-            $scope.selectedItem.contexts = {};
-        }
-        if (!$scope.selectedItem.contexts[tag.tagContext]) {
-            $scope.selectedItem.contexts[tag.tagContext] = [];
-        }
-        $scope.selectedItem.contexts[tag.tagContext].push(tag);
         if (!$rootScope.MainCtrlRef.currentUserData.interactedGroups) {
             $rootScope.MainCtrlRef.currentUserData.interactedGroups = {};
         }
-
         var contextGroupsRef = fireFactory.getGroupsInContextRef(tag.tagContext);
         var groupLinkObject = {};
-        groupLinkObject[$scope.selectedGroupId] = $scope.selectedItem.contexts[tag.tagContext].length;
+        groupLinkObject[$scope.selectedItemId] = $scope.selectedItem.contexts[tag.tagContext].length;
         contextGroupsRef.update(groupLinkObject);
         if (!$rootScope.MainCtrlRef.currentUserData.contexts[tag.tagContext]) {
             $rootScope.MainCtrlRef.currentUserData.contexts[tag.tagContext] = 1;
         } else {
             $rootScope.MainCtrlRef.currentUserData.contexts[tag.tagContext]++;
         }
-
-        $rootScope.MainCtrlRef.currentUserData.interactedGroups[$scope.selectedGroupId] = true;
+        $rootScope.MainCtrlRef.currentUserData.interactedGroups[$scope.selectedItemId] = true;
         $rootScope.MainCtrlRef.currentUserData.$save();
 
     };
@@ -439,13 +322,28 @@ function GroupAddCtrl($scope, $state, $rootScope, $stateParams, fireFactory) {
 
     };
 }
-
 function GroupViewCtrl($scope, $stateParams, fireFactory) {
     $scope.userField = null;
     $scope.content = fireFactory.getContentObject($stateParams.groupId, $stateParams.fieldId, $stateParams.contentId);
-    $scope.content.$loaded().then(function (loadedData) {
+}
 
-    })
+
+function guid() {
+    function s4() {
+        return Math.floor((1 + Math.random()) * 0x10000)
+            .toString(16)
+            .substring(1);
+    }
+
+    return s4() + s4() + '-' + s4() + '-' + s4() + '-' +
+        s4() + '-' + s4() + s4() + s4();
+}
+
+function arrayObjectIndexOf(myArray, searchTerm, property) {
+    for (var i = 0, len = myArray.length; i < len; i++) {
+        if (myArray[i][property] === searchTerm) return i;
+    }
+    return -1;
 }
 
 function PictureUploadCtrl($scope, resizeService, $rootScope) {
@@ -525,6 +423,76 @@ function SearchCtrl($scope, $firebaseObject, $filter) {
     $scope.polls = $firebaseObject(helperFactory.firebaseRef().child('data').child('polls'));
 
     //console.log($scope.polls);
+}
+
+function TagContextCtrl($scope, contextFactory) {
+    $scope.getTagContext = contextFactory.getTagContext;
+
+    $scope.addTag = function(tag){
+
+        $scope.tags = '';
+        $scope.manualTags = '';
+        if (!$scope.tagContext) {
+            $scope.tagContext = {};
+        }
+        if (!$scope.tagContext[tag.tagContext]) {
+            $scope.tagContext[tag.tagContext] = [];
+        }
+        $scope.tagContext[tag.tagContext].push(tag);
+
+        if($scope.addTagCallback){
+            $scope.addTagCallback(item);
+        }
+    };
+
+    $scope.addManualTag = function(tags,inputTagContext){
+        $scope.tags = '';
+        $scope.manualTags = '';
+        var context = {};
+        var tagId = guid();
+
+        context[tagId] = ({
+            tagId: tagId,
+            name: tagName + '<p style= "font-style: italic" class="pull-right">' + inputTagContext,
+            tagName: tagName,
+            tagContext: inputTagContext,
+            tagContextParentDomain: '',
+            tagContextChildDomain: '',
+            score: ''
+        });
+
+        if (!$scope.tagContext[inputTagContext]) {
+            $scope.tagContext[inputTagContext] = [];
+        }
+
+        $scope.tagContext[inputTagContext].push(context[tagId]);
+        if($scope.addManualTagCallback){
+            $scope.addManualTagCallback(tags,inputTagContext);
+        }
+    };
+
+    $scope.removeTag = function(key, tagToBeRemoved){
+        var index = arrayObjectIndexOf($scope.tagContext[key], tagToBeRemoved, "tagId");
+
+        $scope.tagContext[key].splice(index, 1);
+
+        if (isObjectEmpty($scope.tagContext[key])) {
+            delete $scope.tagContext[key];
+        }
+
+        if($scope.removeTagCallback){
+            $scope.removeTagCallback(key, id);
+        }
+    };
+
+    $scope.tagContextList = ["Professional Sports Team",
+        "College/University",
+        "Place with local areas",
+        "Airport",
+        "Newspaper",
+        "Event"
+    ];
+
 }
 
 function EventCtrl($scope, fireFactory,$rootScope, $stateParams, $firebaseObject) {
@@ -679,11 +647,6 @@ function capitalizeFirstLetter(string) {
 }
 angular
     .module('socioactive')
-    .directive('addNodeInfo', addNodeInfo)
-    .directive('typeTemplate', typeTemplate)
-    .directive('tagTemplate', tagTemplate)
-    .directive('itemPreview', itemPreview)
-    .directive('dynamicArea', dynamicArea)
     .controller('MainCtrl', MainCtrl)
     .controller('CustomTypesCtrl', CustomTypesCtrl)
     .controller('TypeTemplateCtrl', TypeTemplateCtrl)
@@ -697,7 +660,7 @@ angular
     .controller('HomeCtrl', HomeCtrl)
     .controller('ItemPreviewCtrl', ItemPreviewCtrl)
     .controller('GroupTemplateCtrl', GroupTemplateCtrl)
-
+    .controller('TagContextCtrl', TagContextCtrl)
     .run(["$templateCache", "$rootScope", function ($templateCache, $rootScope) {
         $rootScope.primitiveTypes = [
             {name: 'Enumeration'},
