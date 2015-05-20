@@ -229,8 +229,8 @@ function itemPreview() {
             previewedItem: '=',
             selectedItem: '=',
             selectedItemId: '=',
-            arrayIterate: '=',
-            selectedItemType: '='
+            arrayIterate: '=?',
+            selectedItemType: '=?'
         },
         controller: ItemPreviewCtrl,
         templateUrl: 'views/item_preview_template.html'
