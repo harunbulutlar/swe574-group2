@@ -10,12 +10,8 @@ function MainCtrl($window, fireFactory, $rootScope) {
     this.email = this.authData.password.email;
 
     this.currentUserData = fireFactory.getUserObject(this.userId);
+    this.userImage = 'img/space_invaders_big.jpg';
 
-    this.currentUserData.$loaded().then(function (loadedData) {
-        if (!loadedData.customTypes) {
-            loadedData.customTypes = [];
-        }
-    });
 
     this.logout = function () {
         fireFactory.firebaseRef().unauth();
@@ -23,6 +19,15 @@ function MainCtrl($window, fireFactory, $rootScope) {
     };
 
     $rootScope.MainCtrlRef = this;
+    this.currentUserData.$loaded().then(function (loadedData) {
+        if (!loadedData.customTypes) {
+            loadedData.customTypes = [];
+        }
+        if(loadedData.userImageSmall){
+            $rootScope.MainCtrlRef.userImage = loadedData.userImageSmall;
+        }
+
+    });
 
 }
 
@@ -556,7 +561,6 @@ function EventCtrl($scope, fireFactory,$rootScope, $stateParams, $firebaseObject
         alert("Event is created.");
 
     }
-
 
 }
 
