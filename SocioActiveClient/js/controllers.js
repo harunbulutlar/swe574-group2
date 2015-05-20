@@ -569,9 +569,6 @@ function HomeCtrl($scope, $rootScope, fireFactory) {
                 var recommendedPolls = {totalCount: 0 ,array:[]};
                 var recommendedGroups = {totalCount: 0 ,array:[]};
                 var recommendedEvents = {totalCount: 0 ,array:[]};
-                var recommendedPollArray = {};
-                var recommendedGroupArray = {};
-                var recommendedEventArray = {};
                 angular.forEach($scope.userContexts, function (value, key) {
                     if (!$scope.contexts[key]) {
                         return;
@@ -629,9 +626,9 @@ function HomeCtrl($scope, $rootScope, fireFactory) {
             //if (userData['created' + capitalItemType] && userData['created' + capitalItemType][key]) {
             //    return;
             //}
-            if (userData['interacted' + capitalItemType] && userData['interacted' + capitalItemType][key]) {
-                return;
-            }
+            //if (userData['interacted' + capitalItemType] && userData['interacted' + capitalItemType][key]) {
+            //    return;
+            //}
             union.push({count:value,id:key});
         });
 
