@@ -1,5 +1,5 @@
 function MainCtrl($window, fireFactory, $rootScope) {
- 
+
     this.authData = fireFactory.firebaseRef().getAuth();
     if (this.authData) {
         console.log("User " + this.authData.uid + " is logged in with " + this.authData.provider);
@@ -34,8 +34,7 @@ function CustomTypesCtrl($state, $scope, contextFactory, $rootScope, fireFactory
             name: "New Type",
             data: []
         };
-        if(!$rootScope.MainCtrlRef.currentUserData.customTypes)
-        {
+        if (!$rootScope.MainCtrlRef.currentUserData.customTypes) {
             $rootScope.MainCtrlRef.currentUserData.customTypes = [];
         }
         $rootScope.MainCtrlRef.currentUserData.customTypes.push(customType);
@@ -72,7 +71,7 @@ function CustomTypesCtrl($state, $scope, contextFactory, $rootScope, fireFactory
         if (!$scope.createdGroup.contexts) {
             $scope.createdGroup.contexts = {};
         }
-        if(!$scope.createdGroup.contexts[tag.tagContext]){
+        if (!$scope.createdGroup.contexts[tag.tagContext]) {
             $scope.createdGroup.contexts[tag.tagContext] = [];
         }
         $scope.createdGroup.contexts[tag.tagContext].push(tag);
@@ -104,12 +103,12 @@ function CustomTypesCtrl($state, $scope, contextFactory, $rootScope, fireFactory
             $rootScope.MainCtrlRef.currentUserData.contexts = {};
         }
 
-        angular.forEach($scope.createdGroup.contexts, function(value, key) {
+        angular.forEach($scope.createdGroup.contexts, function (value, key) {
             var contextGroupsRef = fireFactory.getGroupsInContextRef(key);
             var groupLinkObject = {};
             groupLinkObject[fireBaseObj.key()] = value.length;
             contextGroupsRef.update(groupLinkObject);
-            if(!$rootScope.MainCtrlRef.currentUserData.contexts[key]){
+            if (!$rootScope.MainCtrlRef.currentUserData.contexts[key]) {
                 $rootScope.MainCtrlRef.currentUserData.contexts[key] = 1;
                 return;
             }
@@ -117,7 +116,7 @@ function CustomTypesCtrl($state, $scope, contextFactory, $rootScope, fireFactory
         });
 
         $scope.loading = true;
-        $rootScope.MainCtrlRef.currentUserData.$save().then(function(){
+        $rootScope.MainCtrlRef.currentUserData.$save().then(function () {
             $scope.loading = false;
             $state.go('activity.groups');
 
@@ -274,7 +273,7 @@ function arrayObjectIndexOf(myArray, searchTerm, property) {
     return -1;
 }
 
-function CurrentGroupsCtrl($rootScope,$scope, contextFactory, $state, fireFactory) {
+function CurrentGroupsCtrl($rootScope, $scope, contextFactory, $state, fireFactory) {
     $scope.hideGroupContent = true;
     $scope.selectedGroupId = null;
     var syncObject = fireFactory.getGroupsObject();
@@ -285,59 +284,63 @@ function CurrentGroupsCtrl($rootScope,$scope, contextFactory, $state, fireFactor
         scope.toggle();
     };
 
-    $scope.$watch('groups',function(){
-        if($scope.selectedGroupId != null){
-            if(!$scope.groups.hasOwnProperty($scope.selectedGroupId)){
+    $scope.$watch('groups', function () {
+        if ($scope.selectedGroupId != null) {
+            if (!$scope.groups.hasOwnProperty($scope.selectedGroupId)) {
                 $scope.hideGroupContent = true;
                 $scope.selectedGroup = null;
                 $scope.selectedGroupId = null;
             }
 
         }
-    },true);
+    }, true);
     $scope.selectedGroup = null;
 
     $scope.addGroupTag = function (tag) {
         if (!$scope.selectedGroup.contexts) {
             $scope.selectedGroup.contexts = {};
         }
-        if(!$scope.selectedGroup.contexts[tag.tagContext]){
+        if (!$scope.selectedGroup.contexts[tag.tagContext]) {
             $scope.selectedGroup.contexts[tag.tagContext] = [];
         }
         $scope.selectedGroup.contexts[tag.tagContext].push(tag);
-        if (!$rootScope.MainCtrlRef.currentUserData.joinedGroups) {
-            $rootScope.MainCtrlRef.currentUserData.joinedGroups = {};
+        if (!$rootScope.MainCtrlRef.currentUserData.interactedGroups) {
+            $rootScope.MainCtrlRef.currentUserData.interactedGroups = {};
         }
 
         var contextGroupsRef = fireFactory.getGroupsInContextRef(tag.tagContext);
         var groupLinkObject = {};
         groupLinkObject[$scope.selectedGroupId] = $scope.selectedGroup.contexts[tag.tagContext].length;
         contextGroupsRef.update(groupLinkObject);
-        if(!$rootScope.MainCtrlRef.currentUserData.contexts[tag.tagContext]){
+        if (!$rootScope.MainCtrlRef.currentUserData.contexts[tag.tagContext]) {
             $rootScope.MainCtrlRef.currentUserData.contexts[tag.tagContext] = 1;
         } else {
             $rootScope.MainCtrlRef.currentUserData.contexts[tag.tagContext]++;
         }
 
 
-        $rootScope.MainCtrlRef.currentUserData.joinedGroups[$scope.selectedGroupId] = true;
+        $rootScope.MainCtrlRef.currentUserData.interactedGroups[$scope.selectedGroupId] = true;
         $rootScope.MainCtrlRef.currentUserData.$save();
 
     };
 
-    $scope.show = function (group,key) {
+    $scope.show = function (group, key) {
         $scope.selectedGroup = group;
         $scope.selectedGroupId = key;
         $scope.hideGroupContent = false;
     };
     $scope.getClass = function (group) {
-        if(group == $scope.selectedGroup){
+        if (group == $scope.selectedGroup) {
             return "list-group-item active";
         }
         return "list-group-item";
     };
-    $scope.showContent = function (fieldKey,contentKey) {
-        $state.go('activity.group_add_content', {groupId: $scope.selectedGroupId, fieldId:fieldKey , contentId: contentKey});
+    $scope.showContent = function (fieldKey, contentKey) {
+        $state.go('activity.group_add_content', {
+            groupId: $scope.selectedGroupId,
+            fieldId: fieldKey,
+            contentId: contentKey
+        });
     };
 
     $scope.addButtonClick = function (selectedTypeId) {
@@ -347,8 +350,8 @@ function CurrentGroupsCtrl($rootScope,$scope, contextFactory, $state, fireFactor
 
 function GroupAddCtrl($scope, $state, $rootScope, $stateParams, fireFactory) {
     $scope.loading = false;
-    $scope.userField = fireFactory.getFieldObject($stateParams.groupId,$stateParams.typeId);
-    $scope.userField.$loaded().then(function(loadedData){
+    $scope.userField = fireFactory.getFieldObject($stateParams.groupId, $stateParams.typeId);
+    $scope.userField.$loaded().then(function (loadedData) {
         $scope.customType = angular.copy(loadedData.type);
     });
 
@@ -362,12 +365,12 @@ function GroupAddCtrl($scope, $state, $rootScope, $stateParams, fireFactory) {
             data: angular.fromJson(angular.toJson($scope.customType.data))
         });
         $scope.loading = true;
-        $scope.userField.$save().then(function(){
-            if (!$rootScope.MainCtrlRef.currentUserData.joinedGroups) {
-                $rootScope.MainCtrlRef.currentUserData.joinedGroups = {};
+        $scope.userField.$save().then(function () {
+            if (!$rootScope.MainCtrlRef.currentUserData.interactedGroups) {
+                $rootScope.MainCtrlRef.currentUserData.interactedGroups = {};
             }
-            $rootScope.MainCtrlRef.currentUserData.joinedGroups[$stateParams.groupId] = true;
-            $rootScope.MainCtrlRef.currentUserData.$save().then(function(){
+            $rootScope.MainCtrlRef.currentUserData.interactedGroups[$stateParams.groupId] = true;
+            $rootScope.MainCtrlRef.currentUserData.$save().then(function () {
                 $scope.loading = false;
                 $state.go('activity.groups');
 
@@ -379,13 +382,13 @@ function GroupAddCtrl($scope, $state, $rootScope, $stateParams, fireFactory) {
 
 function GroupViewCtrl($scope, $stateParams, fireFactory) {
     $scope.userField = null;
-    $scope.content = fireFactory.getContentObject($stateParams.groupId,$stateParams.fieldId,$stateParams.contentId);
-    $scope.content.$loaded().then(function(loadedData){
+    $scope.content = fireFactory.getContentObject($stateParams.groupId, $stateParams.fieldId, $stateParams.contentId);
+    $scope.content.$loaded().then(function (loadedData) {
 
     })
 }
 
-function PictureUploadCtrl($scope,resizeService,$rootScope) {
+function PictureUploadCtrl($scope, resizeService, $rootScope) {
     $scope.image = null;
     $scope.imageFileName = '';
     $scope.uploadImage = function () {
@@ -393,8 +396,14 @@ function PictureUploadCtrl($scope,resizeService,$rootScope) {
         $scope.fileReader = new FileReader();
         $scope.fileReader.readAsDataURL(this.$flow.files[0].file);
         $scope.fileReader.onloadend = function () {
-            resizeService.resizeImage($scope.fileReader.result, {size: 100, sizeScale: 'ko', otherOptions: '',height:128,width:128}, function(err, image){
-                if(err) {
+            resizeService.resizeImage($scope.fileReader.result, {
+                size: 100,
+                sizeScale: 'ko',
+                otherOptions: '',
+                height: 128,
+                width: 128
+            }, function (err, image) {
+                if (err) {
                     console.error(err);
                     return;
                 }
@@ -402,8 +411,14 @@ function PictureUploadCtrl($scope,resizeService,$rootScope) {
                 $rootScope.MainCtrlRef.currentUserData.userImage = $scope.bigImage;
                 $rootScope.MainCtrlRef.currentUserData.$save();
             });
-            resizeService.resizeImage($scope.fileReader.result, {size: 100, sizeScale: 'ko', otherOptions: '',height:48,width:48}, function(err, image){
-                if(err) {
+            resizeService.resizeImage($scope.fileReader.result, {
+                size: 100,
+                sizeScale: 'ko',
+                otherOptions: '',
+                height: 48,
+                width: 48
+            }, function (err, image) {
+                if (err) {
                     console.error(err);
                     return;
                 }
@@ -429,22 +444,22 @@ function SearchCtrl($scope, $firebaseObject, $filter) {
 
         var keepGoing = true;
         $scope.pollsFiltered = [];
-        angular.forEach($scope.polls, function(value, key) {
-                if(value.hasOwnProperty('pollTags')) {
-                    angular.forEach(value.pollTags, function(value2, key2) {
-                        if(keepGoing) {
-                            if (value2.tagContext.search($scope.searchTerm) > -1) {
-                                $scope.pollsFiltered.push(value);
-                                keepGoing = false;
-                            }
+        angular.forEach($scope.polls, function (value, key) {
+            if (value.hasOwnProperty('pollTags')) {
+                angular.forEach(value.pollTags, function (value2, key2) {
+                    if (keepGoing) {
+                        if (value2.tagContext.search($scope.searchTerm) > -1) {
+                            $scope.pollsFiltered.push(value);
+                            keepGoing = false;
                         }
-                    });
-                }
-                //result[key] = value;
+                    }
+                });
+            }
+            //result[key] = value;
         });
 
         //$scope.polls =filterFilter($scope.polls, {pollDescription: $scope.searchTerm});
-       //console.log($scope.polls);
+        //console.log($scope.polls);
     });
 
     $scope.polls = $firebaseObject(helperFactory.firebaseRef().child('data').child('polls'));
@@ -460,9 +475,8 @@ function EventCtrl($scope, fireFactory, $stateParams, $firebaseObject) {
     $scope.eventLocation = '';
 
 
-
-    $scope.events =  $firebaseObject(fireFactory.getEventsRef());
-    console.log( $scope.events);
+    $scope.events = $firebaseObject(fireFactory.getEventsRef());
+    console.log($scope.events);
 
 
     $scope.saveEventData = function () {
@@ -490,6 +504,102 @@ function EventCtrl($scope, fireFactory, $stateParams, $firebaseObject) {
 
 }
 
+function HomeCtrl($scope, $rootScope, fireFactory) {
+    $scope.init = function () {
+        $rootScope.MainCtrlRef.currentUserData.$loaded().then(function (loadedData) {
+            $scope.userContexts = loadedData.contexts;
+            $scope.contexts = fireFactory.getContextsObject();
+            $scope.contexts.$loaded().then(function () {
+                var recommendedPolls = {totalCount: 0 ,array:[]};
+                var recommendedGroups = {totalCount: 0 ,array:[]};
+                var recommendedEvents = {totalCount: 0 ,array:[]};
+                var recommendedPollArray = {};
+                var recommendedGroupArray = {};
+                var recommendedEventArray = {};
+                angular.forEach($scope.userContexts, function (value, key) {
+                    if (!$scope.contexts[key]) {
+                        return;
+                    }
+                    $scope.findAndCalculate('polls', $scope.contexts[key], loadedData,recommendedPolls,value ,key);
+                    $scope.findAndCalculate('groups', $scope.contexts[key], loadedData,recommendedGroups,value ,key);
+                    $scope.findAndCalculate('events', $scope.contexts[key], loadedData,recommendedEvents,value ,key);
+
+                });
+                $scope.sortByValue(recommendedPolls.array,'count');
+                $scope.sortByValue(recommendedGroups.array,'count');
+                $scope.sortByValue(recommendedEvents.array,'count');
+                $scope.polls = $scope.calculateWeightAndDecide(recommendedPolls,'polls');
+                $scope.groups = $scope.calculateWeightAndDecide(recommendedGroups,'groups');
+                $scope.events = $scope.calculateWeightAndDecide(recommendedEvents,'events');
+            })
+        });
+    };
+    $scope.calculateWeightAndDecide = function(recommendation,type){
+        var excessWeight = 0;
+        var result = [];
+        var staticTotalRecToShow = 5;
+        var totalRecToShow = staticTotalRecToShow;
+        for(var i =0; i<recommendation.array.length; i++){
+            var item = recommendation.array[i];
+            var weightOfItem = Math.round((item.count/recommendation.totalCount) * staticTotalRecToShow)+ excessWeight;
+            if(totalRecToShow < 1){
+                break;
+            }
+
+            var concatValue = weightOfItem;
+            if(totalRecToShow - weightOfItem < 0){
+                concatValue = totalRecToShow;
+            } else if(item.array.length < weightOfItem){
+                excessWeight = excessWeight + (weightOfItem - item.array.length);
+                concatValue = item.array.length;
+            }
+            totalRecToShow = totalRecToShow - concatValue;
+            for(var y = 0; y < concatValue ; y++){
+                result.push(fireFactory.getDataTypeObjectById(type,item.array[y].id));
+            }
+        }
+        return result;
+
+    };
+    $scope.findAndCalculate = function (itemType, contextItem, userData, outputObject,inputValue,inputKey) {
+        var union = [];
+        var capitalItemType = capitalizeFirstLetter(itemType);
+        angular.forEach(contextItem[itemType], function (value, key) {
+            //if (userData['created' + capitalItemType] && userData['created' + capitalItemType][key]) {
+            //    return;
+            //}
+            if (userData['interacted' + capitalItemType] && userData['interacted' + capitalItemType][key]) {
+                return;
+            }
+            union.push({count:value,id:key});
+        });
+
+        $scope.sortByValue(union,'count');
+        if(union.length != 0){
+            outputObject.totalCount = outputObject.totalCount + inputValue;
+            outputObject.array.push({
+                count: inputValue,
+                name: inputKey,
+                array: union
+            });
+        }
+    };
+    $scope.sortByValue = function (items,sortProperty) {
+        items.sort(function (a, b) {
+            if(sortProperty){
+                return b[sortProperty] - a[sortProperty]
+            } else {
+                return b[Object.keys(b)[0]] - a[Object.keys(a)[0]]
+            }
+        });
+
+    };
+    $scope.init();
+
+}
+function capitalizeFirstLetter(string) {
+    return string.charAt(0).toUpperCase() + string.slice(1);
+}
 angular
     .module('socioactive')
     .directive('addNodeInfo', addNodeInfo)
@@ -503,8 +613,9 @@ angular
     .controller('GroupAddCtrl', GroupAddCtrl)
     .controller('GroupViewCtrl', GroupViewCtrl)
     .controller('PictureUploadCtrl', PictureUploadCtrl)
-	.controller('SearchCtrl', SearchCtrl)
+    .controller('SearchCtrl', SearchCtrl)
     .controller('EventCtrl', EventCtrl)
+    .controller('HomeCtrl', HomeCtrl)
     .run(["$templateCache", "$rootScope", function ($templateCache, $rootScope) {
         $rootScope.primitiveTypes = [
             {name: 'Enumeration'},
@@ -586,10 +697,14 @@ angular
             helperFactory.getGroupsObject = function () {
                 return $firebaseObject(helperFactory.getGroupsRef());
             };
+
             helperFactory.getGroupsInContextRef = function (context) {
                 return helperFactory.firebaseRef().child('data').child('contexts').child(context).child('groups');
             };
 
+            helperFactory.getGroupsInContextObject = function (context) {
+                return $firebaseObject(helperFactory.getGroupsRef());
+            };
             helperFactory.getContextsRef = function () {
                 return helperFactory.firebaseRef().child('data').child('contexts');
             };
@@ -601,9 +716,14 @@ angular
             helperFactory.getFieldObject = function (groupId, fieldId) {
                 return $firebaseObject(helperFactory.getGroupsRef().child(groupId).child('fields').child(fieldId));
             };
-            helperFactory.getContentObject = function (groupId, fieldId,contentId) {
+            helperFactory.getContentObject = function (groupId, fieldId, contentId) {
                 return $firebaseObject(helperFactory.getGroupsRef().child(groupId).child('fields').child(fieldId).child('content').child(contentId));
             };
+
+            helperFactory.getDataTypeObjectById = function (dataType,id) {
+                return $firebaseObject(helperFactory.getGroupsRef().child('data').child(dataType).child(id));
+            };
+
             helperFactory.getEventsRef = function () {
                 return helperFactory.firebaseRef().child('data').child('events');
             };
@@ -611,8 +731,7 @@ angular
 
 
         }]
-
-    )
+)
     .factory('contextFactory', ['$http', '$rootScope',
         function contextFactory($http, $rootScope) {
             var helperFactory = {};
@@ -658,7 +777,7 @@ angular
                 }).then(onResult);
             };
 
-            helperFactory.calculateStandardDeviation = function(values) {
+            helperFactory.calculateStandardDeviation = function (values) {
                 var avg = helperFactory.calculateAverage(values);
                 var squareDiffs = values.map(function (value) {
                     var diff = value - avg;
@@ -668,7 +787,7 @@ angular
                 return Math.sqrt(avgSquareDiff);
             };
 
-            helperFactory.calculateAverage = function(data) {
+            helperFactory.calculateAverage = function (data) {
                 var sum = data.reduce(function (sum, value) {
                     return sum + value;
                 }, 0);
@@ -676,14 +795,14 @@ angular
                 return sum / data.length;
             };
 
-            helperFactory.getTagContextParentDomain = function(notableId) {
+            helperFactory.getTagContextParentDomain = function (notableId) {
                 return notableId.split("/")[1];
             };
 
-            helperFactory.getTagContextChildDomain  = function(notableId) {
+            helperFactory.getTagContextChildDomain = function (notableId) {
                 return notableId.split("/")[2];
             };
 
             return helperFactory;
         }]
-    );
+);
