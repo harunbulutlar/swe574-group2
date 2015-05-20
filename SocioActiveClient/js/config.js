@@ -133,7 +133,6 @@ function config($stateProvider, $urlRouterProvider, $ocLazyLoadProvider) {
         .state('activity.pollsv2', {
             url: "/view_polls",
             templateUrl: "views/polls.html",
-            controller: 'CurrentPollsCtrl',
             data: { pageTitle: 'View Polls'},
             resolve: {
                 loadPlugin: function ($ocLazyLoad) {

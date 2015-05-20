@@ -21,18 +21,19 @@ function PollCtrl($scope, $rootScope, $stateParams, $state, contextFactory, MEMB
 
     $scope.initializePoll = function () {
         $scope.createdPoll = {
-            "pollPrivacy": "",
-            "pollTitle": "",
-            "pollDescription": "",
-            "pollOptions": [],
-            "pollParticipantList": [],
-            "createdBy": "",
-            "createDate": "",
-            "endDate": "",
-            "updateDate": "",
-            "pollComments": [],
-            "pollTagContext": {},
-            "pollRoles": []
+            pollPrivacy: "",
+            title: "",
+            description: "",
+            pollOptions: [],
+            pollParticipantList: [],
+            createdBy: "",
+            createDate: "",
+            endDate: "",
+            updateDate: "",
+            pollComments: [],
+            pollTagContext: {},
+            pollRoles: [],
+            ownerName: $rootScope.MainCtrlRef.currentUserData.userName
         };
 
         $scope.initializeUser();
@@ -182,14 +183,14 @@ function PollCtrl($scope, $rootScope, $stateParams, $state, contextFactory, MEMB
 
     $scope.savePollData = function () {
 
-        if (!$scope.createdPoll.pollTitle) {
+        if (!$scope.createdPoll.title) {
 
             alert("You need to enter a title for your poll!");
             return;
 
         }
 
-        if (!$scope.createdPoll.pollDescription) {
+        if (!$scope.createdPoll.description) {
 
             alert("You need to enter a description for your poll!");
             return;
@@ -276,15 +277,15 @@ function PollTabCtrl($scope) {
 
 }
 
-function CurrentPollsCtrl($scope, $rootScope, $state, MEMBER, fireFactoryForPoll, contextFactory) {
+function PollTemplateCtrl($rootScope, $scope,MEMBER, contextFactory, $state, fireFactoryForPoll) {
+    $scope.selectedItem = $scope.$parent.ngModel;
+    $scope.selectedItemId = $scope.$parent.selectedItemId;
 
     $scope.getPollTagsForView = contextFactory.getTagContext;
     $scope.currentUserId = $rootScope.MainCtrlRef.userId;
     $scope.currentUserName = $rootScope.MainCtrlRef.currentUserData.userName;
     $scope.pollRoles = MEMBER.MEMBER_ROLES;
-    $scope.hidePollContent = true;
-    $scope.selectedPollId = null;
-    $scope.polls = fireFactoryForPoll.getPollsObject();
+
     $scope.pollTagTempId = '';
     $scope.pollCommentTempList = [];
 
@@ -298,48 +299,29 @@ function CurrentPollsCtrl($scope, $rootScope, $state, MEMBER, fireFactoryForPoll
         "Newspaper",
         "Event"
     ];
-
     $scope.toggle = function (scope) {
         scope.toggle();
     };
-    $scope.selectedPoll = null;
-
-    $scope.getPollOwnerName = function (pollOwnerId) {
-
-        fireFactoryForPoll.getUserObject(pollOwnerId).$loaded().then(function (loadedData) {
-            $scope.pollCreatedByName = loadedData.userName;
-        });
-
-        return $scope.pollCreatedByName;
-    };
 
     $scope.isPollDisabled = function () {
-
-        if ($scope.selectedPoll == null) {
-
+        if ($scope.selectedItemId == null) {
             return false;
-
         } else {
-            return !(($scope.currentUserId === $scope.selectedPoll.createdBy) || $scope.currentUserIsAdmin);
+            return !(($scope.currentUserId === $scope.selectedItemId.createdBy) || $scope.currentUserIsAdmin);
         }
-
     };
 
     $scope.isPollObjectEmpty = function (obj) {
-
         return isObjectEmpty(obj);
-
     };
 
     $scope.votePoll = function (optionKey) {
-
-        fireFactoryForPoll.getPollOptionArray($scope.selectedPollId).$loaded().then(function (loadedData) {
+        fireFactoryForPoll.getPollOptionArray($scope.selectedItemId).$loaded().then(function (loadedData) {
 
             var item = loadedData.$getRecord(optionKey);
             item.optionVoteCount = item.optionVoteCount + 1;
             loadedData.$save(item).then(function () {
                 // data has been saved to Firebase
-
                 $scope.loading = true;
                 if (!$rootScope.MainCtrlRef.currentUserData.interactedPolls) {
                     $rootScope.MainCtrlRef.currentUserData.interactedPolls = {};
@@ -348,95 +330,63 @@ function CurrentPollsCtrl($scope, $rootScope, $state, MEMBER, fireFactoryForPoll
                     $rootScope.MainCtrlRef.currentUserData.votedPolls = {};
                 }
 
-                $rootScope.MainCtrlRef.currentUserData.interactedPolls[$scope.selectedPollId] = true;
-                $rootScope.MainCtrlRef.currentUserData.votedPolls[$scope.selectedPollId] = true;
+                $rootScope.MainCtrlRef.currentUserData.interactedPolls[$scope.selectedItemId] = true;
+                $rootScope.MainCtrlRef.currentUserData.votedPolls[$scope.selectedItemId] = true;
                 $rootScope.MainCtrlRef.currentUserData.$save().then(function () {
                     $scope.loading = false;
 
                     alert("Your vote is saved!");
-
                 });
-
             });
-
         });
-
     };
 
     $scope.isCurrentUserVoted = function () {
-
-        if ($scope.selectedPoll != null) {
-
+        if ($scope.selectedItemId != null) {
             if (!$rootScope.MainCtrlRef.currentUserData.votedPolls) {
-
                 return false;
             }
-
-            return $rootScope.MainCtrlRef.currentUserData.votedPolls[$scope.selectedPollId];
+            return $rootScope.MainCtrlRef.currentUserData.votedPolls[$scope.selectedItemId];
         }
-
     };
 
     $scope.addPollOption = function () {
-
-        if (!$scope.selectedPoll.pollOptions) {
-            $scope.selectedPoll.pollOptions = [];
-
+        if (!$scope.selectedItem.pollOptions) {
+            $scope.selectedItem.pollOptions = [];
         }
-
-        $scope.selectedPoll.pollOptions.push({
-
+        $scope.selectedItem.pollOptions.push({
             "optionName": $scope.pollOptionTempList.optionName,
             "optionDetail": $scope.pollOptionTempList.optionDetail,
             "optionVoteCount": 0
-
         });
-
-        $scope.polls.$save();
-
         $scope.pollOptionTempList.optionName = '';
         $scope.pollOptionTempList.optionDetail = '';
-
     };
-
     $scope.removePollOption = function (optionToBeRemoved) {
-
-        $scope.selectedPoll.pollOptions.splice(optionToBeRemoved, 1);
-
-        $scope.polls.$save();
-
+        $scope.selectedItem.pollOptions.splice(optionToBeRemoved, 1);
     };
 
     $scope.addPollTagForView = function (tag) {
-
-        if (!$scope.selectedPoll.pollTagContext) {
-            $scope.selectedPoll.pollTagContext = {};
+        if (!$scope.selectedItem.pollTagContext) {
+            $scope.selectedItem.pollTagContext = {};
         }
-
-        if (!$scope.selectedPoll.pollTagContext[tag.tagContext]) {
-            $scope.selectedPoll.pollTagContext[tag.tagContext] = [];
+        if (!$scope.selectedItem.pollTagContext[tag.tagContext]) {
+            $scope.selectedItem.pollTagContext[tag.tagContext] = [];
         }
-
-        $scope.selectedPoll.pollTagContext[tag.tagContext].push(tag);
-
-        $scope.polls.$save();
-
+        $scope.selectedItem.pollTagContext[tag.tagContext].push(tag);
         $scope.tags = '';
         $scope.manualTags = '';
-
 
         if (!$rootScope.MainCtrlRef.currentUserData.interactedPolls) {
             $rootScope.MainCtrlRef.currentUserData.interactedPolls = {};
         }
-
-
         if (!$rootScope.MainCtrlRef.currentUserData.contexts) {
             $rootScope.MainCtrlRef.currentUserData.contexts = {};
         }
 
         var contextGroupsRef = fireFactoryForPoll.getPollsInContextRef(tag.tagContext);
         var groupLinkObject = {};
-        groupLinkObject[$scope.selectedPollId] = $scope.selectedPoll.pollTagContext[tag.tagContext].length;
+        groupLinkObject[$scope.selectedItemId] = $scope.selectedItem.pollTagContext[tag.tagContext].length;
         contextGroupsRef.update(groupLinkObject);
         if(!$rootScope.MainCtrlRef.currentUserData.contexts[tag.tagContext]){
             $rootScope.MainCtrlRef.currentUserData.contexts[tag.tagContext] = 1;
@@ -444,18 +394,14 @@ function CurrentPollsCtrl($scope, $rootScope, $state, MEMBER, fireFactoryForPoll
             $rootScope.MainCtrlRef.currentUserData.contexts[tag.tagContext]++;
         }
 
-        $rootScope.MainCtrlRef.currentUserData.interactedPolls[$scope.selectedPollId] = true;
+        $rootScope.MainCtrlRef.currentUserData.interactedPolls[$scope.selectedItemId] = true;
         $scope.loading = true;
         $rootScope.MainCtrlRef.currentUserData.$save();
-
-
     };
 
     $scope.addManualPollTagForView = function (tagName, tagContext) {
-
         var context = {};
         var tagId = guid();
-
         context[tagId] = ({
             tagId: tagId,
             name: tagName + '<p style= "font-style: italic" class="pull-right">' + tagContext,
@@ -465,65 +411,54 @@ function CurrentPollsCtrl($scope, $rootScope, $state, MEMBER, fireFactoryForPoll
             tagContextChildDomain: '',
             score: ''
         });
-
-        if (!$scope.selectedPoll.pollTagContext) {
-            $scope.selectedPoll.pollTagContext = {};
+        if (!$scope.selectedItem.pollTagContext) {
+            $scope.selectedItem.pollTagContext = {};
         }
 
-        if (!$scope.selectedPoll.pollTagContext[tagContext]) {
-            $scope.selectedPoll.pollTagContext[tagContext] = [];
+        if (!$scope.selectedItem.pollTagContext[tagContext]) {
+            $scope.selectedItem.pollTagContext[tagContext] = [];
         }
 
-        $scope.selectedPoll.pollTagContext[tagContext].push(context[tagId]);
-
-        $scope.polls.$save();
-
+        $scope.selectedItem.pollTagContext[tagContext].push(context[tagId]);
         $scope.tags = '';
         $scope.manualTags = '';
-
-
     };
 
     $scope.removeTagForView = function (key, tagToBeRemoved) {
-
-        var index = arrayObjectIndexOf($scope.selectedPoll.pollTagContext[key], tagToBeRemoved, "tagId");
-
-        $scope.selectedPoll.pollTagContext[key].splice(index, 1);
-        $scope.polls.$save();
-
+        var index = arrayObjectIndexOf($scope.selectedItem.pollTagContext[key], tagToBeRemoved, "tagId");
+        $scope.selectedItem.pollTagContext[key].splice(index, 1);
     };
 
     $scope.addPollCommentForView = function () {
-
-        if (!$scope.selectedPoll.pollComments) {
-            $scope.selectedPoll.pollComments = [];
-
+        if (!$scope.selectedItem.pollComments) {
+            $scope.selectedItem.pollComments = [];
         }
-
-        $scope.selectedPoll.pollComments.push({
+        $scope.selectedItem.pollComments.push({
             "commentBody": $scope.pollCommentTempList.commentBody,
             "commentUserEmail": $scope.currentUserId,
             "commentUserName": $scope.currentUserName,
             "commentDateTime": new Date().getTime()
         });
-        $scope.polls.$save();
         $scope.pollCommentTempList.commentBody = '';
     };
 
     $scope.pollCommentDateDifference = function (date) {
-
         return dateDifference(date);
 
     };
 
     $scope.showContent = function (fieldKey, contentKey) {
-        $state.go('create.asd', {pollId: $scope.selectedPollId, fieldId: fieldKey, contentId: contentKey});
+        $state.go('create.asd', {pollId: $scope.selectedItemId, fieldId: fieldKey, contentId: contentKey});
     };
 
     $scope.addButtonClick = function (selectedTypeId) {
-        $state.go('activity.group_add_content', {pollIdId: $scope.selectedPollId, typeId: selectedTypeId});
-    }
+        $state.go('activity.group_add_content', {pollIdId: $scope.selectedItemId, typeId: selectedTypeId});
+    };
+}
 
+function CurrentPollsCtrl($scope,fireFactoryForPoll) {
+    var syncObject = fireFactoryForPoll.getPollsObject();
+    syncObject.$bindTo($scope, "polls");
 }
 
 function calculateAverage(data) {
@@ -584,6 +519,7 @@ angular
     .controller('PollCtrl', PollCtrl)
     .controller('PollTabCtrl', PollTabCtrl)
     .controller('CurrentPollsCtrl', CurrentPollsCtrl)
+    .controller('PollTemplateCtrl', PollTemplateCtrl)
     .factory('fireFactoryForPoll', ['$firebaseObject', '$firebaseArray',
         function fireFactory($firebaseObject, $firebaseArray) {
 

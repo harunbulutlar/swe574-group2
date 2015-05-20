@@ -177,9 +177,8 @@ function ItemPreviewCtrl($scope) {
     $scope.$watch('previewedItem', function () {
         if ($scope.selectedItemId != null) {
             if (!$scope.previewedItem.hasOwnProperty($scope.selectedItemId)) {
-                $scope.hideGroupContent = true;
-                $scope.selectedGroup = null;
-                $scope.selectedGroupId = null;
+                $scope.selectedItem = null;
+                $scope.selectedItemId = null;
             }
         }
     }, true);
@@ -334,55 +333,8 @@ function arrayObjectIndexOf(myArray, searchTerm, property) {
 }
 
 function CurrentGroupsCtrl($rootScope, $scope, contextFactory, $state, fireFactory) {
-    $scope.selectedGroupId = null;
     var syncObject = fireFactory.getGroupsObject();
     syncObject.$bindTo($scope, "groups");
-
-    $scope.getGroupTagContext = contextFactory.getTagContext;
-    $scope.toggle = function (scope) {
-        scope.toggle();
-    };
-
-    $scope.selectedGroup = null;
-
-    $scope.addGroupTag = function (tag) {
-        if (!$scope.selectedGroup.contexts) {
-            $scope.selectedGroup.contexts = {};
-        }
-        if (!$scope.selectedGroup.contexts[tag.tagContext]) {
-            $scope.selectedGroup.contexts[tag.tagContext] = [];
-        }
-        $scope.selectedGroup.contexts[tag.tagContext].push(tag);
-        if (!$rootScope.MainCtrlRef.currentUserData.interactedGroups) {
-            $rootScope.MainCtrlRef.currentUserData.interactedGroups = {};
-        }
-
-        var contextGroupsRef = fireFactory.getGroupsInContextRef(tag.tagContext);
-        var groupLinkObject = {};
-        groupLinkObject[$scope.selectedGroupId] = $scope.selectedGroup.contexts[tag.tagContext].length;
-        contextGroupsRef.update(groupLinkObject);
-        if (!$rootScope.MainCtrlRef.currentUserData.contexts[tag.tagContext]) {
-            $rootScope.MainCtrlRef.currentUserData.contexts[tag.tagContext] = 1;
-        } else {
-            $rootScope.MainCtrlRef.currentUserData.contexts[tag.tagContext]++;
-        }
-
-        $rootScope.MainCtrlRef.currentUserData.interactedGroups[$scope.selectedGroupId] = true;
-        $rootScope.MainCtrlRef.currentUserData.$save();
-
-    };
-
-    $scope.showContent = function (fieldKey, contentKey) {
-        $state.go('activity.group_add_content', {
-            groupId: $scope.selectedGroupId,
-            fieldId: fieldKey,
-            contentId: contentKey
-        });
-    };
-
-    $scope.addButtonClick = function (selectedTypeId) {
-        $state.go('activity.group_add_content', {groupId: $scope.selectedGroupId, typeId: selectedTypeId});
-    }
 }
 function GroupTemplateCtrl($rootScope, $scope, contextFactory, $state, fireFactory) {
 
@@ -709,6 +661,7 @@ angular
     .controller('HomeCtrl', HomeCtrl)
     .controller('ItemPreviewCtrl', ItemPreviewCtrl)
     .controller('GroupTemplateCtrl', GroupTemplateCtrl)
+
     .run(["$templateCache", "$rootScope", function ($templateCache, $rootScope) {
         $rootScope.primitiveTypes = [
             {name: 'Enumeration'},
