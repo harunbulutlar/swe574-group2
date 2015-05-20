@@ -23,8 +23,8 @@ function MainCtrl($window, fireFactory, $rootScope) {
         if (!loadedData.customTypes) {
             loadedData.customTypes = [];
         }
-        if(loadedData.userImageSmall){
-            $rootScope.MainCtrlRef.userImage = loadedData.userImageSmall;
+        if(loadedData.userImage){
+            $rootScope.MainCtrlRef.userImage = loadedData.userImage;
         }
 
     });
@@ -615,13 +615,28 @@ function HomeCtrl($scope, $rootScope, fireFactory) {
                 excessWeight = excessWeight + (weightOfItem - item.array.length);
                 concatValue = item.array.length;
             }
-            totalRecToShow = totalRecToShow - concatValue;
+
+            var skipCount = 0;
             for(var y = 0; y < concatValue ; y++){
-                result.push({key:item.array[y].id,value:fireFactory.getDataTypeObjectById(type,item.array[y].id)});
+                if($scope.hasItem(result,item.array[y].id)){
+                    skipCount++;
+                } else{
+                    result.push({key:item.array[y].id,value:fireFactory.getDataTypeObjectById(type,item.array[y].id)});
+                }
             }
+            totalRecToShow = totalRecToShow - concatValue + skipCount;
+            excessWeight = excessWeight + skipCount;
         }
         return result;
 
+    };
+    $scope.hasItem = function(arrayInput, keyInput){
+        for(var y = 0; y < arrayInput.length ; y++){
+            if(arrayInput[y].key == keyInput){
+                return true;
+            }
+        }
+        return false;
     };
     $scope.findAndCalculate = function (itemType, contextItem, userData, outputObject,inputValue,inputKey) {
         var union = [];
