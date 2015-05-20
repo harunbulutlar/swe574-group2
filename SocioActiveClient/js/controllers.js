@@ -586,7 +586,7 @@ function HomeCtrl($scope, $rootScope, fireFactory) {
 
             var skipCount = 0;
             for(var y = 0; y < concatValue ; y++){
-                if($scope.hasItem(result,item.array[y].id)){
+                if(!item.array[y] || $scope.hasItem(result,item.array[y].id)){
                     skipCount++;
                 } else{
                     result.push({key:item.array[y].id,value:fireFactory.getDataTypeObjectById(type,item.array[y].id)});
