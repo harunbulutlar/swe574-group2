@@ -7,16 +7,9 @@
                 </h3>
             </div>
             <div class="ibox-content">
-                <div class="list-group">
-                    <a ng-repeat="group in groups" ng-class="getClass(group)" ng-click="show(group,key)" href="">
-                        <h3 class="list-group-item-heading">{{group.ownerName}}'s group : {{group.title}}</h3>
-                        <p class="list-group-item-text">{{group.description }}</p>
-                    </a>
-                </div>
+                <item-preview selected-item-type="selectedItemType" selected-item ="selectedItem" selected-item-id="selectedItemId" previewed-item="groups" array-iterate="true"></item-preview>
             </div>
         </div>
-    </div>
-    <div class="col-lg-6">
         <div class="ibox float-e-margins">
             <div class="ibox-title">
                 <h3>Recommended Polls
@@ -24,12 +17,9 @@
                 </h3>
             </div>
             <div class="ibox-content">
-                <div class="list-group">
-                </div>
+                <item-preview selected-item-type="selectedItemType" selected-item ="selectedItem" selected-item-id="selectedItemId" previewed-item="polls" array-iterate="true"></item-preview>
             </div>
         </div>
-    </div>
-    <div class="col-lg-6">
         <div class="ibox float-e-margins">
             <div class="ibox-title">
                 <h3>Recommended Events
@@ -37,9 +27,13 @@
                 </h3>
             </div>
             <div class="ibox-content">
-                <div class="list-group">
-                </div>
+                <item-preview selected-item-type="selectedItemType" selected-item ="selectedItem" selected-item-id="selectedItemId" previewed-item="events" array-iterate="true"></item-preview>
             </div>
+        </div>
+    </div>
+    <div class="col-lg-6">
+        <div class="ibox float-e-margins">
+            <dynamic-area ng-model="selectedItem" selected-item-id="selectedItemId" area-type="selectedItemType"></dynamic-area>
         </div>
     </div>
 </div>

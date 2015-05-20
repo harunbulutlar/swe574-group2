@@ -174,18 +174,35 @@ function TypeTemplateCtrl($scope, $rootScope) {
 
 function ItemPreviewCtrl($scope) {
 
-    $scope.$watch('previewedItem', function () {
-        if ($scope.selectedItemId != null) {
-            if (!$scope.previewedItem.hasOwnProperty($scope.selectedItemId)) {
-                $scope.selectedItem = null;
-                $scope.selectedItemId = null;
-            }
-        }
-    }, true);
+    //$scope.$watch('previewedItem', function () {
+    //    if ($scope.selectedItemId != null) {
+    //        if (!$scope.previewedItem.hasOwnProperty($scope.selectedItemId)) {
+    //            $scope.selectedItem = null;
+    //            $scope.selectedItemId = null;
+    //        }
+    //    }
+    //}, true);
 
     $scope.show = function (item, key) {
         $scope.selectedItem = item;
         $scope.selectedItemId = key;
+        $scope.selectedItemType = $scope.getItemType($scope.selectedItem);
+
+    };
+    $scope.getItemType = function(item){
+        if(item.hasOwnProperty("pollOptions")){
+            return "poll";
+        } else if(item.hasOwnProperty("eventDate")){
+            return "event";
+        } else {
+            return "group";
+        }
+    };
+    $scope.getClass = function (item) {
+        if (item == $scope.selectedItem) {
+            return "list-group-item active";
+        }
+        return "list-group-item";
     };
     $scope.getClass = function (item) {
         if (item == $scope.selectedItem) {
@@ -273,7 +290,9 @@ function itemPreview() {
         scope: {
             previewedItem: '=',
             selectedItem: '=',
-            selectedItemId: '='
+            selectedItemId: '=',
+            arrayIterate: '=',
+            selectedItemType: '='
         },
         controller: ItemPreviewCtrl,
         templateUrl: 'views/item_preview_template.html'
@@ -300,7 +319,7 @@ function dynamicArea($compile, $http, $controller) {
         replace: true,
         link: function (scope, element, attrs) {
             var html, templateCtrl, templateScope;
-            scope.$watch('ngModel', function(data) {
+            scope.$watch('selectedItemId', function(data) {
                 if(data){
                     var ctrl = capitalizeFirstLetter(scope.areaType) +"TemplateCtrl";
                     var templateUrl = "views/" + scope.areaType + "_view_template.html";
@@ -333,11 +352,11 @@ function arrayObjectIndexOf(myArray, searchTerm, property) {
 }
 
 function CurrentGroupsCtrl($rootScope, $scope, contextFactory, $state, fireFactory) {
-    var syncObject = fireFactory.getGroupsObject();
-    syncObject.$bindTo($scope, "groups");
+    $scope.groups = fireFactory.getGroupsObject();
 }
 function GroupTemplateCtrl($rootScope, $scope, contextFactory, $state, fireFactory) {
-
+    var syncObj = fireFactory.getDataTypeObjectById('groups',$scope.selectedItemId);
+    syncObj.$bindTo($scope, "selectedItem");
     $scope.getGroupTagContext = contextFactory.getTagContext;
     $scope.toggle = function (scope) {
         scope.toggle();
@@ -503,7 +522,7 @@ function SearchCtrl($scope, $firebaseObject, $filter) {
     //console.log($scope.polls);
 }
 
-function EventCtrl($scope, fireFactory, $stateParams, $firebaseObject) {
+function EventCtrl($scope, fireFactory,$rootScope, $stateParams, $firebaseObject) {
 
     $scope.eventTitle = '';
     $scope.eventDesc = '';
@@ -524,8 +543,9 @@ function EventCtrl($scope, fireFactory, $stateParams, $firebaseObject) {
 
 
         $scope.createdEvent = {};
-        $scope.createdEvent["eventTitle"] = eventTitle;
-        $scope.createdEvent["eventDesc"] = eventDesc;
+        $scope.createdEvent["title"] = eventTitle;
+        $scope.createdEvent["description"] = eventDesc;
+        $scope.createdEvent["ownerName"] = $rootScope.MainCtrlRef.currentUserData.userName;
         $scope.createdEvent["eventDate"] = eventDate;
         $scope.createdEvent["eventLocation"] = eventLocation;
         $scope.createdEvent["users"] = [];
@@ -596,7 +616,7 @@ function HomeCtrl($scope, $rootScope, fireFactory) {
             }
             totalRecToShow = totalRecToShow - concatValue;
             for(var y = 0; y < concatValue ; y++){
-                result.push(fireFactory.getDataTypeObjectById(type,item.array[y].id));
+                result.push({key:item.array[y].id,value:fireFactory.getDataTypeObjectById(type,item.array[y].id)});
             }
         }
         return result;
@@ -767,7 +787,7 @@ angular
             };
 
             helperFactory.getDataTypeObjectById = function (dataType,id) {
-                return $firebaseObject(helperFactory.getGroupsRef().child('data').child(dataType).child(id));
+                return $firebaseObject(helperFactory.firebaseRef().child('data').child(dataType).child(id));
             };
 
             helperFactory.getEventsRef = function () {

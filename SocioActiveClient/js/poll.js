@@ -278,9 +278,9 @@ function PollTabCtrl($scope) {
 }
 
 function PollTemplateCtrl($rootScope, $scope,MEMBER, contextFactory, $state, fireFactoryForPoll) {
-    $scope.selectedItem = $scope.$parent.ngModel;
     $scope.selectedItemId = $scope.$parent.selectedItemId;
-
+    var syncObj = fireFactoryForPoll.getDataTypeObjectById('polls',$scope.selectedItemId);
+    syncObj.$bindTo($scope, "selectedItem");
     $scope.getPollTagsForView = contextFactory.getTagContext;
     $scope.currentUserId = $rootScope.MainCtrlRef.userId;
     $scope.currentUserName = $rootScope.MainCtrlRef.currentUserData.userName;
@@ -457,8 +457,8 @@ function PollTemplateCtrl($rootScope, $scope,MEMBER, contextFactory, $state, fir
 }
 
 function CurrentPollsCtrl($scope,fireFactoryForPoll) {
-    var syncObject = fireFactoryForPoll.getPollsObject();
-    syncObject.$bindTo($scope, "polls");
+    $scope.polls = fireFactoryForPoll.getPollsObject();
+
 }
 
 function calculateAverage(data) {
@@ -583,7 +583,9 @@ angular
             helperFactory.getPollsInContextRef = function (context) {
                 return helperFactory.firebaseRef().child('data').child('contexts').child(context).child('polls');
             };
-
+            helperFactory.getDataTypeObjectById = function (dataType,id) {
+                return $firebaseObject(helperFactory.firebaseRef().child('data').child(dataType).child(id));
+            };
             return helperFactory;
 
         }]);
