@@ -9,15 +9,7 @@
                         </h3>
                     </div>
                     <div class="ibox-content">
-
-                        <div class="list-group">
-                            <a ng-repeat="(key,poll) in polls" ng-class="getClass(poll)" ng-click="show(poll,key)"
-                               href="">
-                                <h3 class="list-group-item-heading">{{poll.createdBy}}'s group : {{poll.pollTitle}}</h3>
-
-                                <p class="list-group-item-text">{{poll.pollDescription }}</p>
-                            </a>
-                        </div>
+                        <item-preview selected-item ="selectedPoll" selected-item-id="selectedPollId" previewed-item="polls"></item-preview>
                     </div>
                 </div>
             </div>
@@ -29,7 +21,7 @@
                             <small>{{selectedPoll.pollDescription}}</small>
                         </h3>
                     </div>
-                    <div class="ibox-content" ng-hide="hidePollContent">
+                    <div class="ibox-content" >
 
 
                         <div class="form-group" ng-hide="isPollDisabled()"><label>Just For: </label>
@@ -64,10 +56,10 @@
 
                             <div class="form-group">
                                 <div class="panel pre-scrollable"
-                                     ng-hide="isPollObjectEmpty(selectedPollPristineState.pollOptions)">
+                                     ng-hide="isPollObjectEmpty(selectedPoll.pollOptions)">
                                     <div class="panel-body">
                                         <ul class="list-group"
-                                            ng-repeat="(key,option) in selectedPollPristineState.pollOptions">
+                                            ng-repeat="(key,option) in selectedPoll.pollOptions">
 
                                             <li class="list-group-item">
 
@@ -127,7 +119,7 @@
                             <div class="form-group pre-scrollable">
 
                                 <div class="ibox-content"
-                                     ng-repeat="(key,value) in selectedPollPristineState.pollTagContext">
+                                     ng-repeat="(key,value) in selectedPoll.pollTagContext">
 
                                     <h4>{{key}}</h4>
 
@@ -190,7 +182,7 @@
 
                                     <div class="panel pre-scrollable">
                                         <div class="feed-activity-list"
-                                             ng-repeat="comment in selectedPollPristineState.pollComments">
+                                             ng-repeat="comment in selectedPoll.pollComments">
 
                                             <div class="feed-element">
 

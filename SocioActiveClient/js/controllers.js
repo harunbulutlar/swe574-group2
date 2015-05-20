@@ -172,6 +172,30 @@ function TypeTemplateCtrl($scope, $rootScope) {
     $scope.typeParameterType = "";
 }
 
+function ItemPreviewCtrl($scope) {
+
+    $scope.$watch('previewedItem', function () {
+        if ($scope.selectedItemId != null) {
+            if (!$scope.previewedItem.hasOwnProperty($scope.selectedItemId)) {
+                $scope.hideGroupContent = true;
+                $scope.selectedGroup = null;
+                $scope.selectedGroupId = null;
+            }
+        }
+    }, true);
+
+    $scope.show = function (item, key) {
+        $scope.selectedItem = item;
+        $scope.selectedItemId = key;
+    };
+    $scope.getClass = function (item) {
+        if (item == $scope.selectedItem) {
+            return "list-group-item active";
+        }
+        return "list-group-item";
+    };
+}
+
 function isEmpty(obj) {
 
     // null and undefined are "empty"
@@ -244,7 +268,18 @@ function typeTemplate() {
         templateUrl: 'views/type_template.html'
     };
 }
-
+function itemPreview() {
+    return {
+        restrict: "E",
+        scope: {
+            previewedItem: '=',
+            selectedItem: '=',
+            selectedItemId: '='
+        },
+        controller: ItemPreviewCtrl,
+        templateUrl: 'views/item_preview_template.html'
+    };
+}
 function tagTemplate() {
     return {
         restrict: "E",
@@ -255,6 +290,31 @@ function tagTemplate() {
     };
 }
 
+function dynamicArea($compile, $http, $controller) {
+    return {
+        restrict: "E",
+        scope: {
+            ngModel: '=',
+            areaType: '=',
+            selectedItemId: '='
+        },
+        replace: true,
+        link: function (scope, element, attrs) {
+            var html, templateCtrl, templateScope;
+            scope.$watch('ngModel', function(data) {
+                if(data){
+                    var ctrl = capitalizeFirstLetter(scope.areaType) +"TemplateCtrl";
+                    var templateUrl = "views/" + scope.areaType + "_view_template.html";
+                    var html = '<div ng-controller="'+ ctrl+ '" ng-include="\'' +templateUrl +'\'"></div>';
+                    element.empty();
+                    element.append(html);
+                    $compile( element.contents())( scope );
+                }
+
+            },true);
+        }
+    };
+}
 function guid() {
     function s4() {
         return Math.floor((1 + Math.random()) * 0x10000)
@@ -274,7 +334,6 @@ function arrayObjectIndexOf(myArray, searchTerm, property) {
 }
 
 function CurrentGroupsCtrl($rootScope, $scope, contextFactory, $state, fireFactory) {
-    $scope.hideGroupContent = true;
     $scope.selectedGroupId = null;
     var syncObject = fireFactory.getGroupsObject();
     syncObject.$bindTo($scope, "groups");
@@ -284,16 +343,6 @@ function CurrentGroupsCtrl($rootScope, $scope, contextFactory, $state, fireFacto
         scope.toggle();
     };
 
-    $scope.$watch('groups', function () {
-        if ($scope.selectedGroupId != null) {
-            if (!$scope.groups.hasOwnProperty($scope.selectedGroupId)) {
-                $scope.hideGroupContent = true;
-                $scope.selectedGroup = null;
-                $scope.selectedGroupId = null;
-            }
-
-        }
-    }, true);
     $scope.selectedGroup = null;
 
     $scope.addGroupTag = function (tag) {
@@ -318,23 +367,11 @@ function CurrentGroupsCtrl($rootScope, $scope, contextFactory, $state, fireFacto
             $rootScope.MainCtrlRef.currentUserData.contexts[tag.tagContext]++;
         }
 
-
         $rootScope.MainCtrlRef.currentUserData.interactedGroups[$scope.selectedGroupId] = true;
         $rootScope.MainCtrlRef.currentUserData.$save();
 
     };
 
-    $scope.show = function (group, key) {
-        $scope.selectedGroup = group;
-        $scope.selectedGroupId = key;
-        $scope.hideGroupContent = false;
-    };
-    $scope.getClass = function (group) {
-        if (group == $scope.selectedGroup) {
-            return "list-group-item active";
-        }
-        return "list-group-item";
-    };
     $scope.showContent = function (fieldKey, contentKey) {
         $state.go('activity.group_add_content', {
             groupId: $scope.selectedGroupId,
@@ -345,6 +382,53 @@ function CurrentGroupsCtrl($rootScope, $scope, contextFactory, $state, fireFacto
 
     $scope.addButtonClick = function (selectedTypeId) {
         $state.go('activity.group_add_content', {groupId: $scope.selectedGroupId, typeId: selectedTypeId});
+    }
+}
+function GroupTemplateCtrl($rootScope, $scope, contextFactory, $state, fireFactory) {
+
+    $scope.getGroupTagContext = contextFactory.getTagContext;
+    $scope.toggle = function (scope) {
+        scope.toggle();
+    };
+    $scope.selectedItem = $scope.$parent.ngModel;
+    $scope.selectedItemId = $scope.$parent.selectedItemId;
+    $scope.addGroupTag = function (tag) {
+        if (!$scope.selectedItem.contexts) {
+            $scope.selectedItem.contexts = {};
+        }
+        if (!$scope.selectedItem.contexts[tag.tagContext]) {
+            $scope.selectedItem.contexts[tag.tagContext] = [];
+        }
+        $scope.selectedItem.contexts[tag.tagContext].push(tag);
+        if (!$rootScope.MainCtrlRef.currentUserData.interactedGroups) {
+            $rootScope.MainCtrlRef.currentUserData.interactedGroups = {};
+        }
+
+        var contextGroupsRef = fireFactory.getGroupsInContextRef(tag.tagContext);
+        var groupLinkObject = {};
+        groupLinkObject[$scope.selectedGroupId] = $scope.selectedItem.contexts[tag.tagContext].length;
+        contextGroupsRef.update(groupLinkObject);
+        if (!$rootScope.MainCtrlRef.currentUserData.contexts[tag.tagContext]) {
+            $rootScope.MainCtrlRef.currentUserData.contexts[tag.tagContext] = 1;
+        } else {
+            $rootScope.MainCtrlRef.currentUserData.contexts[tag.tagContext]++;
+        }
+
+        $rootScope.MainCtrlRef.currentUserData.interactedGroups[$scope.selectedGroupId] = true;
+        $rootScope.MainCtrlRef.currentUserData.$save();
+
+    };
+
+    $scope.showContent = function (fieldKey, contentKey) {
+        $state.go('activity.group_add_content', {
+            groupId: $scope.selectedItemId,
+            fieldId: fieldKey,
+            contentId: contentKey
+        });
+    };
+
+    $scope.addButtonClick = function (selectedTypeId) {
+        $state.go('activity.group_add_content', {groupId: $scope.selectedItemId, typeId: selectedTypeId});
     }
 }
 
@@ -542,6 +626,11 @@ function HomeCtrl($scope, $rootScope, fireFactory) {
         for(var i =0; i<recommendation.array.length; i++){
             var item = recommendation.array[i];
             var weightOfItem = Math.round((item.count/recommendation.totalCount) * staticTotalRecToShow)+ excessWeight;
+            //Since we sorted from top to bottom if weights are equally distributed we can get a zero
+            //value. So round it up to 1
+            if(weightOfItem == 0){
+                weightOfItem = 1;
+            }
             if(totalRecToShow < 1){
                 break;
             }
@@ -605,6 +694,8 @@ angular
     .directive('addNodeInfo', addNodeInfo)
     .directive('typeTemplate', typeTemplate)
     .directive('tagTemplate', tagTemplate)
+    .directive('itemPreview', itemPreview)
+    .directive('dynamicArea', dynamicArea)
     .controller('MainCtrl', MainCtrl)
     .controller('CustomTypesCtrl', CustomTypesCtrl)
     .controller('TypeTemplateCtrl', TypeTemplateCtrl)
@@ -616,6 +707,8 @@ angular
     .controller('SearchCtrl', SearchCtrl)
     .controller('EventCtrl', EventCtrl)
     .controller('HomeCtrl', HomeCtrl)
+    .controller('ItemPreviewCtrl', ItemPreviewCtrl)
+    .controller('GroupTemplateCtrl', GroupTemplateCtrl)
     .run(["$templateCache", "$rootScope", function ($templateCache, $rootScope) {
         $rootScope.primitiveTypes = [
             {name: 'Enumeration'},

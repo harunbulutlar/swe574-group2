@@ -1,0 +1,43 @@
+<div class="ibox-title">
+    <h3>Group Content
+        <small>content of the group you select</small>
+    </h3>
+</div>
+<div class="ibox-content">
+
+    <div class="form-group"><label>{{selectedItem.title}}'s fields</label></div>
+
+    <div class="ibox-content" ng-repeat="(key,value) in selectedItem.contexts">
+        <h2>{{key}}</h2>
+        <button ng-repeat="tag in value" class="btn btn-w-m btn-info">{{tag.tagName}}</button>
+    </div>
+    <input type="text" ng-model="tags"
+           typeahead="contextHead.id as contextHead.name for contextHead in getGroupTagContext($viewValue)"
+           class="form-control" typeahead-loading="loadingLocations" typeahead-min-length="3"
+           typeahead-wait-ms="300" typeahead-on-select="addGroupTag($item)"
+           id="semanticTagName" placeholder="Enter tag...">
+
+
+    <script type="text/ng-template" id="content_renderer.html">
+        <div ui-tree-handle class="tree-node tree-node-content">
+            <a class="pull-right btn btn-white btn-xs" data-nodrag ng-click="showContent(fieldKey, contentKey)"><span class="fa fa-eye"></span></a>
+            {{node.owner}}'s content
+        </div>
+    </script>
+    <script type="text/ng-template" id="field_renderer.html">
+        <div ui-tree-handle class="tree-node tree-node-content">
+            <a class="pull-right btn btn-white btn-xs" data-nodrag ng-click="addButtonClick(fieldKey)"><span class="fa fa-plus"></span></a>
+            <a class="btn btn-primary btn-xs" data-nodrag ng-click="toggle(this)"><span class="fa" ng-class="{'fa-angle-down': collapsed, 'fa-angle-right': !collapsed}"></span></a>
+            {{node.name}}(Type:{{node.type.name}})
+        </div>
+        <ol ui-tree-nodes="" ng-model="node.content" ng-class="{hidden: collapsed}">
+            <li ng-repeat="(contentKey, node) in node.content" ui-tree-node ng-include="'content_renderer.html'">
+            </li>
+        </ol>
+    </script>
+    <div ui-tree id="tree-root">
+        <ol ui-tree-nodes ng-model="selectedItem.fields">
+            <li ng-repeat="(fieldKey,node) in selectedItem.fields" ui-tree-node ng-include="'field_renderer.html'"></li>
+        </ol>
+    </div>
+</div>
