@@ -428,10 +428,12 @@ function SearchCtrl($scope, $firebaseObject, $filter) {
 function TagContextCtrl($scope, contextFactory) {
     $scope.getTagContext = contextFactory.getTagContext;
 
+    $scope.tags = '';
+    $scope.manualTags = '';
+
     $scope.addTag = function(tag){
 
-        $scope.tags = '';
-        $scope.manualTags = '';
+
         if (!$scope.tagContext) {
             $scope.tagContext = {};
         }
@@ -443,18 +445,19 @@ function TagContextCtrl($scope, contextFactory) {
         if($scope.addTagCallback){
             $scope.addTagCallback(item);
         }
+        $scope.tags = '';
+        $scope.manualTags = '';
     };
 
     $scope.addManualTag = function(tags,inputTagContext){
-        $scope.tags = '';
-        $scope.manualTags = '';
+
         var context = {};
         var tagId = guid();
 
         context[tagId] = ({
             tagId: tagId,
-            name: tagName + '<p style= "font-style: italic" class="pull-right">' + inputTagContext,
-            tagName: tagName,
+            name: tags + '<p style= "font-style: italic" class="pull-right">' + inputTagContext,
+            tagName: tags,
             tagContext: inputTagContext,
             tagContextParentDomain: '',
             tagContextChildDomain: '',
@@ -469,6 +472,9 @@ function TagContextCtrl($scope, contextFactory) {
         if($scope.addManualTagCallback){
             $scope.addManualTagCallback(tags,inputTagContext);
         }
+
+        $scope.tags = '';
+        $scope.manualTags = '';
     };
 
     $scope.removeTag = function(key, tagToBeRemoved){
