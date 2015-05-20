@@ -92,26 +92,26 @@ function PollCtrl($scope, $rootScope, $stateParams, $state, contextFactory, MEMB
     //TODO Remove voting in create poll
     /*$scope.votePoll = function (optionId, optionName, optionDetail, optionVoteCount) {
 
-        $scope.createdPoll.pollOptions[optionId] = {
+     $scope.createdPoll.pollOptions[optionId] = {
 
-            "optionId": optionId,
-            "optionName": optionName,
-            "optionDetail": optionDetail,
-            "optionVoteCount": optionVoteCount + 1
+     "optionId": optionId,
+     "optionName": optionName,
+     "optionDetail": optionDetail,
+     "optionVoteCount": optionVoteCount + 1
 
-        };
+     };
 
-        $scope.isVotedTemp = true;
-        $scope.createdPoll.pollParticipantList.push($scope.currentUserId);
+     $scope.isVotedTemp = true;
+     $scope.createdPoll.pollParticipantList.push($scope.currentUserId);
 
-    };
+     };
 
-    $scope.isCurrentUserVoted = function () {
+     $scope.isCurrentUserVoted = function () {
 
-        return (($scope.isVotedTemp == true) ||
-        ($scope.createdPoll.pollParticipantList.indexOf($scope.currentUserId) != -1));
+     return (($scope.isVotedTemp == true) ||
+     ($scope.createdPoll.pollParticipantList.indexOf($scope.currentUserId) != -1));
 
-    };*/
+     };*/
 
     $scope.reloadState = function () {
         $state.reload();
@@ -164,12 +164,12 @@ function PollCtrl($scope, $rootScope, $stateParams, $state, contextFactory, MEMB
             $rootScope.MainCtrlRef.currentUserData.contexts = {};
         }
 
-        angular.forEach($scope.createdPoll.pollTagContext, function(value, key) {
+        angular.forEach($scope.createdPoll.pollTagContext, function (value, key) {
             var contextPollsRef = fireFactoryForPoll.getPollsInContextRef(key);
             var pollLinkObject = {};
             pollLinkObject[fireBaseObj.key()] = value.length;
             contextPollsRef.update(pollLinkObject);
-            if(!$rootScope.MainCtrlRef.currentUserData.contexts[key]){
+            if (!$rootScope.MainCtrlRef.currentUserData.contexts[key]) {
                 $rootScope.MainCtrlRef.currentUserData.contexts[key] = 1;
                 return;
             }
@@ -217,9 +217,9 @@ function PollTabCtrl($scope) {
 
 }
 
-function PollTemplateCtrl($rootScope, $scope,MEMBER, contextFactory, $state, fireFactoryForPoll) {
+function PollTemplateCtrl($rootScope, $scope, MEMBER, contextFactory, $state, fireFactoryForPoll) {
     $scope.selectedItemId = $scope.$parent.selectedItemId;
-    var syncObj = fireFactoryForPoll.getDataTypeObjectById('polls',$scope.selectedItemId);
+    var syncObj = fireFactoryForPoll.getDataTypeObjectById('polls', $scope.selectedItemId);
     syncObj.$bindTo($scope, "selectedItem");
 
     $scope.currentUserId = $rootScope.MainCtrlRef.userId;
@@ -272,9 +272,20 @@ function PollTemplateCtrl($rootScope, $scope,MEMBER, contextFactory, $state, fir
 
                 $rootScope.MainCtrlRef.currentUserData.interactedPolls[$scope.selectedItemId] = true;
                 $rootScope.MainCtrlRef.currentUserData.votedPolls[$scope.selectedItemId] = true;
+
+                angular.forEach($scope.selectedItem.pollTagContext, function (value, key) {
+                    if (!$rootScope.MainCtrlRef.currentUserData.contexts) {
+                        $rootScope.MainCtrlRef.currentUserData.contexts = {};
+                    }
+                    if (!$rootScope.MainCtrlRef.currentUserData.contexts[key]) {
+                        $rootScope.MainCtrlRef.currentUserData.contexts[key] = 1;
+                        return;
+                    }
+                    $rootScope.MainCtrlRef.currentUserData.contexts[key]++;
+                });
+
                 $rootScope.MainCtrlRef.currentUserData.$save().then(function () {
                     $scope.loading = false;
-
                     alert("Your vote is saved!");
                 });
             });
@@ -318,7 +329,7 @@ function PollTemplateCtrl($rootScope, $scope,MEMBER, contextFactory, $state, fir
         var groupLinkObject = {};
         groupLinkObject[$scope.selectedItemId] = $scope.selectedItem.pollTagContext[tag.tagContext].length;
         contextGroupsRef.update(groupLinkObject);
-        if(!$rootScope.MainCtrlRef.currentUserData.contexts[tag.tagContext]){
+        if (!$rootScope.MainCtrlRef.currentUserData.contexts[tag.tagContext]) {
             $rootScope.MainCtrlRef.currentUserData.contexts[tag.tagContext] = 1;
         } else {
             $rootScope.MainCtrlRef.currentUserData.contexts[tag.tagContext]++;
@@ -357,7 +368,7 @@ function PollTemplateCtrl($rootScope, $scope,MEMBER, contextFactory, $state, fir
     };
 }
 
-function CurrentPollsCtrl($scope,fireFactoryForPoll) {
+function CurrentPollsCtrl($scope, fireFactoryForPoll) {
     $scope.polls = fireFactoryForPoll.getPollsObject();
 
 }
@@ -484,7 +495,7 @@ angular
             helperFactory.getPollsInContextRef = function (context) {
                 return helperFactory.firebaseRef().child('data').child('contexts').child(context).child('polls');
             };
-            helperFactory.getDataTypeObjectById = function (dataType,id) {
+            helperFactory.getDataTypeObjectById = function (dataType, id) {
                 return $firebaseObject(helperFactory.firebaseRef().child('data').child(dataType).child(id));
             };
             return helperFactory;
