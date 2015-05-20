@@ -276,7 +276,6 @@ function PollTemplateCtrl($rootScope, $scope, MEMBER, contextFactory, $state, fi
                 angular.forEach($scope.selectedItem.pollTagContext, function (value, key) {
                     if (!$rootScope.MainCtrlRef.currentUserData.contexts) {
                         $rootScope.MainCtrlRef.currentUserData.contexts = {};
-                        return;
                     }
                     if (!$rootScope.MainCtrlRef.currentUserData.contexts[key]) {
                         $rootScope.MainCtrlRef.currentUserData.contexts[key] = 1;
