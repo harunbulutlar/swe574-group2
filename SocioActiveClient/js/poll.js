@@ -31,7 +31,7 @@ function PollCtrl($scope, $rootScope, $stateParams, $state, contextFactory, MEMB
             "endDate": "",
             "updateDate": "",
             "pollComments": [],
-            "pollTags": [],
+            "pollTagContext": {},
             "pollRoles": []
         };
 
@@ -89,7 +89,7 @@ function PollCtrl($scope, $rootScope, $stateParams, $state, contextFactory, MEMB
 
 
     //TODO Remove voting in create poll
-    $scope.votePoll = function (optionId, optionName, optionDetail, optionVoteCount) {
+    /*$scope.votePoll = function (optionId, optionName, optionDetail, optionVoteCount) {
 
         $scope.createdPoll.pollOptions[optionId] = {
 
@@ -110,15 +110,19 @@ function PollCtrl($scope, $rootScope, $stateParams, $state, contextFactory, MEMB
         return (($scope.isVotedTemp == true) ||
         ($scope.createdPoll.pollParticipantList.indexOf($scope.currentUserId) != -1));
 
-    };
+    };*/
 
     $scope.reloadState = function () {
         $state.reload();
     };
 
-    $scope.addPollTag = function (context) {
+    $scope.addPollTag = function (tag) {
 
-        $scope.createdPoll.pollTags.push(context);
+        if (!$scope.createdPoll.pollTagContext[tag.tagContext]) {
+            $scope.createdPoll.pollTagContext[tag.tagContext] = [];
+        }
+
+        $scope.createdPoll.pollTagContext[tag.tagContext].push(tag);
 
         $scope.tags = '';
         $scope.manualTags = '';
@@ -140,32 +144,27 @@ function PollCtrl($scope, $rootScope, $stateParams, $state, contextFactory, MEMB
             score: ''
         });
 
-        $scope.createdPoll.pollTags.push(context[tagId]);
+        if (!$scope.createdPoll.pollTagContext[tagContext]) {
+            $scope.createdPoll.pollTagContext[tagContext] = [];
+        }
+
+        $scope.createdPoll.pollTagContext[tagContext].push(context[tagId]);
 
         $scope.tags = '';
         $scope.manualTags = '';
 
     };
 
-    $scope.removeTag = function (tagToBeRemoved) {
+    $scope.removeTag = function (key, tagToBeRemoved) {
 
 
-        var index = arrayObjectIndexOf($scope.createdPoll.pollTags, tagToBeRemoved, "tagId");
+        var index = arrayObjectIndexOf($scope.createdPoll.pollTagContext[key], tagToBeRemoved, "tagId");
 
-        $scope.createdPoll.pollTags.splice(index, 1);
+        $scope.createdPoll.pollTagContext[key].splice(index, 1);
 
-        if ($scope.pollToBeViewed != null) {
-
-            /*saveData($scope.createdPoll.pollId, $scope.createdPoll);*/
-
-            var pollList = getPollListFromLocalStorage();
-            var tempPoll = pollList[$scope.createdPoll.pollId];
-            tempPoll.pollTags = $scope.createdPoll.pollTags;
-            pollList[$scope.createdPoll.pollId] = tempPoll;
-            localStorage.setItem('pollData', JSON.stringify(pollList));
-
+        if (isObjectEmpty($scope.createdPoll.pollTagContext[key])) {
+            delete $scope.createdPoll.pollTagContext[key];
         }
-
     };
 
     $scope.pollCommentDateDifference = function (date) {
@@ -206,9 +205,27 @@ function PollCtrl($scope, $rootScope, $stateParams, $state, contextFactory, MEMB
 
         var strippedPolls = angular.fromJson(angular.toJson($scope.createdPoll));
         var fireBaseObj = fireFactoryForPoll.getPollsRef().push(strippedPolls);
+
         if (!$rootScope.MainCtrlRef.currentUserData.createdPolls) {
             $rootScope.MainCtrlRef.currentUserData.createdPolls = {};
         }
+
+        if (!$rootScope.MainCtrlRef.currentUserData.contexts) {
+            $rootScope.MainCtrlRef.currentUserData.contexts = {};
+        }
+
+        angular.forEach($scope.createdPoll.pollTagContext, function(value, key) {
+            var contextPollsRef = fireFactoryForPoll.getPollsInContextRef(key);
+            var pollLinkObject = {};
+            pollLinkObject[fireBaseObj.key()] = value.length;
+            contextPollsRef.update(pollLinkObject);
+            if(!$rootScope.MainCtrlRef.currentUserData.contexts[key]){
+                $rootScope.MainCtrlRef.currentUserData.contexts[key] = 1;
+                return;
+            }
+            $rootScope.MainCtrlRef.currentUserData.contexts[key]++;
+        });
+
         $rootScope.MainCtrlRef.currentUserData.createdPolls[fireBaseObj.key()] = true;
         $scope.loading = true;
         $rootScope.MainCtrlRef.currentUserData.$save().then(function () {
@@ -301,7 +318,7 @@ function CurrentPollsCtrl($scope, $rootScope, $state, MEMBER, fireFactoryForPoll
             $scope.pollCreatedByName = loadedData.userName;
         });
 
-        return $scope.pollCreatedByName; // TODO buradaki hatay� ��z!
+        return $scope.pollCreatedByName;
     };
 
     /*    fireFactoryForPoll.getUserObject('simplelogin:38').$loaded().then(function (loadedData) {
@@ -313,11 +330,10 @@ function CurrentPollsCtrl($scope, $rootScope, $state, MEMBER, fireFactoryForPoll
         $scope.selectedPoll = poll;
         $scope.selectedPollId = key;
         $scope.hidePollContent = false;
-
+        $scope.selectedPollPristineState = {};
+        var syncObject = fireFactoryForPoll.getPollObject($scope.selectedPollId);
         /*Pristine state of the poll!*/
-        fireFactoryForPoll.getPollObject($scope.selectedPollId).$loaded().then(function (loadedData) {
-            $scope.selectedPollPristineState = loadedData;
-        });
+        syncObject.$bindTo($scope,'selectedPollPristineState');
 
     };
 
@@ -360,7 +376,12 @@ function CurrentPollsCtrl($scope, $rootScope, $state, MEMBER, fireFactoryForPoll
                 if (!$rootScope.MainCtrlRef.currentUserData.interactedPolls) {
                     $rootScope.MainCtrlRef.currentUserData.interactedPolls = {};
                 }
+                if (!$rootScope.MainCtrlRef.currentUserData.votedPolls) {
+                    $rootScope.MainCtrlRef.currentUserData.votedPolls = {};
+                }
+
                 $rootScope.MainCtrlRef.currentUserData.interactedPolls[$scope.selectedPollId] = true;
+                $rootScope.MainCtrlRef.currentUserData.votedPolls[$scope.selectedPollId] = true;
                 $rootScope.MainCtrlRef.currentUserData.$save().then(function () {
                     $scope.loading = false;
 
@@ -378,20 +399,20 @@ function CurrentPollsCtrl($scope, $rootScope, $state, MEMBER, fireFactoryForPoll
 
         if ($scope.selectedPoll != null) {
 
-            if (!$rootScope.MainCtrlRef.currentUserData.interactedPolls) {
+            if (!$rootScope.MainCtrlRef.currentUserData.votedPolls) {
 
                 return false;
             }
 
-            return $rootScope.MainCtrlRef.currentUserData.interactedPolls[$scope.selectedPollId];
+            return $rootScope.MainCtrlRef.currentUserData.votedPolls[$scope.selectedPollId];
         }
 
     };
 
     $scope.addPollOption = function () {
 
-        if (!$scope.selectedPollPristineState.pollOptions){
-            $scope.selectedPollPristineState.pollOptions=[];
+        if (!$scope.selectedPollPristineState.pollOptions) {
+            $scope.selectedPollPristineState.pollOptions = [];
 
         }
 
@@ -403,8 +424,6 @@ function CurrentPollsCtrl($scope, $rootScope, $state, MEMBER, fireFactoryForPoll
 
         });
 
-        $scope.selectedPollPristineState.$save();
-
         $scope.pollOptionTempList.optionName = '';
         $scope.pollOptionTempList.optionDetail = '';
 
@@ -414,24 +433,44 @@ function CurrentPollsCtrl($scope, $rootScope, $state, MEMBER, fireFactoryForPoll
 
         $scope.selectedPollPristineState.pollOptions.splice(optionToBeRemoved, 1);
 
-        $scope.selectedPollPristineState.$save();
-
     };
 
-    $scope.addPollTagForView = function (context) {
+    $scope.addPollTagForView = function (tag) {
 
 
-        if (!$scope.selectedPollPristineState.pollTags){
-            $scope.selectedPollPristineState.pollTags=[];
-
+        if (!$scope.selectedPollPristineState.pollTagContext[tag.tagContext]) {
+            $scope.selectedPollPristineState.pollTagContext[tag.tagContext] = [];
         }
 
-        $scope.selectedPollPristineState.pollTags.push(context);
+        $scope.selectedPollPristineState.pollTagContext[tag.tagContext].push(tag);
 
         $scope.tags = '';
         $scope.manualTags = '';
 
-        $scope.selectedPollPristineState.$save();
+
+        if (!$rootScope.MainCtrlRef.currentUserData.interactedPolls) {
+            $rootScope.MainCtrlRef.currentUserData.interactedPolls = {};
+        }
+
+
+        if (!$rootScope.MainCtrlRef.currentUserData.contexts) {
+            $rootScope.MainCtrlRef.currentUserData.contexts = {};
+        }
+
+        var contextGroupsRef = fireFactoryForPoll.getPollsInContextRef(tag.tagContext);
+        var groupLinkObject = {};
+        groupLinkObject[$scope.selectedPollId] = $scope.selectedPollPristineState.pollTagContext[tag.tagContext].length;
+        contextGroupsRef.update(groupLinkObject);
+        if(!$rootScope.MainCtrlRef.currentUserData.contexts[tag.tagContext]){
+            $rootScope.MainCtrlRef.currentUserData.contexts[tag.tagContext] = 1;
+        } else {
+            $rootScope.MainCtrlRef.currentUserData.contexts[tag.tagContext]++;
+        }
+
+        $rootScope.MainCtrlRef.currentUserData.interactedPolls[$scope.selectedPollId] = true;
+        $scope.loading = true;
+        $rootScope.MainCtrlRef.currentUserData.$save();
+
 
     };
 
@@ -450,34 +489,30 @@ function CurrentPollsCtrl($scope, $rootScope, $state, MEMBER, fireFactoryForPoll
             score: ''
         });
 
-        if (!$scope.selectedPollPristineState.pollTags){
-            $scope.selectedPollPristineState.pollTags=[];
-
+        if (!$scope.selectedPollPristineState.pollTagContext[tagContext]) {
+            $scope.selectedPollPristineState.pollTagContext[tagContext] = [];
         }
 
-        $scope.selectedPollPristineState.pollTags.push(context[tagId]);
+        $scope.selectedPollPristineState.pollTagContext[tagContext].push(context[tagId]);
 
         $scope.tags = '';
         $scope.manualTags = '';
 
-        $scope.selectedPollPristineState.$save();
-
-
 
     };
 
-    $scope.removeTagForView = function (tagToBeRemoved) {
+    $scope.removeTagForView = function (key, tagToBeRemoved) {
 
-        $scope.selectedPollPristineState.pollTags.splice(tagToBeRemoved, 1);
+        var index = arrayObjectIndexOf($scope.selectedPollPristineState.pollTagContext[key], tagToBeRemoved, "tagId");
 
-        $scope.selectedPollPristineState.$save();
+        $scope.selectedPollPristineState.pollTagContext[key].splice(index, 1);
 
     };
 
     $scope.addPollCommentForView = function () {
 
-        if (!$scope.selectedPollPristineState.pollComments){
-            $scope.selectedPollPristineState.pollComments=[];
+        if (!$scope.selectedPollPristineState.pollComments) {
+            $scope.selectedPollPristineState.pollComments = [];
 
         }
 
@@ -489,9 +524,6 @@ function CurrentPollsCtrl($scope, $rootScope, $state, MEMBER, fireFactoryForPoll
         });
 
         $scope.pollCommentTempList.commentBody = '';
-
-
-        $scope.selectedPollPristineState.$save();
     };
 
     $scope.pollCommentDateDifference = function (date) {
@@ -552,7 +584,7 @@ function dateDifference(date) {
 
         return diff + " mins";
 
-    } else if (diff< 1440) {
+    } else if (diff < 1440) {
 
         return Math.round(diff / (60)) + " hours";
 
@@ -562,31 +594,6 @@ function dateDifference(date) {
     }
 
 }
-
-function getTagContextParentDomain(notableId) {
-    return notableId.split("/")[1];
-}
-
-
-function getTagContextChildDomain(notableId) {
-    return notableId.split("/")[2];
-}
-
-function calculateStandardDeviation(values) {
- var avg = calculateAverage(values);
-
- var squareDiffs = values.map(function (value) {
- var diff = value - avg;
- return diff * diff;
-
- });
-
- var avgSquareDiff = calculateAverage(squareDiffs);
-
- return Math.sqrt(avgSquareDiff);
-
- }
-
 
 angular
     .module('socioactive')
@@ -651,6 +658,10 @@ angular
 
             helperFactory.getContentObject = function (pollId, fieldId, contentId) {
                 return $firebaseObject(helperFactory.getPollsRef().child(pollId).child('fields').child(fieldId).child('content').child(contentId));
+            };
+
+            helperFactory.getPollsInContextRef = function (context) {
+                return helperFactory.firebaseRef().child('data').child('contexts').child(context).child('polls');
             };
 
             return helperFactory;
