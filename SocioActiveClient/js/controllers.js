@@ -266,14 +266,14 @@ function GroupTemplateCtrl($rootScope, $scope, contextFactory, $state, fireFacto
         }
         var contextGroupsRef = fireFactory.getGroupsInContextRef(tag.tagContext);
         var groupLinkObject = {};
-        groupLinkObject[$scope.selectedGroupId] = $scope.selectedItem.contexts[tag.tagContext].length;
+        groupLinkObject[$scope.selectedItemId] = $scope.selectedItem.contexts[tag.tagContext].length;
         contextGroupsRef.update(groupLinkObject);
         if (!$rootScope.MainCtrlRef.currentUserData.contexts[tag.tagContext]) {
             $rootScope.MainCtrlRef.currentUserData.contexts[tag.tagContext] = 1;
         } else {
             $rootScope.MainCtrlRef.currentUserData.contexts[tag.tagContext]++;
         }
-        $rootScope.MainCtrlRef.currentUserData.interactedGroups[$scope.selectedGroupId] = true;
+        $rootScope.MainCtrlRef.currentUserData.interactedGroups[$scope.selectedItemId] = true;
         $rootScope.MainCtrlRef.currentUserData.$save();
 
     };
