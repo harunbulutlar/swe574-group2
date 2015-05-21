@@ -858,6 +858,45 @@ function HomeCtrl($scope, $rootScope, fireFactory) {
     };
     $scope.init();
 
+    $scope.groupsFromDB = fireFactory.getGroupsObjectAll();
+    $scope.pollsFromDB = fireFactory.getPollsObjectAll();
+    $scope.searchTerm = '';
+    $scope.$watch('searchTerm', function () {
+
+        if($scope.searchTerm.length > 0) {
+            $scope.groups = '';
+            $scope.polls = '';
+            var searchResultGroup = [];
+            var searchResultPoll = [];
+            angular.forEach($scope.groupsFromDB, function (value, key) {
+                console.log("value: " +  value.description + " key: " + key);
+                var tempSearchTerm = $scope.searchTerm;
+                var tempDescription = value.description;
+                tempSearchTerm = angular.lowercase(tempSearchTerm);
+                tempDescription = angular.lowercase(tempDescription);
+                if(tempDescription.search(tempSearchTerm) > -1) {
+                    searchResultGroup.push({key:key,value:fireFactory.getDataTypeObjectById("groups",key)});
+                }
+            });
+
+            angular.forEach($scope.pollsFromDB, function (value, key) {
+                console.log("value: " +  value.description + " key: " + key);
+                var tempSearchTerm = $scope.searchTerm;
+                var tempDescription = value.description;
+                tempSearchTerm = angular.lowercase(tempSearchTerm);
+                tempDescription = angular.lowercase(tempDescription);
+                if(tempDescription.search(tempSearchTerm) > -1) {
+                    searchResultPoll.push({key:key,value:fireFactory.getDataTypeObjectById("polls",key)});
+                }
+            });
+            $scope.groups = searchResultGroup;
+            $scope.polls = searchResultPoll;
+        }
+        else{
+            $scope.init();
+        }
+    });
+
 }
 function capitalizeFirstLetter(string) {
     return string.charAt(0).toUpperCase() + string.slice(1);
@@ -1003,6 +1042,16 @@ angular
 
             helperFactory.getEventsRef = function () {
                 return helperFactory.getDataRef().child('events');
+            };
+
+            helperFactory.getGroupsObjectAll = function () {
+                return $firebaseObject(helperFactory.getGroupsRef());
+            };
+            helperFactory.getPollsObjectAll = function () {
+                return $firebaseObject(helperFactory.getPollsRef());
+            };
+            helperFactory.getPollsRef = function () {
+                return helperFactory.firebaseRef().child('data').child('polls');
             };
 
             return helperFactory;
