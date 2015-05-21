@@ -72,7 +72,6 @@ function CustomTypesCtrl($state, $scope, contextFactory, $rootScope, fireFactory
         $scope.createdGroup.fields.push(userField);
     };
 
-
     $scope.saveChanges = function () {
 
         if ($scope.createdGroup.title == '') {
@@ -130,6 +129,7 @@ function CustomTypesCtrl($state, $scope, contextFactory, $rootScope, fireFactory
         $scope.createdGroup["title"] = '';
         $scope.createdGroup["description"] = '';
         $scope.createdGroup["fields"] = [];
+        $scope.createdGroup["contexts"] = {};
 
     };
     $scope.initPage();
@@ -447,10 +447,12 @@ function SearchCtrl($scope, $firebaseObject, $filter) {
 function TagContextCtrl($scope, contextFactory) {
     $scope.getTagContext = contextFactory.getTagContext;
 
+    $scope.tags = '';
+    $scope.manualTags = '';
+
     $scope.addTag = function(tag){
 
-        $scope.tags = '';
-        $scope.manualTags = '';
+
         if (!$scope.tagContext) {
             $scope.tagContext = {};
         }
@@ -460,20 +462,21 @@ function TagContextCtrl($scope, contextFactory) {
         $scope.tagContext[tag.tagContext].push(tag);
 
         if($scope.addTagCallback){
-            $scope.addTagCallback(item);
+            $scope.addTagCallback(tag);
         }
+        $scope.tags = '';
+        $scope.manualTags = '';
     };
 
     $scope.addManualTag = function(tags,inputTagContext){
-        $scope.tags = '';
-        $scope.manualTags = '';
+
         var context = {};
         var tagId = guid();
 
         context[tagId] = ({
             tagId: tagId,
-            name: tagName + '<p style= "font-style: italic" class="pull-right">' + inputTagContext,
-            tagName: tagName,
+            name: tags + '<p style= "font-style: italic" class="pull-right">' + inputTagContext,
+            tagName: tags,
             tagContext: inputTagContext,
             tagContextParentDomain: '',
             tagContextChildDomain: '',
@@ -488,6 +491,9 @@ function TagContextCtrl($scope, contextFactory) {
         if($scope.addManualTagCallback){
             $scope.addManualTagCallback(tags,inputTagContext);
         }
+
+        $scope.tags = '';
+        $scope.manualTags = '';
     };
 
     $scope.removeTag = function(key, tagToBeRemoved){
