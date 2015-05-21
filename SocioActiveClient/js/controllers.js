@@ -23,7 +23,7 @@ function MainCtrl($window, fireFactory, $rootScope) {
         if (!loadedData.customTypes) {
             loadedData.customTypes = [];
         }
-        if(loadedData.userImage){
+        if (loadedData.userImage) {
             $rootScope.MainCtrlRef.userImage = loadedData.userImage;
         }
 
@@ -111,7 +111,7 @@ function CustomTypesCtrl($state, $scope, contextFactory, $rootScope, fireFactory
         });
 
         angular.forEach($rootScope.MainCtrlRef.currentUserData.contexts, function (value, key) {
-            var userInContext= fireFactory.getUserInContextRef(key,$rootScope.MainCtrlRef.userId);
+            var userInContext = fireFactory.getUserInContextRef(key, $rootScope.MainCtrlRef.userId);
             userInContext.set(value);
         });
 
@@ -173,7 +173,7 @@ function TypeTemplateCtrl($scope, $rootScope) {
     $scope.typeParameterType = "";
 }
 
-function ItemPreviewCtrl($scope,fireFactory) {
+function ItemPreviewCtrl($scope, fireFactory) {
 
     //$scope.$watch('previewedItem', function () {
     //    if ($scope.selectedItemId != null) {
@@ -190,10 +190,10 @@ function ItemPreviewCtrl($scope,fireFactory) {
         $scope.selectedItemType = $scope.getItemType($scope.selectedItem);
 
     };
-    $scope.getItemType = function(item){
-        if(item.hasOwnProperty("pollOptions")){
+    $scope.getItemType = function (item) {
+        if (item.hasOwnProperty("pollOptions")) {
             return "poll";
-        } else if(item.hasOwnProperty("eventDate")){
+        } else if (item.hasOwnProperty("eventDate")) {
             return "event";
         } else {
             return "group";
@@ -207,20 +207,19 @@ function ItemPreviewCtrl($scope,fireFactory) {
         }
 
         var userId = null;
-        if(item.hasOwnProperty('createdBy')){
+        if (item.hasOwnProperty('createdBy')) {
             userId = item.createdBy;
 
-        } else if (item.hasOwnProperty('owner')){
+        } else if (item.hasOwnProperty('owner')) {
             userId = item.owner;
         }
 
-        if(!item.imageLoaded)
-        {
+        if (!item.imageLoaded) {
             item.image = "img/space_invaders_small.jpg";
-            if(userId){
+            if (userId) {
                 var image = fireFactory.getUserImageSmallObject(userId);
-                image.$loaded().then(function(loadedData){
-                    if(loadedData.$value){
+                image.$loaded().then(function (loadedData) {
+                    if (loadedData.$value) {
                         item.image = loadedData.$value;
                     }
                 })
@@ -228,7 +227,7 @@ function ItemPreviewCtrl($scope,fireFactory) {
             item.imageLoaded = true;
         }
 
-       return itemClass;
+        return itemClass;
     };
 }
 
@@ -278,7 +277,7 @@ function CurrentGroupsCtrl($scope, fireFactory) {
 }
 
 function GroupTemplateCtrl($rootScope, $scope, contextFactory, $state, fireFactory) {
-    var syncObj = fireFactory.getDataTypeObjectById('groups',$scope.selectedItemId);
+    var syncObj = fireFactory.getDataTypeObjectById('groups', $scope.selectedItemId);
     syncObj.$bindTo($scope, "selectedItem");
     $scope.toggle = function (scope) {
         scope.toggle();
@@ -300,7 +299,7 @@ function GroupTemplateCtrl($rootScope, $scope, contextFactory, $state, fireFacto
             $rootScope.MainCtrlRef.currentUserData.contexts[tag.tagContext]++;
         }
 
-        var userInContext= fireFactory.getUserInContextRef(tag.tagContext,$rootScope.MainCtrlRef.userId);
+        var userInContext = fireFactory.getUserInContextRef(tag.tagContext, $rootScope.MainCtrlRef.userId);
         userInContext.set($rootScope.MainCtrlRef.currentUserData.contexts[tag.tagContext]);
 
         $rootScope.MainCtrlRef.currentUserData.interactedGroups[$scope.selectedItemId] = true;
@@ -354,7 +353,7 @@ function GroupAddCtrl($scope, $state, $rootScope, $stateParams, fireFactory) {
 }
 function _update(srcObj, destObj) {
     for (var key in destObj) {
-        if(destObj.hasOwnProperty(key) && srcObj.hasOwnProperty(key)) {
+        if (destObj.hasOwnProperty(key) && srcObj.hasOwnProperty(key)) {
             destObj[key] = srcObj[key];
         }
     }
@@ -468,7 +467,7 @@ function TagContextCtrl($scope, contextFactory) {
     $scope.tags = '';
     $scope.manualTags = '';
 
-    $scope.addTag = function(tag){
+    $scope.addTag = function (tag) {
 
 
         if (!$scope.tagContext) {
@@ -479,14 +478,14 @@ function TagContextCtrl($scope, contextFactory) {
         }
         $scope.tagContext[tag.tagContext].push(tag);
 
-        if($scope.addTagCallback){
+        if ($scope.addTagCallback) {
             $scope.addTagCallback(tag);
         }
         $scope.tags = '';
         $scope.manualTags = '';
     };
 
-    $scope.addManualTag = function(tags,inputTagContext){
+    $scope.addManualTag = function (tags, inputTagContext) {
 
         var context = {};
         var tagId = guid();
@@ -506,15 +505,15 @@ function TagContextCtrl($scope, contextFactory) {
         }
 
         $scope.tagContext[inputTagContext].push(context[tagId]);
-        if($scope.addManualTagCallback){
-            $scope.addManualTagCallback(tags,inputTagContext);
+        if ($scope.addManualTagCallback) {
+            $scope.addManualTagCallback(tags, inputTagContext);
         }
 
         $scope.tags = '';
         $scope.manualTags = '';
     };
 
-    $scope.removeTag = function(key, tagToBeRemoved){
+    $scope.removeTag = function (key, tagToBeRemoved) {
         var index = arrayObjectIndexOf($scope.tagContext[key], tagToBeRemoved, "tagId");
 
         $scope.tagContext[key].splice(index, 1);
@@ -523,7 +522,7 @@ function TagContextCtrl($scope, contextFactory) {
             delete $scope.tagContext[key];
         }
 
-        if($scope.removeTagCallback){
+        if ($scope.removeTagCallback) {
             $scope.removeTagCallback(key, tagToBeRemoved);
         }
     };
@@ -538,7 +537,7 @@ function TagContextCtrl($scope, contextFactory) {
 
 }
 
-function EventCtrl($scope, $rootScope, fireFactoryForEvent, $state, contextFactory, MEMBER) {
+function EventCtrl($scope, $rootScope, fireFactory, $state, contextFactory, MEMBER) {
 
 
     $scope.getEventTags = contextFactory.getTagContext;
@@ -617,7 +616,7 @@ function EventCtrl($scope, $rootScope, fireFactoryForEvent, $state, contextFacto
         }
 
         var strippedEvents = angular.fromJson(angular.toJson($scope.createdEvent));
-        var fireBaseObj = fireFactoryForEvent.getEventsRef().push(strippedEvents);
+        var fireBaseObj = fireFactory.getEventsRef().push(strippedEvents);
 
         if (!$rootScope.MainCtrlRef.currentUserData.createdEvents) {
             $rootScope.MainCtrlRef.currentUserData.createdEvents = {};
@@ -628,7 +627,7 @@ function EventCtrl($scope, $rootScope, fireFactoryForEvent, $state, contextFacto
         }
 
         angular.forEach($scope.createdEvent.eventTagContext, function (value, key) {
-            var contextEventsRef = fireFactoryForEvent.getEventsInContextRef(key);
+            var contextEventsRef = fireFactory.getEventsInContextRef(key);
             var eventLinkObject = {};
             eventLinkObject[fireBaseObj.key()] = value.length;
             contextEventsRef.update(eventLinkObject);
@@ -644,8 +643,8 @@ function EventCtrl($scope, $rootScope, fireFactoryForEvent, $state, contextFacto
         $rootScope.MainCtrlRef.currentUserData.$save().then(function () {
             $scope.loading = false;
 
-                alert("Your event created!");
-                $state.go('activity.events2');
+            alert("Your event created!");
+            $state.go('activity.events2');
 
 
         });
@@ -654,29 +653,28 @@ function EventCtrl($scope, $rootScope, fireFactoryForEvent, $state, contextFacto
     };
 
 }
-function ProfileCtrl($scope, $rootScope, fireFactory){
+function ProfileCtrl($scope, $rootScope, fireFactory) {
     $scope.init = function () {
         $rootScope.MainCtrlRef.currentUserData.$loaded().then(function (loadedData) {
             $scope.userContexts = loadedData.contexts;
             $scope.contexts = fireFactory.getContextsObject();
             $scope.contexts.$loaded().then(function () {
-                var recommendedPeople = {totalCount: 0 ,array:[]};
+                var recommendedPeople = {totalCount: 0, array: []};
                 angular.forEach($scope.userContexts, function (value, key) {
                     if (!$scope.contexts[key]) {
                         return;
                     }
-                    findAndCalculate('users', $scope.contexts[key], loadedData,recommendedPeople,value ,key);
+                    findAndCalculate('users', $scope.contexts[key], loadedData, recommendedPeople, value, key);
                 });
-                sortByValue(recommendedPeople.array,'count');
-                $scope.people = calculateWeightAndDecide(recommendedPeople,fireFactory.getUserObject);
+                sortByValue(recommendedPeople.array, 'count');
+                $scope.people = calculateWeightAndDecide(recommendedPeople, fireFactory.getUserObject);
             })
         });
     };
 
 
     $scope.getClass = function (item) {
-        if(!item.userImageSmall)
-        {
+        if (!item.userImageSmall) {
             item.userImageSmall = "img/space_invaders_small.jpg";
         }
 
@@ -692,7 +690,7 @@ function CommentCtrl($scope, $rootScope) {
 
     $scope.addComments = function () {
 
-        if(!$scope.itemComment){
+        if (!$scope.itemComment) {
             $scope.itemComment = [];
         }
 
@@ -703,7 +701,7 @@ function CommentCtrl($scope, $rootScope) {
             "commentDateTime": new Date().getTime()
         });
 
-        if($scope.addCommentCallback){
+        if ($scope.addCommentCallback) {
 
             $scope.addCommentCallback($scope.commentBody);
 
@@ -741,24 +739,24 @@ function HomeCtrl($scope, $rootScope, fireFactory) {
             $scope.userContexts = loadedData.contexts;
             $scope.contexts = fireFactory.getContextsObject();
             $scope.contexts.$loaded().then(function () {
-                var recommendedPolls = {totalCount: 0 ,array:[]};
-                var recommendedGroups = {totalCount: 0 ,array:[]};
-                var recommendedEvents = {totalCount: 0 ,array:[]};
+                var recommendedPolls = {totalCount: 0, array: []};
+                var recommendedGroups = {totalCount: 0, array: []};
+                var recommendedEvents = {totalCount: 0, array: []};
                 angular.forEach($scope.userContexts, function (value, key) {
                     if (!$scope.contexts[key]) {
                         return;
                     }
-                    findAndCalculate('polls', $scope.contexts[key], loadedData,recommendedPolls,value ,key);
-                    findAndCalculate('groups', $scope.contexts[key], loadedData,recommendedGroups,value ,key);
-                    findAndCalculate('events', $scope.contexts[key], loadedData,recommendedEvents,value ,key);
+                    findAndCalculate('polls', $scope.contexts[key], loadedData, recommendedPolls, value, key);
+                    findAndCalculate('groups', $scope.contexts[key], loadedData, recommendedGroups, value, key);
+                    findAndCalculate('events', $scope.contexts[key], loadedData, recommendedEvents, value, key);
 
                 });
-                sortByValue(recommendedPolls.array,'count');
-                sortByValue(recommendedGroups.array,'count');
-                sortByValue(recommendedEvents.array,'count');
-                $scope.polls = calculateWeightAndDecide(recommendedPolls,fireFactory.getPollObject);
-                $scope.groups = calculateWeightAndDecide(recommendedGroups,fireFactory.getGroupObject);
-                $scope.events = calculateWeightAndDecide(recommendedEvents,fireFactory.getEventObject);
+                sortByValue(recommendedPolls.array, 'count');
+                sortByValue(recommendedGroups.array, 'count');
+                sortByValue(recommendedEvents.array, 'count');
+                $scope.polls = calculateWeightAndDecide(recommendedPolls, fireFactory.getPollObject);
+                $scope.groups = calculateWeightAndDecide(recommendedGroups, fireFactory.getGroupObject);
+                $scope.events = calculateWeightAndDecide(recommendedEvents, fireFactory.getEventObject);
             })
         });
 
@@ -769,73 +767,73 @@ function HomeCtrl($scope, $rootScope, fireFactory) {
     $scope.searchTerm = '';
     $scope.$watch('searchTerm', function () {
 
-        if($scope.searchTerm.length > 0) {
+        if ($scope.searchTerm.length > 0) {
             $scope.groups = '';
             $scope.polls = '';
             var searchResultGroup = [];
             var searchResultPoll = [];
             angular.forEach($scope.groupsFromDB, function (value, key) {
-                console.log("value: " +  value.description + " key: " + key);
+                console.log("value: " + value.description + " key: " + key);
                 var tempSearchTerm = $scope.searchTerm;
                 var tempDescription = value.description;
                 tempSearchTerm = angular.lowercase(tempSearchTerm);
                 tempDescription = angular.lowercase(tempDescription);
-                if(tempDescription.search(tempSearchTerm) > -1) {
-                    searchResultGroup.push({key:key,value:fireFactory.getDataTypeObjectById("groups",key)});
+                if (tempDescription.search(tempSearchTerm) > -1) {
+                    searchResultGroup.push({key: key, value: fireFactory.getDataTypeObjectById("groups", key)});
                 }
             });
 
             angular.forEach($scope.pollsFromDB, function (value, key) {
-                console.log("value: " +  value.description + " key: " + key);
+                console.log("value: " + value.description + " key: " + key);
                 var tempSearchTerm = $scope.searchTerm;
                 var tempDescription = value.description;
                 tempSearchTerm = angular.lowercase(tempSearchTerm);
                 tempDescription = angular.lowercase(tempDescription);
-                if(tempDescription.search(tempSearchTerm) > -1) {
-                    searchResultPoll.push({key:key,value:fireFactory.getDataTypeObjectById("polls",key)});
+                if (tempDescription.search(tempSearchTerm) > -1) {
+                    searchResultPoll.push({key: key, value: fireFactory.getDataTypeObjectById("polls", key)});
                 }
             });
             $scope.groups = searchResultGroup;
             $scope.polls = searchResultPoll;
         }
-        else{
+        else {
             $scope.init();
         }
     });
 
 }
 
-function calculateWeightAndDecide(recommendation,getObjectCallback){
+function calculateWeightAndDecide(recommendation, getObjectCallback) {
     var excessWeight = 0;
     var result = [];
     var staticTotalRecToShow = 5;
     var totalRecToShow = staticTotalRecToShow;
-    for(var i =0; i<recommendation.array.length; i++){
+    for (var i = 0; i < recommendation.array.length; i++) {
         var item = recommendation.array[i];
-        var weightOfItem = Math.round((item.count/recommendation.totalCount) * staticTotalRecToShow)+ excessWeight;
+        var weightOfItem = Math.round((item.count / recommendation.totalCount) * staticTotalRecToShow) + excessWeight;
         //Since we sorted from top to bottom if weights are equally distributed we can get a zero
         //value. So round it up to 1
-        if(weightOfItem == 0){
+        if (weightOfItem == 0) {
             weightOfItem = 1;
         }
-        if(totalRecToShow < 1){
+        if (totalRecToShow < 1) {
             break;
         }
 
         var concatValue = weightOfItem;
-        if(totalRecToShow - weightOfItem < 0){
+        if (totalRecToShow - weightOfItem < 0) {
             concatValue = totalRecToShow;
-        } else if(item.array.length < weightOfItem){
+        } else if (item.array.length < weightOfItem) {
             excessWeight = excessWeight + (weightOfItem - item.array.length);
             concatValue = item.array.length;
         }
 
         var skipCount = 0;
-        for(var y = 0; y < concatValue ; y++){
-            if(!item.array[y] || hasItem(result,item.array[y].id)){
+        for (var y = 0; y < concatValue; y++) {
+            if (!item.array[y] || hasItem(result, item.array[y].id)) {
                 skipCount++;
-            } else{
-                result.push({key:item.array[y].id,value:getObjectCallback(item.array[y].id)});
+            } else {
+                result.push({key: item.array[y].id, value: getObjectCallback(item.array[y].id)});
             }
         }
         totalRecToShow = totalRecToShow - concatValue + skipCount;
@@ -845,15 +843,15 @@ function calculateWeightAndDecide(recommendation,getObjectCallback){
 
 }
 
-function hasItem(arrayInput, keyInput){
-    for(var y = 0; y < arrayInput.length ; y++){
-        if(arrayInput[y].key == keyInput){
+function hasItem(arrayInput, keyInput) {
+    for (var y = 0; y < arrayInput.length; y++) {
+        if (arrayInput[y].key == keyInput) {
             return true;
         }
     }
     return false;
 }
-function findAndCalculate(itemType, contextItem, userData, outputObject,inputValue,inputKey) {
+function findAndCalculate(itemType, contextItem, userData, outputObject, inputValue, inputKey) {
     var union = [];
     var capitalItemType = capitalizeFirstLetter(itemType);
     angular.forEach(contextItem[itemType], function (value, key) {
@@ -869,11 +867,11 @@ function findAndCalculate(itemType, contextItem, userData, outputObject,inputVal
         if (userData['$id'] && userData.$id == key) {
             return;
         }
-        union.push({count:value,id:key});
+        union.push({count: value, id: key});
     });
 
-    sortByValue(union,'count');
-    if(union.length != 0){
+    sortByValue(union, 'count');
+    if (union.length != 0) {
         outputObject.totalCount = outputObject.totalCount + inputValue;
         outputObject.array.push({
             count: inputValue,
@@ -882,9 +880,9 @@ function findAndCalculate(itemType, contextItem, userData, outputObject,inputVal
         });
     }
 }
-function sortByValue(items,sortProperty) {
+function sortByValue(items, sortProperty) {
     items.sort(function (a, b) {
-        if(sortProperty){
+        if (sortProperty) {
             return b[sortProperty] - a[sortProperty]
         } else {
             return b[Object.keys(b)[0]] - a[Object.keys(a)[0]]
@@ -955,8 +953,8 @@ angular
         $templateCache.put("ipv4.html", "<div><input type='text' class='form-control' data-mask='999.999.999.9999' ng-model='nodeValue.nodeData'><span class='help-block'>192.168.100.200</span></div>");
         $templateCache.put("ipv4_view.html", "<div><input type='text' class='form-control' data-mask='999.999.999.9999' ng-disabled='true' ng-model='nodeValue.nodeData'><span class='help-block'>192.168.100.200</span></div>");
     }])
-    .factory('fireFactory', ['$firebaseObject',
-        function fireFactory($firebaseObject) {
+    .factory('fireFactory', ['$firebaseObject', '$firebaseArray',
+        function fireFactory($firebaseObject, $firebaseArray) {
             var helperFactory = {};
             helperFactory.firebaseRef = function (path) {
                 var baseUrl = "https://resplendent-fire-2746.firebaseio.com";
@@ -966,72 +964,120 @@ angular
             helperFactory.getUserRef = function (uid) {
                 return helperFactory.firebaseRef().child('users').child(uid);
             };
-            helperFactory.getUserObject = function (uid) {
-                return $firebaseObject(helperFactory.getUserRef(uid));
-            };
-            helperFactory.getUserImageSmallObject = function (uid) {
-                return $firebaseObject(helperFactory.getUserRef(uid).child("userImageSmall"));
-            };
             helperFactory.getDataRef = function () {
                 return helperFactory.firebaseRef().child('data');
             };
 
+            ///Plural References
             helperFactory.getGroupsRef = function () {
                 return helperFactory.getDataRef().child('groups');
-            };
-
-            helperFactory.getGroupsObject = function () {
-                return $firebaseObject(helperFactory.getGroupsRef());
-            };
-
-            helperFactory.getGroupRef = function (uid) {
-                return helperFactory.getGroupsRef().child(uid);
-            };
-
-            helperFactory.getGroupObject = function (uid) {
-                return $firebaseObject(helperFactory.getGroupRef(uid));
             };
             helperFactory.getPollsRef = function () {
                 return helperFactory.getDataRef().child('polls');
             };
-            helperFactory.getPollRef = function (uid) {
-                return helperFactory.getPollsRef().child(uid);
-            };
 
-            helperFactory.getPollObject = function (uid) {
-                return $firebaseObject(helperFactory.getPollRef(uid));
+            helperFactory.getEventsRef = function () {
+                return helperFactory.getDataRef().child('events');
             };
 
             helperFactory.getContextsRef = function () {
                 return helperFactory.getDataRef().child('contexts');
             };
 
-            helperFactory.getContextsObject = function () {
-                return $firebaseObject(helperFactory.getContextsRef());
+            helperFactory.getGroupsInContextRef = function (context) {
+                return helperFactory.getContextRef(context).child('groups');
             };
 
-            helperFactory.getGroupsInContextRef = function (context) {
-                return helperFactory.getContextsRef().child(context).child('groups');
+            helperFactory.getUsersInContextRef = function (context) {
+                return helperFactory.getContextRef(context).child('users');
+            };
+
+            helperFactory.getEventsInContextRef = function (context) {
+                return helperFactory.getContextRef(context).child('events');
+            };
+
+
+            ///Singular References
+            helperFactory.getGroupRef = function (uid) {
+                return helperFactory.getGroupsRef().child(uid);
+            };
+
+            helperFactory.getPollRef = function (uid) {
+                return helperFactory.getPollsRef().child(uid);
+            };
+
+            helperFactory.getEventRef = function (uid) {
+                return helperFactory.getEventsRef().child(uid);
+            };
+
+            helperFactory.getContextRef = function (context) {
+                return helperFactory.getContextsRef().child(context);
+            };
+
+
+            ///Plural Objects
+            helperFactory.getGroupsObject = function () {
+                return $firebaseObject(helperFactory.getGroupsRef());
+            };
+
+            helperFactory.getPollsObject = function () {
+                return $firebaseObject(helperFactory.getPollsRef());
+            };
+
+            helperFactory.getEventsObject = function () {
+                return $firebaseObject(helperFactory.getEventsRef());
+            };
+
+            helperFactory.getContextsObject = function () {
+                return $firebaseObject(helperFactory.getContextsRef());
             };
 
             helperFactory.getGroupsInContextObject = function (context) {
                 return $firebaseObject(helperFactory.getGroupsInContextRef(context));
             };
 
-            helperFactory.getUsersInContextRef = function (context) {
-                return helperFactory.getContextsRef().child(context).child('users');
-            };
-
             helperFactory.getUsersInContextObject = function (context) {
                 return $firebaseObject(helperFactory.getGroupsInContextRef(context));
             };
 
-            helperFactory.getUserInContextRef = function (context,userId) {
+            helperFactory.getEventsInContextObject = function (context) {
+                $firebaseObject(helperFactory.getEventsInContextRef(context));
+            };
+
+            ///Singular Objects
+            helperFactory.getUserObject = function (uid) {
+                return $firebaseObject(helperFactory.getUserRef(uid));
+            };
+
+            helperFactory.getGroupObject = function (uid) {
+                return $firebaseObject(helperFactory.getGroupRef(uid));
+            };
+
+            helperFactory.getPollObject = function (uid) {
+                return $firebaseObject(helperFactory.getPollRef(uid));
+            };
+
+            helperFactory.getEventObject = function (uid) {
+                return $firebaseObject(helperFactory.getEventRef(uid));
+            };
+
+            helperFactory.getEventTagRef = function (uid) {
+                return helperFactory.getEventRef(uid).child("eventTags");
+            };
+
+            helperFactory.getEventTagArray = function (uid) {
+                return $firebaseArray(helperFactory.getEventTagRef(uid));
+            };
+
+
+
+            ///Specific Helpers
+            helperFactory.getUserInContextRef = function (context, userId) {
                 return helperFactory.getUsersInContextRef(context).child(userId);
             };
 
-            helperFactory.getUserInContextObject = function (context,userId) {
-                return $firebaseObject(helperFactory.getUserInContextRef(context,userId));
+            helperFactory.getUserInContextObject = function (context, userId) {
+                return $firebaseObject(helperFactory.getUserInContextRef(context, userId));
             };
 
             helperFactory.getFieldObject = function (groupId, fieldId) {
@@ -1042,12 +1088,12 @@ angular
                 return $firebaseObject(helperFactory.getGroupsRef().child(groupId).child('fields').child(fieldId).child('content').child(contentId));
             };
 
-            helperFactory.getDataTypeObjectById = function (dataType,id) {
+            helperFactory.getDataTypeObjectById = function (dataType, id) {
                 return $firebaseObject(helperFactory.getDataRef().child(dataType).child(id));
             };
 
-            helperFactory.getEventsRef = function () {
-                return helperFactory.getDataRef().child('events');
+            helperFactory.getUserImageSmallObject = function (uid) {
+                return $firebaseObject(helperFactory.getUserRef(uid).child("userImageSmall"));
             };
 
             helperFactory.getGroupsObjectAll = function () {
@@ -1056,15 +1102,14 @@ angular
             helperFactory.getPollsObjectAll = function () {
                 return $firebaseObject(helperFactory.getPollsRef());
             };
-            helperFactory.getPollsRef = function () {
-                return helperFactory.firebaseRef().child('data').child('polls');
-            };
+
+
 
             return helperFactory;
 
 
         }]
-)
+    )
     .factory('contextFactory', ['$http', '$rootScope',
         function contextFactory($http) {
             var helperFactory = {};
@@ -1138,63 +1183,4 @@ angular
 
             return helperFactory;
         }]
-).factory('fireFactoryForEvent', ['$firebaseObject', '$firebaseArray',
-        function fireFactory($firebaseObject, $firebaseArray) {
-
-            var helperFactory = {};
-
-            helperFactory.firebaseRef = function (path) {
-                var baseUrl = "https://resplendent-fire-2746.firebaseio.com";
-                path = (path !== '' && path) ? baseUrl + '/' + path : baseUrl;
-                return new Firebase(path);
-            };
-
-            helperFactory.getUserRef = function (uid) {
-                return helperFactory.firebaseRef().child('users').child(uid);
-            };
-
-            helperFactory.getUserObject = function (uid) {
-                return $firebaseObject(helperFactory.getUserRef(uid));
-            };
-
-            helperFactory.getEventRef = function (uid) {
-                return helperFactory.firebaseRef().child('data').child('events').child(uid);
-            };
-
-            helperFactory.getEventObject = function (uid) {
-                return $firebaseObject(helperFactory.getEventRef(uid));
-            };
-
-            helperFactory.getEventTagRef = function (uid) {
-                return helperFactory.firebaseRef().child('data').child('events').child(uid).child("eventTags");
-            };
-
-            helperFactory.getEventTagArray = function (uid) {
-                return $firebaseArray(helperFactory.getEventTagRef(uid));
-            };
-
-            helperFactory.getEventsRef = function () {
-                return helperFactory.firebaseRef().child('data').child('events');
-            };
-
-            helperFactory.getEventsObject = function () {
-                return $firebaseObject(helperFactory.getEventsRef());
-            };
-
-            helperFactory.getFieldObject = function (eventId, fieldId) {
-                return $firebaseObject(helperFactory.getEventsRef().child(eventId).child('fields').child(fieldId));
-            };
-
-            helperFactory.getContentObject = function (eventId, fieldId, contentId) {
-                return $firebaseObject(helperFactory.getEventsRef().child(eventId).child('fields').child(fieldId).child('content').child(contentId));
-            };
-
-            helperFactory.getEventsInContextRef = function (context) {
-                return helperFactory.firebaseRef().child('data').child('contexts').child(context).child('events');
-            };
-            helperFactory.getDataTypeObjectById = function (dataType, id) {
-                return $firebaseObject(helperFactory.firebaseRef().child('data').child(dataType).child(id));
-            };
-            return helperFactory;
-
-        }]);
+    );
