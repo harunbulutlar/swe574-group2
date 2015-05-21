@@ -1,41 +1,52 @@
-<!DOCTYPE html>
-<html>
-<head lang="en">
-    <meta charset="UTF-8">
-    <title>Create an Event</title>
-</head>
-<body>
-
 <div class="wrapper wrapper-content animated fadeInRight">
     <div class="row show-grid">
         <div class="col-lg-6">
             <div class="ibox float-e-margins">
                 <div class="ibox-title">
+                    <h5>Create an Event</h5>
                     <div ibox-tools></div>
                 </div>
                 <div class="ibox-content">
-                    <div class=" form-group"><label>Event Title</label> <input type="text"
-                                                                               ng-model="eventTitle"
-                                                                               placeholder="Enter a Title for your event"
-                                                                               class="form-control"
-                                                                               required="">
+                    <div class=" form-group"><label>Title</label> <input type="text"
+                                                                         ng-model="createdEvent.eventTitle"
+                                                                         placeholder="Enter a Title for your event"
+                                                                         class="form-control"
+                                                                         required="">
                     </div>
-                    <div class=" form-group"><label>Event Details</label>
+                    <div class=" form-group"><label>Details</label>
                                                                     <textarea
                                                                             placeholder="Enter a details for your event"
-                                                                            ng-model="eventDesc"
+                                                                            ng-model="createdEvent.eventDescription"
                                                                             class="form-control"></textarea>
                     </div>
-                    <div class=" form-group"><label>Event Location</label> <input type="text"
-                                                                                  placeholder="Enter a location for your event"
-                                                                                  ng-model="eventLocation"
-                                                                                  class="form-control"
-                                                                                  required="">
+
+                    <div class="form-group"><label>Just For: </label>
+
+                        <div class="radio"><label> <input type="radio" value="friends" id="friendsRadio"
+                                                          ng-checked="true"
+                                                          name="privacyRadios"
+                                                          ng-model="createdEvent.eventPrivacy">Friends</label>
+                        </div>
+                        <div class=" radio"><label> <input type="radio" value="public" id="publicRadio"
+                                                           name="privacyRadios"
+                                                           ng-model="createdEvent.eventPrivacy">Public</label>
+                        </div>
+                        <select class="form-control MultiSelect" data-placeholder="Roles"
+                                ng-model="createdEvent.eventRoles"
+                                ng-options="roles for roles in eventRoles" multiple="multiple" multiselect-dropdown>
+                        </select>
                     </div>
-                    <div class=" form-group"><label>Event Time</label> <div class='input-group date'>
+
+                    <div class=" form-group"><label>Place</label> <input type="text"
+                                                                         placeholder="Enter a location for your event"
+                                                                         ng-model="createdEvent.eventLocation"
+                                                                         class="form-control"
+                                                                         required="">
+                    </div>
+                    <div class=" form-group"><label>Time</label> <div class='input-group date'>
                         <input type='datetime' class='form-control' date-time
                                view='date'
-                               ng-model="eventDate"
+                               ng-model="createdEvent.eventDate"
                                required=""><span
                             class='input-group-addon'><i class='fa fa-calendar'></i></span></div>
                     </div>
