@@ -520,40 +520,120 @@ function TagContextCtrl($scope, contextFactory) {
 
 }
 
-function EventCtrl($scope, fireFactory,$rootScope, $stateParams, $firebaseObject) {
-
-    $scope.eventTitle = '';
-    $scope.eventDesc = '';
-    $scope.eventDate = '';
-    $scope.eventLocation = '';
+function EventCtrl($scope, $rootScope, fireFactoryForEvent, $state, contextFactory, MEMBER) {
 
 
-    $scope.events = $firebaseObject(fireFactory.getEventsRef());
-    console.log($scope.events);
+    $scope.getEventTags = contextFactory.getTagContext;
+    $scope.eventCommentTempList = [];
 
+    $scope.eventTags = '';
+    $scope.eventManualTags = '';
+
+    $scope.eventRoles = MEMBER.MEMBER_ROLES;
+
+    $scope.initializeEvent = function () {
+        $scope.createdEvent = {
+            eventPrivacy: "",
+            eventTitle: "",
+            eventDescription: "",
+            eventLocation: "",
+            eventDate: "",
+            createdBy: "",
+            createDate: "",
+            updateDate: "",
+            eventTagContext: {},
+            eventParticipantList: [],
+            eventComments: [],
+            eventRoles: [],
+            ownerName: $rootScope.MainCtrlRef.currentUserData.userName
+        };
+
+        $scope.initializeUser();
+    };
+
+    $scope.initializeUser = function () {
+        $scope.currentUserId = $rootScope.MainCtrlRef.userId;
+        $scope.currentUserName = $rootScope.MainCtrlRef.currentUserData.userName;
+        $scope.currentUserIsAdmin = $rootScope.MainCtrlRef.currentUserData.isAdmin;
+    };
+
+    $scope.initializeEvent();
+    $scope.createdEvent.createdBy = $scope.currentUserId;
+    $scope.createdEvent.createDate = new Date();
+    $scope.createdEvent.updateDate = new Date();
+
+    $scope.addEventComment = function () {
+
+        $scope.createdEvent.eventComments.push({
+            "commentBody": $scope.eventCommentTempList.commentBody,
+            "commentUserId": $scope.currentUserId,
+            "commentUserName": $scope.currentUserName,
+            "commentDateTime": new Date().getTime()
+        });
+
+        $scope.eventCommentTempList.commentBody = '';
+
+    };
 
     $scope.saveEventData = function () {
-        console.log("Event saved!");
-        var eventTitle = $scope.eventTitle.trim();
-        var eventDesc = $scope.eventDesc.trim();
-        var eventDate = $scope.eventDate;
-        var eventLocation = $scope.eventLocation;
 
+        if (!$scope.createdEvent.eventTitle) {
 
-        $scope.createdEvent = {};
-        $scope.createdEvent["title"] = eventTitle;
-        $scope.createdEvent["description"] = eventDesc;
-        $scope.createdEvent["ownerName"] = $rootScope.MainCtrlRef.currentUserData.userName;
-        $scope.createdEvent["eventDate"] = eventDate;
-        $scope.createdEvent["eventLocation"] = eventLocation;
-        $scope.createdEvent["users"] = [];
+            alert("You need to enter a title for your event!");
+            return;
+
+        }
+
+        if (!$scope.createdEvent.eventDescription) {
+
+            alert("You need to enter a description for your event!");
+            return;
+
+        }
+
+        if (!$scope.createdEvent.eventDate) {
+
+            alert("You need to enter a date for your event!");
+            return;
+
+        }
 
         var strippedEvents = angular.fromJson(angular.toJson($scope.createdEvent));
+        var fireBaseObj = fireFactoryForEvent.getEventsRef().push(strippedEvents);
 
-        var fireBaseObj = fireFactory.getEventsRef().push(strippedEvents);
-        alert("Event is created.");
+        if (!$rootScope.MainCtrlRef.currentUserData.createdEvents) {
+            $rootScope.MainCtrlRef.currentUserData.createdEvents = {};
+        }
 
-    }
+        if (!$rootScope.MainCtrlRef.currentUserData.contexts) {
+            $rootScope.MainCtrlRef.currentUserData.contexts = {};
+        }
+
+        angular.forEach($scope.createdEvent.eventTagContext, function (value, key) {
+            var contextEventsRef = fireFactoryForEvent.getEventsInContextRef(key);
+            var eventLinkObject = {};
+            eventLinkObject[fireBaseObj.key()] = value.length;
+            contextEventsRef.update(eventLinkObject);
+            if (!$rootScope.MainCtrlRef.currentUserData.contexts[key]) {
+                $rootScope.MainCtrlRef.currentUserData.contexts[key] = 1;
+                return;
+            }
+            $rootScope.MainCtrlRef.currentUserData.contexts[key]++;
+        });
+
+        $rootScope.MainCtrlRef.currentUserData.createdEvents[fireBaseObj.key()] = true;
+        $scope.loading = true;
+        $rootScope.MainCtrlRef.currentUserData.$save().then(function () {
+            $scope.loading = false;
+
+                alert("Your event created!");
+                $state.go('activity.events2');
+
+
+        });
+
+
+    };
 
 }
 
@@ -876,4 +956,63 @@ angular
 
             return helperFactory;
         }]
-);
+).factory('fireFactoryForEvent', ['$firebaseObject', '$firebaseArray',
+        function fireFactory($firebaseObject, $firebaseArray) {
+
+            var helperFactory = {};
+
+            helperFactory.firebaseRef = function (path) {
+                var baseUrl = "https://resplendent-fire-2746.firebaseio.com";
+                path = (path !== '' && path) ? baseUrl + '/' + path : baseUrl;
+                return new Firebase(path);
+            };
+
+            helperFactory.getUserRef = function (uid) {
+                return helperFactory.firebaseRef().child('users').child(uid);
+            };
+
+            helperFactory.getUserObject = function (uid) {
+                return $firebaseObject(helperFactory.getUserRef(uid));
+            };
+
+            helperFactory.getEventRef = function (uid) {
+                return helperFactory.firebaseRef().child('data').child('events').child(uid);
+            };
+
+            helperFactory.getEventObject = function (uid) {
+                return $firebaseObject(helperFactory.getEventRef(uid));
+            };
+
+            helperFactory.getEventTagRef = function (uid) {
+                return helperFactory.firebaseRef().child('data').child('events').child(uid).child("eventTags");
+            };
+
+            helperFactory.getEventTagArray = function (uid) {
+                return $firebaseArray(helperFactory.getEventTagRef(uid));
+            };
+
+            helperFactory.getEventsRef = function () {
+                return helperFactory.firebaseRef().child('data').child('events');
+            };
+
+            helperFactory.getEventsObject = function () {
+                return $firebaseObject(helperFactory.getEventsRef());
+            };
+
+            helperFactory.getFieldObject = function (eventId, fieldId) {
+                return $firebaseObject(helperFactory.getEventsRef().child(eventId).child('fields').child(fieldId));
+            };
+
+            helperFactory.getContentObject = function (eventId, fieldId, contentId) {
+                return $firebaseObject(helperFactory.getEventsRef().child(eventId).child('fields').child(fieldId).child('content').child(contentId));
+            };
+
+            helperFactory.getEventsInContextRef = function (context) {
+                return helperFactory.firebaseRef().child('data').child('contexts').child(context).child('events');
+            };
+            helperFactory.getDataTypeObjectById = function (dataType, id) {
+                return $firebaseObject(helperFactory.firebaseRef().child('data').child(dataType).child(id));
+            };
+            return helperFactory;
+
+        }]);

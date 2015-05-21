@@ -11,12 +11,9 @@ function PollCtrl($scope, $rootScope, $stateParams, $state, contextFactory, MEMB
     $scope.getPollTags = contextFactory.getTagContext;
     $scope.pollOptionTempList = [];
     $scope.pollCommentTempList = [];
-    $rootScope.pollTagTempList = [];
     $scope.tags = '';
     $scope.manualTags = '';
-
     $scope.pollRoles = MEMBER.MEMBER_ROLES;
-
     $scope.pollToBeViewed = $stateParams.pollToBeViewed;
 
     $scope.initializePoll = function () {
@@ -79,7 +76,7 @@ function PollCtrl($scope, $rootScope, $stateParams, $state, contextFactory, MEMB
 
         $scope.createdPoll.pollComments.push({
             "commentBody": $scope.pollCommentTempList.commentBody,
-            "commentUserEmail": $scope.currentUserId,
+            "commentUserId": $scope.currentUserId,
             "commentUserName": $scope.currentUserName,
             "commentDateTime": new Date().getTime()
         });
@@ -194,24 +191,6 @@ function PollCtrl($scope, $rootScope, $stateParams, $state, contextFactory, MEMB
 
         });
 
-
-    };
-
-}
-
-function PollTabCtrl($scope) {
-
-    var tabs = 1;
-
-    $scope.selectTab = function (setTab) {
-
-        tabs = setTab;
-
-    };
-
-    $scope.isSelected = function (checkTab) {
-
-        return tabs == checkTab;
 
     };
 
@@ -375,6 +354,24 @@ function CurrentPollsCtrl($scope, fireFactoryForPoll) {
 
 }
 
+function PollTabCtrl($scope) {
+
+    var tabs = 1;
+
+    $scope.selectTab = function (setTab) {
+
+        tabs = setTab;
+
+    };
+
+    $scope.isSelected = function (checkTab) {
+
+        return tabs == checkTab;
+
+    };
+
+}
+
 function calculateAverage(data) {
     var sum = data.reduce(function (sum, value) {
         return sum + value;
@@ -431,9 +428,9 @@ function dateDifference(date) {
 angular
     .module('socioactive')
     .controller('PollCtrl', PollCtrl)
-    .controller('PollTabCtrl', PollTabCtrl)
-    .controller('CurrentPollsCtrl', CurrentPollsCtrl)
     .controller('PollTemplateCtrl', PollTemplateCtrl)
+    .controller('CurrentPollsCtrl', CurrentPollsCtrl)
+    .controller('PollTabCtrl', PollTabCtrl)
     .factory('fireFactoryForPoll', ['$firebaseObject', '$firebaseArray',
         function fireFactory($firebaseObject, $firebaseArray) {
 
