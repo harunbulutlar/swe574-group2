@@ -1,14 +1,26 @@
 <div ng-controller="GroupViewCtrl">
     <div>
-        <script type="text/ng-template" id="view_renderer.html">
+        <script type="text/ng-template" id="nodes_renderer.html">
             <div ui-tree-handle class="tree-node tree-node-content">
                 <add-node-info node-value="node" node-type="'view'"></add-node-info>
             </div>
         </script>
-        <div ui-tree id="tree-root">
-            <ol ui-tree-nodes ng-model="content">
-                <li ng-repeat="node in content.data" ui-tree-node ng-include="'view_renderer.html'"></li>
+        <script type="text/ng-template" id="list_renderer.html">
+            <div ui-tree-handle class="tree-node tree-node-content">
+                <a class="pull-right btn btn-white btn-xs" data-nodrag ng-click="removeSubNode(subNode)"><span class="fa fa-trash"></span></a>
+            </div>
+            <ol ui-tree-nodes ng-model="subNode.data">
+                <li ng-repeat="node in subNode.data" ui-tree-node ng-include="'nodes_renderer.html'"></li>
+            </ol>
+        </script>
+        <div ng-if="content.type.data" ui-tree id="tree-root">
+            <ol ui-tree-nodes ng-model="field.type.data">
+                <li ng-repeat="node in content.type.data" ui-tree-node ng-include="'nodes_renderer.html'"></li>
             </ol>
         </div>
+        <div ng-if="!content.type.data">
+            <add-node-info node-value="content" node-type="'view'"></add-node-info>
+        </div>
+
     </div>
 </div>
