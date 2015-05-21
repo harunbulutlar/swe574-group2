@@ -761,46 +761,47 @@ function HomeCtrl($scope, $rootScope, fireFactory) {
                 $scope.events = calculateWeightAndDecide(recommendedEvents,fireFactory.getEventObject);
             })
         });
-        $scope.groupsFromDB = fireFactory.getGroupsObjectAll();
-        $scope.pollsFromDB = fireFactory.getPollsObjectAll();
-        $scope.searchTerm = '';
-        $scope.$watch('searchTerm', function () {
 
-            if($scope.searchTerm.length > 0) {
-                $scope.groups = '';
-                $scope.polls = '';
-                var searchResultGroup = [];
-                var searchResultPoll = [];
-                angular.forEach($scope.groupsFromDB, function (value, key) {
-                    console.log("value: " +  value.description + " key: " + key);
-                    var tempSearchTerm = $scope.searchTerm;
-                    var tempDescription = value.description;
-                    tempSearchTerm = angular.lowercase(tempSearchTerm);
-                    tempDescription = angular.lowercase(tempDescription);
-                    if(tempDescription.search(tempSearchTerm) > -1) {
-                        searchResultGroup.push({key:key,value:fireFactory.getDataTypeObjectById("groups",key)});
-                    }
-                });
-
-                angular.forEach($scope.pollsFromDB, function (value, key) {
-                    console.log("value: " +  value.description + " key: " + key);
-                    var tempSearchTerm = $scope.searchTerm;
-                    var tempDescription = value.description;
-                    tempSearchTerm = angular.lowercase(tempSearchTerm);
-                    tempDescription = angular.lowercase(tempDescription);
-                    if(tempDescription.search(tempSearchTerm) > -1) {
-                        searchResultPoll.push({key:key,value:fireFactory.getDataTypeObjectById("polls",key)});
-                    }
-                });
-                $scope.groups = searchResultGroup;
-                $scope.polls = searchResultPoll;
-            }
-            else{
-                $scope.init();
-            }
-        });
     };
     $scope.init();
+    $scope.groupsFromDB = fireFactory.getGroupsObjectAll();
+    $scope.pollsFromDB = fireFactory.getPollsObjectAll();
+    $scope.searchTerm = '';
+    $scope.$watch('searchTerm', function () {
+
+        if($scope.searchTerm.length > 0) {
+            $scope.groups = '';
+            $scope.polls = '';
+            var searchResultGroup = [];
+            var searchResultPoll = [];
+            angular.forEach($scope.groupsFromDB, function (value, key) {
+                console.log("value: " +  value.description + " key: " + key);
+                var tempSearchTerm = $scope.searchTerm;
+                var tempDescription = value.description;
+                tempSearchTerm = angular.lowercase(tempSearchTerm);
+                tempDescription = angular.lowercase(tempDescription);
+                if(tempDescription.search(tempSearchTerm) > -1) {
+                    searchResultGroup.push({key:key,value:fireFactory.getDataTypeObjectById("groups",key)});
+                }
+            });
+
+            angular.forEach($scope.pollsFromDB, function (value, key) {
+                console.log("value: " +  value.description + " key: " + key);
+                var tempSearchTerm = $scope.searchTerm;
+                var tempDescription = value.description;
+                tempSearchTerm = angular.lowercase(tempSearchTerm);
+                tempDescription = angular.lowercase(tempDescription);
+                if(tempDescription.search(tempSearchTerm) > -1) {
+                    searchResultPoll.push({key:key,value:fireFactory.getDataTypeObjectById("polls",key)});
+                }
+            });
+            $scope.groups = searchResultGroup;
+            $scope.polls = searchResultPoll;
+        }
+        else{
+            $scope.init();
+        }
+    });
 
 }
 
@@ -890,6 +891,7 @@ function sortByValue(items,sortProperty) {
         }
     });
 }
+
 function capitalizeFirstLetter(string) {
     return string.charAt(0).toUpperCase() + string.slice(1);
 }
