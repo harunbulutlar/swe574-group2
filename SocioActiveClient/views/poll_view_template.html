@@ -123,46 +123,7 @@
 
             <div class='form-group' ng-show="isSelected(1)">
 
-                <div class="panel pre-scrollable">
-                    <div class="feed-activity-list"
-                         ng-repeat="comment in selectedItem.pollComments">
-
-                        <div class="feed-element">
-
-                            <a ui-sref="profile" class="pull-left">
-                                <img alt="image" class="img-circle" src="img/a5.jpg">
-                            </a>
-
-                            <div class="media-body ">
-                                <small class="pull-right">
-                                    {{pollCommentDateDifference(comment.commentDateTime)}}
-                                    ago
-                                </small>
-                                <strong>{{comment.commentUserName}}</strong> posted a message
-                                <br>
-                                <small class="text-muted">{{comment.commentDateTime |
-                                    date:'yyyy-MM-dd
-                                    HH:mm'}}
-                                </small>
-                                <div class="well">
-                                    {{comment.commentBody}}
-                                </div>
-                            </div>
-
-                        </div>
-
-                    </div>
-                </div>
-
-                <form name='addComment' ng-submit="addPollCommentForView()">
-
-                            <textarea ng-model="pollCommentTempList.commentBody"
-                                      placeholder="Post anything on your mind!"
-                                      class="form-control" required=""></textarea>
-
-                    <button type="submit" class="btn btn-primary">Post Comment</button>
-
-                </form>
+                <comment-template item-comment="selectedItem.pollComments" add-comment-callback="addPollCommentForView"></comment-template>
 
             </div>
 

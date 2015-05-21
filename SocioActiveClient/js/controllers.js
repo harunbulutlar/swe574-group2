@@ -524,7 +524,7 @@ function TagContextCtrl($scope, contextFactory) {
         }
 
         if($scope.removeTagCallback){
-            $scope.removeTagCallback(key, id);
+            $scope.removeTagCallback(key, tagToBeRemoved);
         }
     };
 
@@ -688,6 +688,53 @@ function ProfileCtrl($scope, $rootScope, fireFactory){
     $scope.init();
 
 }
+function CommentCtrl($scope, $rootScope) {
+
+    $scope.addComments = function () {
+
+        if(!$scope.itemComment){
+            $scope.itemComment = [];
+        }
+
+        $scope.itemComment.push({
+            "commentBody": $scope.commentBody,
+            "commentUserId": $rootScope.MainCtrlRef.userId,
+            "commentUserName": $rootScope.MainCtrlRef.currentUserData.userName,
+            "commentDateTime": new Date().getTime()
+        });
+
+        if($scope.addCommentCallback){
+
+            $scope.addCommentCallback($scope.commentBody);
+
+        }
+        $scope.commentBody = '';
+    };
+
+    $scope.commentDateDifference = function (date) {
+        return dateDifference(date);
+    };
+
+}
+
+function TabCtrl($scope) {
+
+    var tabs = 1;
+
+    $scope.selectTab = function (setTab) {
+
+        tabs = setTab;
+
+    };
+
+    $scope.isSelected = function (checkTab) {
+
+        return tabs == checkTab;
+
+    };
+
+}
+
 function HomeCtrl($scope, $rootScope, fireFactory) {
     $scope.init = function () {
         $rootScope.MainCtrlRef.currentUserData.$loaded().then(function (loadedData) {
@@ -805,6 +852,45 @@ function sortByValue(items,sortProperty) {
         }
     });
 
+    $scope.groupsFromDB = fireFactory.getGroupsObjectAll();
+    $scope.pollsFromDB = fireFactory.getPollsObjectAll();
+    $scope.searchTerm = '';
+    $scope.$watch('searchTerm', function () {
+
+        if($scope.searchTerm.length > 0) {
+            $scope.groups = '';
+            $scope.polls = '';
+            var searchResultGroup = [];
+            var searchResultPoll = [];
+            angular.forEach($scope.groupsFromDB, function (value, key) {
+                console.log("value: " +  value.description + " key: " + key);
+                var tempSearchTerm = $scope.searchTerm;
+                var tempDescription = value.description;
+                tempSearchTerm = angular.lowercase(tempSearchTerm);
+                tempDescription = angular.lowercase(tempDescription);
+                if(tempDescription.search(tempSearchTerm) > -1) {
+                    searchResultGroup.push({key:key,value:fireFactory.getDataTypeObjectById("groups",key)});
+                }
+            });
+
+            angular.forEach($scope.pollsFromDB, function (value, key) {
+                console.log("value: " +  value.description + " key: " + key);
+                var tempSearchTerm = $scope.searchTerm;
+                var tempDescription = value.description;
+                tempSearchTerm = angular.lowercase(tempSearchTerm);
+                tempDescription = angular.lowercase(tempDescription);
+                if(tempDescription.search(tempSearchTerm) > -1) {
+                    searchResultPoll.push({key:key,value:fireFactory.getDataTypeObjectById("polls",key)});
+                }
+            });
+            $scope.groups = searchResultGroup;
+            $scope.polls = searchResultPoll;
+        }
+        else{
+            $scope.init();
+        }
+    });
+
 }
 function capitalizeFirstLetter(string) {
     return string.charAt(0).toUpperCase() + string.slice(1);
@@ -826,6 +912,8 @@ angular
     .controller('GroupTemplateCtrl', GroupTemplateCtrl)
     .controller('TagContextCtrl', TagContextCtrl)
     .controller('ProfileCtrl', ProfileCtrl)
+    .controller('TabCtrl', TabCtrl)
+    .controller('CommentCtrl', CommentCtrl)
     .run(["$templateCache", "$rootScope", function ($templateCache, $rootScope) {
         $rootScope.primitiveTypes = [
             {name: 'Enumeration'},
@@ -960,6 +1048,16 @@ angular
 
             helperFactory.getEventsRef = function () {
                 return helperFactory.getDataRef().child('events');
+            };
+
+            helperFactory.getGroupsObjectAll = function () {
+                return $firebaseObject(helperFactory.getGroupsRef());
+            };
+            helperFactory.getPollsObjectAll = function () {
+                return $firebaseObject(helperFactory.getPollsRef());
+            };
+            helperFactory.getPollsRef = function () {
+                return helperFactory.firebaseRef().child('data').child('polls');
             };
 
             return helperFactory;

@@ -236,6 +236,7 @@ function itemPreview() {
         templateUrl: 'views/item_preview_template.html'
     };
 }
+
 function freebaseTags() {
     return {
         restrict: "E",
@@ -246,6 +247,17 @@ function freebaseTags() {
             removeTagCallback: '='
         },
         templateUrl: 'views/tag_template.html'
+    };
+}
+
+function commentTemplate() {
+    return {
+        restrict: "E",
+        scope: {
+            itemComment: '=',
+            addCommentCallback: '='
+        },
+        templateUrl: 'views/comment_template.html'
     };
 }
 
@@ -288,5 +300,6 @@ angular
     .directive('addNodeInfo', addNodeInfo)
     .directive('typeTemplate', typeTemplate)
     .directive('freebaseTags', freebaseTags)
+    .directive('commentTemplate', commentTemplate)
     .directive('itemPreview', itemPreview)
     .directive('dynamicArea', dynamicArea);
