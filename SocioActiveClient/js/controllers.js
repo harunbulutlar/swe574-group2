@@ -298,7 +298,7 @@ function GroupTemplateCtrl($rootScope, $scope, contextFactory, $state, fireFacto
     };
 
     $scope.showContent = function (fieldKey, contentKey) {
-        $state.go('activity.group_add_content', {
+        $state.go('index.group_view_content', {
             groupId: $scope.selectedItemId,
             fieldId: fieldKey,
             contentId: contentKey
@@ -306,7 +306,7 @@ function GroupTemplateCtrl($rootScope, $scope, contextFactory, $state, fireFacto
     };
 
     $scope.addButtonClick = function (selectedTypeId) {
-        $state.go('activity.group_add_content', {groupId: $scope.selectedItemId, typeId: selectedTypeId});
+        $state.go('index.group_add_content', {groupId: $scope.selectedItemId, typeId: selectedTypeId});
     }
 }
 
@@ -321,11 +321,11 @@ function GroupAddCtrl($scope, $state, $rootScope, $stateParams, fireFactory) {
         if ($scope.userField.content == null) {
             $scope.userField.content = [];
         }
-        $scope.userField.content.push({
-            ownerId: $rootScope.MainCtrlRef.userId,
-            owner: $rootScope.MainCtrlRef.currentUserData.userName,
-            data: angular.fromJson(angular.toJson($scope.field.data))
-        });
+        var saveContent = $scope.field;
+        $scope.field['ownerId'] = $rootScope.MainCtrlRef.userId;
+        $scope.field['owner'] = $rootScope.MainCtrlRef.currentUserData.userName;
+        $scope.userField.content.push(angular.fromJson(angular.toJson(saveContent)));
+
         $scope.loading = true;
         $scope.userField.$save().then(function () {
             if (!$rootScope.MainCtrlRef.currentUserData.interactedGroups) {
@@ -340,6 +340,13 @@ function GroupAddCtrl($scope, $state, $rootScope, $stateParams, fireFactory) {
         });
 
     };
+}
+function _update(srcObj, destObj) {
+    for (var key in destObj) {
+        if(destObj.hasOwnProperty(key) && srcObj.hasOwnProperty(key)) {
+            destObj[key] = srcObj[key];
+        }
+    }
 }
 function GroupViewCtrl($scope, $stateParams, fireFactory) {
     $scope.userField = null;

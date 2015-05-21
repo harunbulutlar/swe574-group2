@@ -3,7 +3,7 @@ function config($stateProvider, $urlRouterProvider, $ocLazyLoadProvider) {
 
     $ocLazyLoadProvider.config({
         // Set to true if you want to see what and when is dynamically loaded
-        debug: false
+        debug: true
     });
 
     $stateProvider
@@ -329,8 +329,8 @@ function config($stateProvider, $urlRouterProvider, $ocLazyLoadProvider) {
             }
         })
 
-        .state('activity.group_add_content', {
-            url: "/:groupId?typeId",
+        .state('index.group_add_content', {
+            url: "/group_add_content:groupId?typeId",
             templateUrl: "views/group_add_content.html",
             data: { pageTitle: 'Add to Group' },
             resolve: {
@@ -359,9 +359,8 @@ function config($stateProvider, $urlRouterProvider, $ocLazyLoadProvider) {
                 }
             }
         })
-
-        .state('activity.group_view_content', {
-            url: "/:groupId?fieldId?contentId",
+        .state('index.group_view_content', {
+            url: "/group_view_content:groupId?fieldId?contentId",
             templateUrl: "views/group_view_content.html",
             data: { pageTitle: 'View Content' },
             resolve: {
