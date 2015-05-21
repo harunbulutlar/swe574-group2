@@ -551,8 +551,8 @@ function EventCtrl($scope, $rootScope, fireFactory, $state, contextFactory, MEMB
     $scope.initializeEvent = function () {
         $scope.createdEvent = {
             eventPrivacy: "",
-            eventTitle: "",
-            eventDescription: "",
+            title: "",
+            description: "",
             eventLocation: "",
             eventDate: "",
             createdBy: "",
@@ -594,14 +594,14 @@ function EventCtrl($scope, $rootScope, fireFactory, $state, contextFactory, MEMB
 
     $scope.saveEventData = function () {
 
-        if (!$scope.createdEvent.eventTitle) {
+        if (!$scope.createdEvent.title) {
 
             alert("You need to enter a title for your event!");
             return;
 
         }
 
-        if (!$scope.createdEvent.eventDescription) {
+        if (!$scope.createdEvent.description) {
 
             alert("You need to enter a description for your event!");
             return;
@@ -653,6 +653,99 @@ function EventCtrl($scope, $rootScope, fireFactory, $state, contextFactory, MEMB
     };
 
 }
+
+function EventTemplateCtrl($rootScope, $scope, MEMBER, contextFactory, $state, fireFactory) {
+
+    $scope.selectedItemId = $scope.$parent.selectedItemId;
+    var syncObj = fireFactory.getDataTypeObjectById('events', $scope.selectedItemId);
+    syncObj.$bindTo($scope, "selectedItem");
+
+    $scope.currentUserId = $rootScope.MainCtrlRef.userId;
+    $scope.currentUserName = $rootScope.MainCtrlRef.currentUserData.userName;
+    $scope.eventRoles = MEMBER.MEMBER_ROLES;
+
+    $scope.tags = '';
+    $scope.manualTags = '';
+
+    $scope.tagContextList = ["Professional Sports Team",
+        "College/University",
+        "Place with local areas",
+        "Airport",
+        "Newspaper",
+        "Event"
+    ];
+
+    $scope.toggle = function (scope) {
+        scope.toggle();
+    };
+
+    $scope.isEventDisabled = function () {
+        if ($scope.selectedItemId == null) {
+            return false;
+        } else {
+            return !(($scope.currentUserId === $scope.selectedItemId.createdBy) || $scope.currentUserIsAdmin);
+        }
+    };
+
+    $scope.isEventObjectEmpty = function (obj) {
+        return isObjectEmpty(obj);
+    };
+
+    $scope.addEventTagForView = function (tag) {
+        if (!$rootScope.MainCtrlRef.currentUserData.interactedEvents) {
+            $rootScope.MainCtrlRef.currentUserData.interactedEvents = {};
+        }
+        if (!$rootScope.MainCtrlRef.currentUserData.contexts) {
+            $rootScope.MainCtrlRef.currentUserData.contexts = {};
+        }
+
+        var contextEventsRef = fireFactoryForEvent.getEventsInContextRef(tag.tagContext);
+        var eventLinkObject = {};
+        eventLinkObject[$scope.selectedItemId] = $scope.selectedItem.eventTagContext[tag.tagContext].length;
+        contextEventsRef.update(eventLinkObject);
+        if (!$rootScope.MainCtrlRef.currentUserData.contexts[tag.tagContext]) {
+            $rootScope.MainCtrlRef.currentUserData.contexts[tag.tagContext] = 1;
+        } else {
+            $rootScope.MainCtrlRef.currentUserData.contexts[tag.tagContext]++;
+        }
+
+        $rootScope.MainCtrlRef.currentUserData.interactedEvents[$scope.selectedItemId] = true;
+        $scope.loading = true;
+        $rootScope.MainCtrlRef.currentUserData.$save();
+        $scope.tags = '';
+        $scope.manualTags = '';
+    };
+
+
+    $scope.addEventCommentForView = function (body) {
+        if (!$scope.selectedItem.eventComments) {
+            $scope.selectedItem.eventComments = [];
+        }
+        $scope.selectedItem.eventComments.push({
+            "commentBody": body,
+            "commentUserEmail": $scope.currentUserId,
+            "commentUserName": $scope.currentUserName,
+            "commentDateTime": new Date().getTime()
+        });
+    };
+
+    $scope.showContent = function (fieldKey, contentKey) {
+        $state.go('create.asd', {eventId: $scope.selectedItemId, fieldId: fieldKey, contentId: contentKey});
+    };
+
+    $scope.addButtonClick = function (selectedTypeId) {
+        $state.go('activity.group_add_content', {eventIdId: $scope.selectedItemId, typeId: selectedTypeId});
+    };
+
+
+}
+
+
+function CurrentEventsCtrl($scope, fireFactory) {
+    $scope.events = fireFactory.getEventsObject();
+
+}
+
 function ProfileCtrl($scope, $rootScope, fireFactory) {
     $scope.init = function () {
         $rootScope.MainCtrlRef.currentUserData.$loaded().then(function (loadedData) {
@@ -900,6 +993,7 @@ angular
     .controller('TypeTemplateCtrl', TypeTemplateCtrl)
     .controller('NodeInfoCtrl', NodeInfoCtrl)
     .controller('CurrentGroupsCtrl', CurrentGroupsCtrl)
+    .controller('CurrentEventsCtrl', CurrentEventsCtrl)
     .controller('GroupAddCtrl', GroupAddCtrl)
     .controller('GroupViewCtrl', GroupViewCtrl)
     .controller('PictureUploadCtrl', PictureUploadCtrl)
@@ -908,6 +1002,7 @@ angular
     .controller('HomeCtrl', HomeCtrl)
     .controller('ItemPreviewCtrl', ItemPreviewCtrl)
     .controller('GroupTemplateCtrl', GroupTemplateCtrl)
+    .controller('EventTemplateCtrl', EventTemplateCtrl)
     .controller('TagContextCtrl', TagContextCtrl)
     .controller('ProfileCtrl', ProfileCtrl)
     .controller('TabCtrl', TabCtrl)

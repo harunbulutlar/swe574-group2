@@ -1,0 +1,23 @@
+<div class="row" ng-controller="CurrentEventsCtrl">
+    <div class="col-lg-12">
+        <div class="wrapper wrapper-content">
+            <div class="col-lg-6">
+                <div class="ibox float-e-margins">
+                    <div class="ibox-title">
+                        <h3>Polls
+                            <small>The list of the events that you have interacted with!</small>
+                        </h3>
+                    </div>
+                    <div class="ibox-content">
+                        <item-preview selected-item ="selectedEvent" selected-item-id="selectedEventId" previewed-item="events"></item-preview>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="ibox float-e-margins">
+                    <dynamic-area ng-model="selectedEvent" selected-item-id="selectedEventId" area-type="'event'"></dynamic-area>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

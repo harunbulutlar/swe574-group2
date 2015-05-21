@@ -1,46 +1,55 @@
-<div ng-controller="HomeCtrl">
-    <div>
-        <input type="text" ng-model="searchTerm"
-               class="form-control input-lg"
-               id="search-term" placeholder="Search Something..." autofocus>
-    </div>
+<div class="wrapper wrapper-content animated fadeInRight" ng-controller="HomeCtrl">
+    <div class="row show-grid">
 
+        <div class="ibox-content">
+            <input type="text" ng-model="searchTerm"
+                   class="form-control input-lg"
+                   id="search-term" placeholder="Search Something..." autofocus>
+        </div>
 
-    <div class="col-lg-6">
-        <div class="ibox float-e-margins">
-            <div class="ibox-title">
-                <h3>Recommended Groups
-                    <small>every group you can find</small>
-                </h3>
+        <div class="col-lg-6">
+            <div class="ibox float-e-margins">
+                <div class="ibox-title">
+                    <h3>Recommended Groups
+                        <small>We hope you visit these groups soon!</small>
+                    </h3>
+                </div>
+                <div class="ibox-content">
+                    <item-preview selected-item-type="selectedItemType" selected-item="selectedItem"
+                                  selected-item-id="selectedItemId" previewed-item="groups"
+                                  array-iterate="true"></item-preview>
+                </div>
             </div>
-            <div class="ibox-content">
-                <item-preview selected-item-type="selectedItemType" selected-item ="selectedItem" selected-item-id="selectedItemId" previewed-item="groups" array-iterate="true"></item-preview>
+            <div class="ibox float-e-margins">
+                <div class="ibox-title">
+                    <h3>Recommended Polls
+                        <small>We hope you visit these polls soon!</small>
+                    </h3>
+                </div>
+                <div class="ibox-content">
+                    <item-preview selected-item-type="selectedItemType" selected-item="selectedItem"
+                                  selected-item-id="selectedItemId" previewed-item="polls"
+                                  array-iterate="true"></item-preview>
+                </div>
+            </div>
+            <div class="ibox float-e-margins">
+                <div class="ibox-title">
+                    <h3>Recommended Events
+                        <small>We hope you visit these events soon!</small>
+                    </h3>
+                </div>
+                <div class="ibox-content">
+                    <item-preview selected-item-type="selectedItemType" selected-item="selectedItem"
+                                  selected-item-id="selectedItemId" previewed-item="events"
+                                  array-iterate="true"></item-preview>
+                </div>
             </div>
         </div>
-        <div class="ibox float-e-margins">
-            <div class="ibox-title">
-                <h3>Recommended Polls
-                    <small>every group you can find</small>
-                </h3>
+        <div class="col-lg-6">
+            <div class="ibox float-e-margins">
+                <dynamic-area ng-model="selectedItem" selected-item-id="selectedItemId"
+                              area-type="selectedItemType"></dynamic-area>
             </div>
-            <div class="ibox-content">
-                <item-preview selected-item-type="selectedItemType" selected-item ="selectedItem" selected-item-id="selectedItemId" previewed-item="polls" array-iterate="true"></item-preview>
-            </div>
-        </div>
-        <div class="ibox float-e-margins">
-            <div class="ibox-title">
-                <h3>Recommended Events
-                    <small>every group you can find</small>
-                </h3>
-            </div>
-            <div class="ibox-content">
-                <item-preview selected-item-type="selectedItemType" selected-item ="selectedItem" selected-item-id="selectedItemId" previewed-item="events" array-iterate="true"></item-preview>
-            </div>
-        </div>
-    </div>
-    <div class="col-lg-6">
-        <div class="ibox float-e-margins">
-            <dynamic-area ng-model="selectedItem" selected-item-id="selectedItemId" area-type="selectedItemType"></dynamic-area>
         </div>
     </div>
 </div>

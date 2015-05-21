@@ -116,13 +116,6 @@ function config($stateProvider, $urlRouterProvider, $ocLazyLoadProvider) {
             }
         })
 
-        .state('activity.events', {
-            url: "/event_view",
-            controller: 'EventCtrl',
-            templateUrl: "views/event_view.html",
-            data: { pageTitle: 'Events' }
-        })
-
         .state('activity.polls', {
             url: "/view_poll/:pollToBeViewed",
             templateUrl: "views/poll.html",
@@ -188,7 +181,7 @@ function config($stateProvider, $urlRouterProvider, $ocLazyLoadProvider) {
 
         .state('activity.events2', {
             url: "/view_events",
-            templateUrl: "views/event_view_new.html",
+            templateUrl: "views/events.html",
             controller: 'EventCtrl',
             data: { pageTitle: 'View Events'},
             resolve: {

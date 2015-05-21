@@ -1,27 +1,33 @@
-<div class="panel pre-scrollable">
-    <div class="feed-activity-list" ng-if="!arrayIterate">
-        <div ng-repeat="(key, value) in previewedItem" ng-class="getClass(value)" ng-click="show(value,key)">
+<div class="ibox float-e-margins">
+    <div class="panel pre-scrollable">
+        <div class="feed-activity-list" ng-if="!arrayIterate">
+            <div ng-repeat="(key, value) in previewedItem" ng-class="getClass(value)" ng-click="show(value,key)">
 
-            <a ui-sref="profile" class="pull-left">
-                <img alt="image" class="img-circle" src="{{value.image}}">
-            </a>
+                <a ui-sref="profile" class="pull-left">
+                    <img alt="image" class="img-circle" src="{{value.image}}">
+                </a>
 
-            <div class="media-body ">
-                <h3 class="list-group-item-heading">{{value.ownerName}}'s {{getItemType(value)}} : {{value.title}}</h3>
-                <p class="list-group-item-text">{{value.description }}</p>
+                <div class="media-body ">
+                    <h3 class="list-group-item-heading">{{value.ownerName}}'s {{getItemType(value)}} :
+                        {{value.title}}</h3>
+
+                    <p class="list-group-item-text">{{value.description }}</p>
+                </div>
             </div>
         </div>
-    </div>
-    <div class="feed-activity-list" ng-if="arrayIterate">
-        <div ng-repeat="item in previewedItem" ng-class="getClass(item.value)" ng-click="show(item.value,item.key)" >
+        <div class="feed-activity-list" ng-if="arrayIterate">
+            <div ng-repeat="item in previewedItem" ng-class="getClass(item.value)" ng-click="show(item.value,item.key)">
 
-            <a ui-sref="profile" class="pull-left">
-                <img alt="image" class="img-circle" src="{{item.value.image}}">
-            </a>
+                <a ui-sref="profile" class="pull-left">
+                    <img alt="image" class="img-circle" src="{{item.value.image}}">
+                </a>
 
-            <div class="media-body ">
-                <h3 class="list-group-item-heading">{{item.value.ownerName}}'s {{getItemType(item.value)}} : {{item.value.title}}</h3>
-                <p class="list-group-item-text">{{item.value.description }}</p>
+                <div class="media-body ">
+                    <h3 class="list-group-item-heading">{{item.value.ownerName}}'s {{getItemType(item.value)}} :
+                        {{item.value.title}}</h3>
+
+                    <p class="list-group-item-text">{{item.value.description }}</p>
+                </div>
             </div>
         </div>
     </div>

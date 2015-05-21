@@ -173,6 +173,11 @@ function PollCtrl($scope, $rootScope, $stateParams, $state, contextFactory, MEMB
             $rootScope.MainCtrlRef.currentUserData.contexts[key]++;
         });
 
+        angular.forEach($rootScope.MainCtrlRef.currentUserData.contexts, function (value, key) {
+            var userInContext= fireFactoryForPoll.getUserInContextRef(key,$rootScope.MainCtrlRef.userId);
+            userInContext.set(value);
+        });
+
         $rootScope.MainCtrlRef.currentUserData.createdPolls[fireBaseObj.key()] = true;
         $scope.loading = true;
         $rootScope.MainCtrlRef.currentUserData.$save().then(function () {
@@ -197,6 +202,7 @@ function PollCtrl($scope, $rootScope, $stateParams, $state, contextFactory, MEMB
 }
 
 function PollTemplateCtrl($rootScope, $scope, MEMBER, contextFactory, $state, fireFactoryForPoll) {
+
     $scope.selectedItemId = $scope.$parent.selectedItemId;
     var syncObj = fireFactoryForPoll.getDataTypeObjectById('polls', $scope.selectedItemId);
     syncObj.$bindTo($scope, "selectedItem");
@@ -304,10 +310,10 @@ function PollTemplateCtrl($rootScope, $scope, MEMBER, contextFactory, $state, fi
             $rootScope.MainCtrlRef.currentUserData.contexts = {};
         }
 
-        var contextGroupsRef = fireFactoryForPoll.getPollsInContextRef(tag.tagContext);
-        var groupLinkObject = {};
-        groupLinkObject[$scope.selectedItemId] = $scope.selectedItem.pollTagContext[tag.tagContext].length;
-        contextGroupsRef.update(groupLinkObject);
+        var contextPollsRef = fireFactoryForPoll.getPollsInContextRef(tag.tagContext);
+        var pollLinkObject = {};
+        pollLinkObject[$scope.selectedItemId] = $scope.selectedItem.pollTagContext[tag.tagContext].length;
+        contextPollsRef.update(pollLinkObject);
         if (!$rootScope.MainCtrlRef.currentUserData.contexts[tag.tagContext]) {
             $rootScope.MainCtrlRef.currentUserData.contexts[tag.tagContext] = 1;
         } else {
@@ -441,6 +447,10 @@ angular
                 return new Firebase(path);
             };
 
+            helperFactory.getDataRef = function () {
+                return helperFactory.firebaseRef().child('data');
+            };
+
             helperFactory.getUserRef = function (uid) {
                 return helperFactory.firebaseRef().child('users').child(uid);
             };
@@ -450,13 +460,16 @@ angular
             };
 
             helperFactory.getPollRef = function (uid) {
-                return helperFactory.firebaseRef().child('data').child('polls').child(uid);
+                return helperFactory.getPollsRef().child(uid);
             };
 
             helperFactory.getPollObject = function (uid) {
                 return $firebaseObject(helperFactory.getPollRef(uid));
             };
 
+            helperFactory.getContextsRef = function () {
+                return helperFactory.getDataRef().child('contexts');
+            };
 
             helperFactory.getPollOptionRef = function (uid) {
                 return helperFactory.firebaseRef().child('data').child('polls').child(uid).child("pollOptions");
@@ -475,7 +488,7 @@ angular
             };
 
             helperFactory.getPollsRef = function () {
-                return helperFactory.firebaseRef().child('data').child('polls');
+                return helperFactory.getDataRef().child('polls');
             };
 
             helperFactory.getPollsObject = function () {
@@ -495,6 +508,30 @@ angular
             };
             helperFactory.getDataTypeObjectById = function (dataType, id) {
                 return $firebaseObject(helperFactory.firebaseRef().child('data').child(dataType).child(id));
+            };
+
+            helperFactory.getPollsInContextRef = function (context) {
+                return helperFactory.getContextsRef().child(context).child('polls');
+            };
+
+            helperFactory.getPollsInContextObject = function (context) {
+                return $firebaseObject(helperFactory.getPollsInContextRef(context));
+            };
+
+            helperFactory.getUsersInContextRef = function (context) {
+                return helperFactory.getContextsRef().child(context).child('users');
+            };
+
+            helperFactory.getUsersInContextObject = function (context) {
+                return $firebaseObject(helperFactory.getPollsInContextRef(context));
+            };
+
+            helperFactory.getUserInContextRef = function (context,userId) {
+                return helperFactory.getUsersInContextRef(context).child(userId);
+            };
+
+            helperFactory.getUserInContextObject = function (context,userId) {
+                return $firebaseObject(helperFactory.getUserInContextRef(context,userId));
             };
             return helperFactory;
 

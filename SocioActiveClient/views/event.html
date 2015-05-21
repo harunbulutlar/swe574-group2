@@ -9,7 +9,7 @@
                 </div>
                 <div class="ibox-content">
                     <div class=" form-group"><label>Title</label> <input type="text"
-                                                                         ng-model="createdEvent.eventTitle"
+                                                                         ng-model="createdEvent.title"
                                                                          placeholder="Enter a Title for your event"
                                                                          class="form-control"
                                                                          required="">
@@ -17,7 +17,7 @@
                     <div class=" form-group"><label>Details</label>
                                                                     <textarea
                                                                             placeholder="Enter a details for your event"
-                                                                            ng-model="createdEvent.eventDescription"
+                                                                            ng-model="createdEvent.description"
                                                                             class="form-control"></textarea>
                     </div>
 
@@ -87,13 +87,14 @@
 
                     </section>
 
+
                 </div>
+                <form class="col-lg-12" ng-submit="saveEventData()">
+                    <button type="submit" class="btn btn-primary btn-sm btn-block"><i class="fa fa-save"></i> Save Your Changes
+                    </button>
+                </form>
             </div>
         </div>
     </div>
-</div>
 
-<form class="col-lg-12" ng-submit="saveEventData()">
-    <button type="submit" class="btn btn-primary btn-sm btn-block"><i class="fa fa-save"></i> Save Your Changes
-    </button>
-</form>
+</div>
