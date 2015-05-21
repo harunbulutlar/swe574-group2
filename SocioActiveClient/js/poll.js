@@ -338,6 +338,8 @@ function PollTemplateCtrl($rootScope, $scope, MEMBER, contextFactory, $state, fi
         $rootScope.MainCtrlRef.currentUserData.interactedPolls[$scope.selectedItemId] = true;
         $scope.loading = true;
         $rootScope.MainCtrlRef.currentUserData.$save();
+        $scope.tags = '';
+        $scope.manualTags = '';
     };
 
 

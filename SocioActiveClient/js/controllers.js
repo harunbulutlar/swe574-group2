@@ -72,7 +72,6 @@ function CustomTypesCtrl($state, $scope, contextFactory, $rootScope, fireFactory
         $scope.createdGroup.fields.push(userField);
     };
 
-
     $scope.saveChanges = function () {
 
         if ($scope.createdGroup.title == '') {
@@ -130,6 +129,7 @@ function CustomTypesCtrl($state, $scope, contextFactory, $rootScope, fireFactory
         $scope.createdGroup["title"] = '';
         $scope.createdGroup["description"] = '';
         $scope.createdGroup["fields"] = [];
+        $scope.createdGroup["contexts"] = {};
 
     };
     $scope.initPage();
@@ -443,7 +443,7 @@ function TagContextCtrl($scope, contextFactory) {
         $scope.tagContext[tag.tagContext].push(tag);
 
         if($scope.addTagCallback){
-            $scope.addTagCallback(item);
+            $scope.addTagCallback(tag);
         }
         $scope.tags = '';
         $scope.manualTags = '';
