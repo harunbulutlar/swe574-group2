@@ -166,7 +166,7 @@ function TypeTemplateCtrl($scope, $rootScope) {
     $scope.typeParameterType = "";
 }
 
-function ItemPreviewCtrl($scope) {
+function ItemPreviewCtrl($scope,fireFactory) {
 
     //$scope.$watch('previewedItem', function () {
     //    if ($scope.selectedItemId != null) {
@@ -192,17 +192,36 @@ function ItemPreviewCtrl($scope) {
             return "group";
         }
     };
+
     $scope.getClass = function (item) {
+        var itemClass = "list-group-item";
         if (item == $scope.selectedItem) {
-            return "list-group-item active";
+            itemClass = "list-group-item active";
         }
-        return "list-group-item";
-    };
-    $scope.getClass = function (item) {
-        if (item == $scope.selectedItem) {
-            return "list-group-item active";
+
+        var userId = null;
+        if(item.hasOwnProperty('createdBy')){
+            userId = item.createdBy;
+
+        } else if (item.hasOwnProperty('owner')){
+            userId = item.owner;
         }
-        return "list-group-item";
+
+        if(!item.imageLoaded)
+        {
+            item.image = "img/space_invaders_small.jpg";
+            if(userId){
+                var image = fireFactory.getUserImageSmallObject(userId);
+                image.$loaded().then(function(loadedData){
+                    if(loadedData.$value){
+                        item.image = loadedData.$value;
+                    }
+                })
+            }
+            item.imageLoaded = true;
+        }
+
+       return itemClass;
     };
 }
 
@@ -799,11 +818,12 @@ angular
             helperFactory.getUserRef = function (uid) {
                 return helperFactory.firebaseRef().child('users').child(uid);
             };
-
             helperFactory.getUserObject = function (uid) {
                 return $firebaseObject(helperFactory.getUserRef(uid));
             };
-
+            helperFactory.getUserImageSmallObject = function (uid) {
+                return $firebaseObject(helperFactory.getUserRef(uid).child("userImageSmall"));
+            };
             helperFactory.getData = function () {
                 return $firebaseObject(helperFactory.firebaseRef().child('data'));
             };
@@ -812,7 +832,7 @@ angular
                 data.$loaded().then(callback)
             };
             helperFactory.getGroupsObject = function (callback) {
-                return $firebaseObject(helperFactory.firebaseRef().child('data').child('groups'));
+                return $firebaseObject(helperFactory.firebaseRef().child('data').child('groups').orderByKey().limitToLast(5));
             };
             helperFactory.getGroupRef = function (uid) {
                 return helperFactory.firebaseRef().child('data').child('groups').child(uid);
@@ -825,9 +845,9 @@ angular
             helperFactory.getGroupsRef = function () {
                 return helperFactory.firebaseRef().child('data').child('groups');
             };
-            helperFactory.getGroupsObject = function () {
-                return $firebaseObject(helperFactory.getGroupsRef());
-            };
+            //helperFactory.getGroupsObject = function () {
+            //    return $firebaseObject(helperFactory.getGroupsRef());
+            //};
 
             helperFactory.getGroupsInContextRef = function (context) {
                 return helperFactory.firebaseRef().child('data').child('contexts').child(context).child('groups');
