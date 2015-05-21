@@ -110,9 +110,16 @@ function CustomTypesCtrl($state, $scope, contextFactory, $rootScope, fireFactory
             $rootScope.MainCtrlRef.currentUserData.contexts[key]++;
         });
 
+        angular.forEach($rootScope.MainCtrlRef.currentUserData.contexts, function (value, key) {
+            var userInContext= fireFactory.getUserInContextRef(key,$rootScope.MainCtrlRef.userId);
+            userInContext.set(value);
+        });
+
         $scope.loading = true;
         $rootScope.MainCtrlRef.currentUserData.$save().then(function () {
             $scope.loading = false;
+
+
             $state.go('activity.groups');
 
         });
@@ -292,6 +299,10 @@ function GroupTemplateCtrl($rootScope, $scope, contextFactory, $state, fireFacto
         } else {
             $rootScope.MainCtrlRef.currentUserData.contexts[tag.tagContext]++;
         }
+
+        var userInContext= fireFactory.getUserInContextRef(tag.tagContext,$rootScope.MainCtrlRef.userId);
+        userInContext.set($rootScope.MainCtrlRef.currentUserData.contexts[tag.tagContext]);
+
         $rootScope.MainCtrlRef.currentUserData.interactedGroups[$scope.selectedItemId] = true;
         $rootScope.MainCtrlRef.currentUserData.$save();
 
@@ -643,7 +654,101 @@ function EventCtrl($scope, $rootScope, fireFactoryForEvent, $state, contextFacto
     };
 
 }
+function ProfileCtrl($scope, $rootScope, fireFactory){
+    $scope.init = function () {
+        $rootScope.MainCtrlRef.currentUserData.$loaded().then(function (loadedData) {
+            $scope.userContexts = loadedData.contexts;
+            $scope.contexts = fireFactory.getContextsObject();
+            $scope.contexts.$loaded().then(function () {
+                var recommendedPeople = {totalCount: 0 ,array:[]};
+                angular.forEach($scope.userContexts, function (value, key) {
+                    if (!$scope.contexts[key]) {
+                        return;
+                    }
+                    $scope.findAndCalculate('users', $scope.contexts[key], loadedData,recommendedPeople,value ,key);
 
+                });
+                $scope.sortByValue(recommendedPeople.array,'count');
+                $scope.people = $scope.calculateWeightAndDecide(recommendedPolls,'polls');
+            })
+        });
+    };
+    $scope.calculateWeightAndDecide = function(recommendation,type){
+        var excessWeight = 0;
+        var result = [];
+        var staticTotalRecToShow = 5;
+        var totalRecToShow = staticTotalRecToShow;
+        for(var i =0; i<recommendation.array.length; i++){
+            var item = recommendation.array[i];
+            var weightOfItem = Math.round((item.count/recommendation.totalCount) * staticTotalRecToShow)+ excessWeight;
+            //Since we sorted from top to bottom if weights are equally distributed we can get a zero
+            //value. So round it up to 1
+            if(weightOfItem == 0){
+                weightOfItem = 1;
+            }
+            if(totalRecToShow < 1){
+                break;
+            }
+
+            var concatValue = weightOfItem;
+            if(totalRecToShow - weightOfItem < 0){
+                concatValue = totalRecToShow;
+            } else if(item.array.length < weightOfItem){
+                excessWeight = excessWeight + (weightOfItem - item.array.length);
+                concatValue = item.array.length;
+            }
+
+            var skipCount = 0;
+            for(var y = 0; y < concatValue ; y++){
+                if(!item.array[y] || $scope.hasItem(result,item.array[y].id)){
+                    skipCount++;
+                } else{
+                    result.push({key:item.array[y].id,value:fireFactory.getDataTypeObjectById(type,item.array[y].id)});
+                }
+            }
+            totalRecToShow = totalRecToShow - concatValue + skipCount;
+            excessWeight = excessWeight + skipCount;
+        }
+        return result;
+
+    };
+    $scope.hasItem = function(arrayInput, keyInput){
+        for(var y = 0; y < arrayInput.length ; y++){
+            if(arrayInput[y].key == keyInput){
+                return true;
+            }
+        }
+        return false;
+    };
+    $scope.findAndCalculate = function (itemType, contextItem, userData, outputObject,inputValue,inputKey) {
+        var union = [];
+        var capitalItemType = capitalizeFirstLetter(itemType);
+        angular.forEach(contextItem[itemType], function (value, key) {
+            union.push({count:value,id:key});
+        });
+
+        $scope.sortByValue(union,'count');
+        if(union.length != 0){
+            outputObject.totalCount = outputObject.totalCount + inputValue;
+            outputObject.array.push({
+                count: inputValue,
+                name: inputKey,
+                array: union
+            });
+        }
+    };
+    $scope.sortByValue = function (items,sortProperty) {
+        items.sort(function (a, b) {
+            if(sortProperty){
+                return b[sortProperty] - a[sortProperty]
+            } else {
+                return b[Object.keys(b)[0]] - a[Object.keys(a)[0]]
+            }
+        });
+
+    };
+    $scope.init();
+}
 function HomeCtrl($scope, $rootScope, fireFactory) {
     $scope.init = function () {
         $rootScope.MainCtrlRef.currentUserData.$loaded().then(function (loadedData) {
@@ -773,6 +878,7 @@ angular
     .controller('ItemPreviewCtrl', ItemPreviewCtrl)
     .controller('GroupTemplateCtrl', GroupTemplateCtrl)
     .controller('TagContextCtrl', TagContextCtrl)
+    .controller('ProfileCtrl', ProfileCtrl)
     .run(["$templateCache", "$rootScope", function ($templateCache, $rootScope) {
         $rootScope.primitiveTypes = [
             {name: 'Enumeration'},
@@ -831,60 +937,74 @@ angular
             helperFactory.getUserImageSmallObject = function (uid) {
                 return $firebaseObject(helperFactory.getUserRef(uid).child("userImageSmall"));
             };
-            helperFactory.getData = function () {
-                return $firebaseObject(helperFactory.firebaseRef().child('data'));
+            helperFactory.getDataRef = function () {
+                return helperFactory.firebaseRef().child('data');
             };
-            helperFactory.loadData = function (callback) {
-                var data = helperFactory.getData();
-                data.$loaded().then(callback)
+
+            helperFactory.getGroupsRef = function () {
+                return helperFactory.getDataRef().child('groups');
             };
-            helperFactory.getGroupsObject = function (callback) {
-                return $firebaseObject(helperFactory.firebaseRef().child('data').child('groups').orderByKey().limitToLast(5));
+
+            helperFactory.getGroupsObject = function () {
+                return $firebaseObject(helperFactory.getGroupsRef());
             };
+
             helperFactory.getGroupRef = function (uid) {
-                return helperFactory.firebaseRef().child('data').child('groups').child(uid);
+                return helperFactory.getGroupsRef().child(uid);
             };
 
             helperFactory.getGroupObject = function (uid) {
                 return $firebaseObject(helperFactory.getGroupRef(uid));
             };
 
-            helperFactory.getGroupsRef = function () {
-                return helperFactory.firebaseRef().child('data').child('groups');
-            };
-            //helperFactory.getGroupsObject = function () {
-            //    return $firebaseObject(helperFactory.getGroupsRef());
-            //};
-
-            helperFactory.getGroupsInContextRef = function (context) {
-                return helperFactory.firebaseRef().child('data').child('contexts').child(context).child('groups');
-            };
-
-            helperFactory.getGroupsInContextObject = function (context) {
-                return $firebaseObject(helperFactory.getGroupsRef());
-            };
             helperFactory.getContextsRef = function () {
-                return helperFactory.firebaseRef().child('data').child('contexts');
+                return helperFactory.getDataRef().child('contexts');
             };
 
             helperFactory.getContextsObject = function () {
                 return $firebaseObject(helperFactory.getContextsRef());
             };
 
+            helperFactory.getGroupsInContextRef = function (context) {
+                return helperFactory.getContextsRef().child(context).child('groups');
+            };
+
+            helperFactory.getGroupsInContextObject = function (context) {
+                return $firebaseObject(helperFactory.getGroupsInContextRef(context));
+            };
+
+            helperFactory.getUsersInContextRef = function (context) {
+                return helperFactory.getContextsRef().child(context).child('users');
+            };
+
+            helperFactory.getUsersInContextObject = function (context) {
+                return $firebaseObject(helperFactory.getGroupsInContextRef(context));
+            };
+
+            helperFactory.getUserInContextRef = function (context,userId) {
+                return helperFactory.getUsersInContextRef(context).child(userId);
+            };
+
+            helperFactory.getUserInContextObject = function (context,userId) {
+                return $firebaseObject(helperFactory.getUserInContextRef(context,userId));
+            };
+
             helperFactory.getFieldObject = function (groupId, fieldId) {
                 return $firebaseObject(helperFactory.getGroupsRef().child(groupId).child('fields').child(fieldId));
             };
+
             helperFactory.getContentObject = function (groupId, fieldId, contentId) {
                 return $firebaseObject(helperFactory.getGroupsRef().child(groupId).child('fields').child(fieldId).child('content').child(contentId));
             };
 
             helperFactory.getDataTypeObjectById = function (dataType,id) {
-                return $firebaseObject(helperFactory.firebaseRef().child('data').child(dataType).child(id));
+                return $firebaseObject(helperFactory.getDataRef().child(dataType).child(id));
             };
 
             helperFactory.getEventsRef = function () {
-                return helperFactory.firebaseRef().child('data').child('events');
+                return helperFactory.getDataRef().child('events');
             };
+
             return helperFactory;
 
 
