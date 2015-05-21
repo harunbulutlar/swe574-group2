@@ -322,17 +322,16 @@ function PollTemplateCtrl($rootScope, $scope, MEMBER, contextFactory, $state, fi
     };
 
 
-    $scope.addPollCommentForView = function () {
+    $scope.addPollCommentForView = function (body) {
         if (!$scope.selectedItem.pollComments) {
             $scope.selectedItem.pollComments = [];
         }
         $scope.selectedItem.pollComments.push({
-            "commentBody": $scope.pollCommentTempList.commentBody,
+            "commentBody": body,
             "commentUserEmail": $scope.currentUserId,
             "commentUserName": $scope.currentUserName,
             "commentDateTime": new Date().getTime()
         });
-        $scope.pollCommentTempList.commentBody = '';
     };
 
     $scope.pollCommentDateDifference = function (date) {

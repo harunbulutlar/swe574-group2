@@ -506,7 +506,7 @@ function TagContextCtrl($scope, contextFactory) {
         }
 
         if($scope.removeTagCallback){
-            $scope.removeTagCallback(key, id);
+            $scope.removeTagCallback(key, tagToBeRemoved);
         }
     };
 
@@ -632,6 +632,53 @@ function EventCtrl($scope, $rootScope, fireFactoryForEvent, $state, contextFacto
 
         });
 
+
+    };
+
+}
+
+function CommentCtrl($scope, $rootScope) {
+
+    $scope.addComments = function () {
+
+        if(!$scope.itemComment){
+            $scope.itemComment = [];
+        }
+
+        $scope.itemComment.push({
+            "commentBody": $scope.commentBody,
+            "commentUserId": $rootScope.MainCtrlRef.userId,
+            "commentUserName": $rootScope.MainCtrlRef.currentUserData.userName,
+            "commentDateTime": new Date().getTime()
+        });
+
+        if($scope.addCommentCallback){
+
+            $scope.addCommentCallback($scope.commentBody);
+
+        }
+        $scope.commentBody = '';
+    };
+
+    $scope.commentDateDifference = function (date) {
+        return dateDifference(date);
+    };
+
+}
+
+function TabCtrl($scope) {
+
+    var tabs = 1;
+
+    $scope.selectTab = function (setTab) {
+
+        tabs = setTab;
+
+    };
+
+    $scope.isSelected = function (checkTab) {
+
+        return tabs == checkTab;
 
     };
 
@@ -766,6 +813,8 @@ angular
     .controller('ItemPreviewCtrl', ItemPreviewCtrl)
     .controller('GroupTemplateCtrl', GroupTemplateCtrl)
     .controller('TagContextCtrl', TagContextCtrl)
+    .controller('TabCtrl', TabCtrl)
+    .controller('CommentCtrl', CommentCtrl)
     .run(["$templateCache", "$rootScope", function ($templateCache, $rootScope) {
         $rootScope.primitiveTypes = [
             {name: 'Enumeration'},

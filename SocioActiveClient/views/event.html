@@ -4,6 +4,7 @@
             <div class="ibox float-e-margins">
                 <div class="ibox-title">
                     <h5>Create an Event</h5>
+
                     <div ibox-tools></div>
                 </div>
                 <div class="ibox-content">
@@ -43,33 +44,56 @@
                                                                          class="form-control"
                                                                          required="">
                     </div>
-                    <div class=" form-group"><label>Time</label> <div class='input-group date'>
-                        <input type='datetime' class='form-control' date-time
-                               view='date'
-                               ng-model="createdEvent.eventDate"
-                               required=""><span
-                            class='input-group-addon'><i class='fa fa-calendar'></i></span></div>
+                    <div class=" form-group"><label>Time</label>
+
+                        <div class='input-group date'>
+                            <input type='datetime' class='form-control' date-time
+                                   view='date'
+                                   ng-model="createdEvent.eventDate"
+                                   required=""><span
+                                class='input-group-addon'><i class='fa fa-calendar'></i></span></div>
                     </div>
+
+                    <freebase-tags tag-context="createdEvent.eventTagContext"></freebase-tags>
+
+                    <section ng-controller="TabCtrl">
+
+                        <div class="ibox-content">
+                            <tabset>
+                                <tab ng-click="selectTab(1)">
+                                    <tab-heading>
+                                        Comments
+                                    </tab-heading>
+
+                                </tab>
+
+                                <tab ng-click="selectTab(2)">
+                                    <tab-heading>
+                                        Results
+                                    </tab-heading>
+
+                                </tab>
+                            </tabset>
+                        </div>
+
+                        <div class='form-group' ng-show="isSelected(1)">
+
+                            <comment-template item-comment="createdEvent.eventComments"></comment-template>
+                        </div>
+
+                        <div class='form-group' ng-show="isSelected(2)">
+                            <h4>Participants</h4>
+                        </div>
+
+                    </section>
+
                 </div>
             </div>
         </div>
     </div>
 </div>
 
-<br>
-<br>
-<br>
-<br>
-<br>
-<br>
-
-
 <form class="col-lg-12" ng-submit="saveEventData()">
     <button type="submit" class="btn btn-primary btn-sm btn-block"><i class="fa fa-save"></i> Save Your Changes
     </button>
 </form>
-
-
-
-</body>
-</html>
