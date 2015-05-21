@@ -314,7 +314,7 @@ function GroupAddCtrl($scope, $state, $rootScope, $stateParams, fireFactory) {
     $scope.loading = false;
     $scope.userField = fireFactory.getFieldObject($stateParams.groupId, $stateParams.typeId);
     $scope.userField.$loaded().then(function (loadedData) {
-        $scope.customType = angular.copy(loadedData.type);
+        $scope.field = angular.fromJson((angular.toJson(loadedData)));
     });
 
     $scope.saveChanges = function () {
@@ -324,7 +324,7 @@ function GroupAddCtrl($scope, $state, $rootScope, $stateParams, fireFactory) {
         $scope.userField.content.push({
             ownerId: $rootScope.MainCtrlRef.userId,
             owner: $rootScope.MainCtrlRef.currentUserData.userName,
-            data: angular.fromJson(angular.toJson($scope.customType.data))
+            data: angular.fromJson(angular.toJson($scope.field.data))
         });
         $scope.loading = true;
         $scope.userField.$save().then(function () {
