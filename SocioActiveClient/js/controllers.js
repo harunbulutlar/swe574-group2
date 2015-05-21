@@ -665,89 +665,28 @@ function ProfileCtrl($scope, $rootScope, fireFactory){
                     if (!$scope.contexts[key]) {
                         return;
                     }
-                    $scope.findAndCalculate('users', $scope.contexts[key], loadedData,recommendedPeople,value ,key);
-
+                    findAndCalculate('users', $scope.contexts[key], loadedData,recommendedPeople,value ,key);
                 });
-                $scope.sortByValue(recommendedPeople.array,'count');
-                $scope.people = $scope.calculateWeightAndDecide(recommendedPolls,'polls');
+                sortByValue(recommendedPeople.array,'count');
+                $scope.people = calculateWeightAndDecide(recommendedPeople,fireFactory.getUserObject);
             })
         });
     };
-    $scope.calculateWeightAndDecide = function(recommendation,type){
-        var excessWeight = 0;
-        var result = [];
-        var staticTotalRecToShow = 5;
-        var totalRecToShow = staticTotalRecToShow;
-        for(var i =0; i<recommendation.array.length; i++){
-            var item = recommendation.array[i];
-            var weightOfItem = Math.round((item.count/recommendation.totalCount) * staticTotalRecToShow)+ excessWeight;
-            //Since we sorted from top to bottom if weights are equally distributed we can get a zero
-            //value. So round it up to 1
-            if(weightOfItem == 0){
-                weightOfItem = 1;
-            }
-            if(totalRecToShow < 1){
-                break;
-            }
 
-            var concatValue = weightOfItem;
-            if(totalRecToShow - weightOfItem < 0){
-                concatValue = totalRecToShow;
-            } else if(item.array.length < weightOfItem){
-                excessWeight = excessWeight + (weightOfItem - item.array.length);
-                concatValue = item.array.length;
-            }
 
-            var skipCount = 0;
-            for(var y = 0; y < concatValue ; y++){
-                if(!item.array[y] || $scope.hasItem(result,item.array[y].id)){
-                    skipCount++;
-                } else{
-                    result.push({key:item.array[y].id,value:fireFactory.getDataTypeObjectById(type,item.array[y].id)});
-                }
-            }
-            totalRecToShow = totalRecToShow - concatValue + skipCount;
-            excessWeight = excessWeight + skipCount;
+    $scope.getClass = function (item) {
+        if(!item.userImageSmall)
+        {
+            item.userImageSmall = "img/space_invaders_small.jpg";
         }
-        return result;
 
+        return "feed-element";
     };
-    $scope.hasItem = function(arrayInput, keyInput){
-        for(var y = 0; y < arrayInput.length ; y++){
-            if(arrayInput[y].key == keyInput){
-                return true;
-            }
-        }
-        return false;
-    };
-    $scope.findAndCalculate = function (itemType, contextItem, userData, outputObject,inputValue,inputKey) {
-        var union = [];
-        var capitalItemType = capitalizeFirstLetter(itemType);
-        angular.forEach(contextItem[itemType], function (value, key) {
-            union.push({count:value,id:key});
-        });
-
-        $scope.sortByValue(union,'count');
-        if(union.length != 0){
-            outputObject.totalCount = outputObject.totalCount + inputValue;
-            outputObject.array.push({
-                count: inputValue,
-                name: inputKey,
-                array: union
-            });
-        }
-    };
-    $scope.sortByValue = function (items,sortProperty) {
-        items.sort(function (a, b) {
-            if(sortProperty){
-                return b[sortProperty] - a[sortProperty]
-            } else {
-                return b[Object.keys(b)[0]] - a[Object.keys(a)[0]]
-            }
-        });
+    $scope.follow = function (item) {
 
     };
     $scope.init();
+
 }
 function HomeCtrl($scope, $rootScope, fireFactory) {
     $scope.init = function () {
@@ -762,101 +701,109 @@ function HomeCtrl($scope, $rootScope, fireFactory) {
                     if (!$scope.contexts[key]) {
                         return;
                     }
-                    $scope.findAndCalculate('polls', $scope.contexts[key], loadedData,recommendedPolls,value ,key);
-                    $scope.findAndCalculate('groups', $scope.contexts[key], loadedData,recommendedGroups,value ,key);
-                    $scope.findAndCalculate('events', $scope.contexts[key], loadedData,recommendedEvents,value ,key);
+                    findAndCalculate('polls', $scope.contexts[key], loadedData,recommendedPolls,value ,key);
+                    findAndCalculate('groups', $scope.contexts[key], loadedData,recommendedGroups,value ,key);
+                    findAndCalculate('events', $scope.contexts[key], loadedData,recommendedEvents,value ,key);
 
                 });
-                $scope.sortByValue(recommendedPolls.array,'count');
-                $scope.sortByValue(recommendedGroups.array,'count');
-                $scope.sortByValue(recommendedEvents.array,'count');
-                $scope.polls = $scope.calculateWeightAndDecide(recommendedPolls,'polls');
-                $scope.groups = $scope.calculateWeightAndDecide(recommendedGroups,'groups');
-                $scope.events = $scope.calculateWeightAndDecide(recommendedEvents,'events');
+                sortByValue(recommendedPolls.array,'count');
+                sortByValue(recommendedGroups.array,'count');
+                sortByValue(recommendedEvents.array,'count');
+                $scope.polls = calculateWeightAndDecide(recommendedPolls,fireFactory.getPollObject);
+                $scope.groups = calculateWeightAndDecide(recommendedGroups,fireFactory.getGroupObject);
+                $scope.events = calculateWeightAndDecide(recommendedEvents,fireFactory.getEventObject);
             })
         });
     };
-    $scope.calculateWeightAndDecide = function(recommendation,type){
-        var excessWeight = 0;
-        var result = [];
-        var staticTotalRecToShow = 5;
-        var totalRecToShow = staticTotalRecToShow;
-        for(var i =0; i<recommendation.array.length; i++){
-            var item = recommendation.array[i];
-            var weightOfItem = Math.round((item.count/recommendation.totalCount) * staticTotalRecToShow)+ excessWeight;
-            //Since we sorted from top to bottom if weights are equally distributed we can get a zero
-            //value. So round it up to 1
-            if(weightOfItem == 0){
-                weightOfItem = 1;
-            }
-            if(totalRecToShow < 1){
-                break;
-            }
-
-            var concatValue = weightOfItem;
-            if(totalRecToShow - weightOfItem < 0){
-                concatValue = totalRecToShow;
-            } else if(item.array.length < weightOfItem){
-                excessWeight = excessWeight + (weightOfItem - item.array.length);
-                concatValue = item.array.length;
-            }
-
-            var skipCount = 0;
-            for(var y = 0; y < concatValue ; y++){
-                if(!item.array[y] || $scope.hasItem(result,item.array[y].id)){
-                    skipCount++;
-                } else{
-                    result.push({key:item.array[y].id,value:fireFactory.getDataTypeObjectById(type,item.array[y].id)});
-                }
-            }
-            totalRecToShow = totalRecToShow - concatValue + skipCount;
-            excessWeight = excessWeight + skipCount;
-        }
-        return result;
-
-    };
-    $scope.hasItem = function(arrayInput, keyInput){
-        for(var y = 0; y < arrayInput.length ; y++){
-            if(arrayInput[y].key == keyInput){
-                return true;
-            }
-        }
-        return false;
-    };
-    $scope.findAndCalculate = function (itemType, contextItem, userData, outputObject,inputValue,inputKey) {
-        var union = [];
-        var capitalItemType = capitalizeFirstLetter(itemType);
-        angular.forEach(contextItem[itemType], function (value, key) {
-            //if (userData['created' + capitalItemType] && userData['created' + capitalItemType][key]) {
-            //    return;
-            //}
-            //if (userData['interacted' + capitalItemType] && userData['interacted' + capitalItemType][key]) {
-            //    return;
-            //}
-            union.push({count:value,id:key});
-        });
-
-        $scope.sortByValue(union,'count');
-        if(union.length != 0){
-            outputObject.totalCount = outputObject.totalCount + inputValue;
-            outputObject.array.push({
-                count: inputValue,
-                name: inputKey,
-                array: union
-            });
-        }
-    };
-    $scope.sortByValue = function (items,sortProperty) {
-        items.sort(function (a, b) {
-            if(sortProperty){
-                return b[sortProperty] - a[sortProperty]
-            } else {
-                return b[Object.keys(b)[0]] - a[Object.keys(a)[0]]
-            }
-        });
-
-    };
     $scope.init();
+
+}
+
+function calculateWeightAndDecide(recommendation,getObjectCallback){
+    var excessWeight = 0;
+    var result = [];
+    var staticTotalRecToShow = 5;
+    var totalRecToShow = staticTotalRecToShow;
+    for(var i =0; i<recommendation.array.length; i++){
+        var item = recommendation.array[i];
+        var weightOfItem = Math.round((item.count/recommendation.totalCount) * staticTotalRecToShow)+ excessWeight;
+        //Since we sorted from top to bottom if weights are equally distributed we can get a zero
+        //value. So round it up to 1
+        if(weightOfItem == 0){
+            weightOfItem = 1;
+        }
+        if(totalRecToShow < 1){
+            break;
+        }
+
+        var concatValue = weightOfItem;
+        if(totalRecToShow - weightOfItem < 0){
+            concatValue = totalRecToShow;
+        } else if(item.array.length < weightOfItem){
+            excessWeight = excessWeight + (weightOfItem - item.array.length);
+            concatValue = item.array.length;
+        }
+
+        var skipCount = 0;
+        for(var y = 0; y < concatValue ; y++){
+            if(!item.array[y] || hasItem(result,item.array[y].id)){
+                skipCount++;
+            } else{
+                result.push({key:item.array[y].id,value:getObjectCallback(item.array[y].id)});
+            }
+        }
+        totalRecToShow = totalRecToShow - concatValue + skipCount;
+        excessWeight = excessWeight + skipCount;
+    }
+    return result;
+
+}
+
+function hasItem(arrayInput, keyInput){
+    for(var y = 0; y < arrayInput.length ; y++){
+        if(arrayInput[y].key == keyInput){
+            return true;
+        }
+    }
+    return false;
+}
+function findAndCalculate(itemType, contextItem, userData, outputObject,inputValue,inputKey) {
+    var union = [];
+    var capitalItemType = capitalizeFirstLetter(itemType);
+    angular.forEach(contextItem[itemType], function (value, key) {
+        //if (userData['created' + capitalItemType] && userData['created' + capitalItemType][key]) {
+        //    return;
+        //}
+        //if (userData['interacted' + capitalItemType] && userData['interacted' + capitalItemType][key]) {
+        //    return;
+        //}
+        //if (userData['interacted' + capitalItemType] && userData['interacted' + capitalItemType][key]) {
+        //    return;
+        //}
+        if (userData['$id'] && userData.$id == key) {
+            return;
+        }
+        union.push({count:value,id:key});
+    });
+
+    sortByValue(union,'count');
+    if(union.length != 0){
+        outputObject.totalCount = outputObject.totalCount + inputValue;
+        outputObject.array.push({
+            count: inputValue,
+            name: inputKey,
+            array: union
+        });
+    }
+}
+function sortByValue(items,sortProperty) {
+    items.sort(function (a, b) {
+        if(sortProperty){
+            return b[sortProperty] - a[sortProperty]
+        } else {
+            return b[Object.keys(b)[0]] - a[Object.keys(a)[0]]
+        }
+    });
 
 }
 function capitalizeFirstLetter(string) {
@@ -955,6 +902,16 @@ angular
 
             helperFactory.getGroupObject = function (uid) {
                 return $firebaseObject(helperFactory.getGroupRef(uid));
+            };
+            helperFactory.getPollsRef = function () {
+                return helperFactory.getDataRef().child('polls');
+            };
+            helperFactory.getPollRef = function (uid) {
+                return helperFactory.getPollsRef().child(uid);
+            };
+
+            helperFactory.getPollObject = function (uid) {
+                return $firebaseObject(helperFactory.getPollRef(uid));
             };
 
             helperFactory.getContextsRef = function () {
