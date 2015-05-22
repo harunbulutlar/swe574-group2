@@ -67,7 +67,7 @@
 
             <div class='form-group' ng-show="isSelected(1)">
 
-                <comment-template item-comment="selectedItem.eventComments"></comment-template>
+                <comment-template item-comment="selectedItem.eventComments" add-comment-callback="addEventCommentForView"></comment-template>
             </div>
 
             <div class='form-group' ng-show="isSelected(2)">
