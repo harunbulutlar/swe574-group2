@@ -211,9 +211,6 @@ function PollTemplateCtrl($rootScope, $scope, MEMBER, contextFactory, $state, fi
     $scope.currentUserName = $rootScope.MainCtrlRef.currentUserData.userName;
     $scope.pollRoles = MEMBER.MEMBER_ROLES;
 
-    $scope.pollTagTempId = '';
-    $scope.pollCommentTempList = [];
-
     $scope.tags = '';
     $scope.manualTags = '';
 
@@ -232,7 +229,7 @@ function PollTemplateCtrl($rootScope, $scope, MEMBER, contextFactory, $state, fi
         if ($scope.selectedItemId == null) {
             return false;
         } else {
-            return !(($scope.currentUserId === $scope.selectedItemId.createdBy) || $scope.currentUserIsAdmin);
+            return !(($scope.currentUserId === $scope.selectedItem.createdBy) || $scope.currentUserIsAdmin);
         }
     };
 

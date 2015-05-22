@@ -683,7 +683,7 @@ function EventTemplateCtrl($rootScope, $scope, MEMBER, contextFactory, $state, f
         if ($scope.selectedItemId == null) {
             return false;
         } else {
-            return !(($scope.currentUserId === $scope.selectedItemId.createdBy) || $scope.currentUserIsAdmin);
+            return !(($scope.currentUserId === $scope.selectedItem.createdBy) || $scope.currentUserIsAdmin);
         }
     };
 
