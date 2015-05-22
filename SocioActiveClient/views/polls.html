@@ -6,16 +6,20 @@
                     <div class="ibox-title">
                         <h3>Polls
                             <small>The list of the polls that you have interacted with!</small>
+                            <div ibox-tools></div>
                         </h3>
+
                     </div>
                     <div class="ibox-content">
-                        <item-preview selected-item ="selectedPoll" selected-item-id="selectedPollId" previewed-item="polls"></item-preview>
+                        <item-preview selected-item="selectedPoll" selected-item-id="selectedPollId"
+                                      previewed-item="polls"></item-preview>
                     </div>
                 </div>
             </div>
             <div class="col-lg-6">
                 <div class="ibox float-e-margins">
-                    <dynamic-area ng-model="selectedPoll" selected-item-id="selectedPollId" area-type="'poll'"></dynamic-area>
+                    <dynamic-area ng-model="selectedPoll" selected-item-id="selectedPollId"
+                                  area-type="'poll'"></dynamic-area>
                 </div>
             </div>
         </div>
