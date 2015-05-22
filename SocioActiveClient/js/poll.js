@@ -174,7 +174,7 @@ function PollCtrl($scope, $rootScope, $stateParams, $state, contextFactory, MEMB
         });
 
         angular.forEach($rootScope.MainCtrlRef.currentUserData.contexts, function (value, key) {
-            var userInContext= fireFactoryForPoll.getUserInContextRef(key,$rootScope.MainCtrlRef.userId);
+            var userInContext = fireFactoryForPoll.getUserInContextRef(key, $rootScope.MainCtrlRef.userId);
             userInContext.set(value);
         });
 
@@ -207,9 +207,31 @@ function PollTemplateCtrl($rootScope, $scope, MEMBER, contextFactory, $state, fi
     var syncObj = fireFactoryForPoll.getDataTypeObjectById('polls', $scope.selectedItemId);
     syncObj.$bindTo($scope, "selectedItem");
 
+    $scope.doughnutData = [];
+
+    var deneme = fireFactoryForPoll.getPollObject($scope.selectedItemId);
+
+    deneme.$loaded().then(function (loadedData) {
+
+        for (var i = 0; i < loadedData.pollOptions.length; i++) {
+
+            $scope.doughnutData.push({
+
+                value: loadedData.pollOptions[i].optionVoteCount,
+                color: getRandomColor(),
+                highlight: getRandomColor(),
+                label: loadedData.pollOptions[i].optionName
+
+            });
+
+        }
+    });
+
     $scope.currentUserId = $rootScope.MainCtrlRef.userId;
     $scope.currentUserName = $rootScope.MainCtrlRef.currentUserData.userName;
     $scope.pollRoles = MEMBER.MEMBER_ROLES;
+
+    $scope.pollOptionTempList = [];
 
     $scope.tags = '';
     $scope.manualTags = '';
@@ -295,6 +317,7 @@ function PollTemplateCtrl($rootScope, $scope, MEMBER, contextFactory, $state, fi
         $scope.pollOptionTempList.optionName = '';
         $scope.pollOptionTempList.optionDetail = '';
     };
+
     $scope.removePollOption = function (optionToBeRemoved) {
         $scope.selectedItem.pollOptions.splice(optionToBeRemoved, 1);
     };
@@ -309,8 +332,10 @@ function PollTemplateCtrl($rootScope, $scope, MEMBER, contextFactory, $state, fi
 
         var contextPollsRef = fireFactoryForPoll.getPollsInContextRef(tag.tagContext);
         var pollLinkObject = {};
+
         pollLinkObject[$scope.selectedItemId] = $scope.selectedItem.pollTagContext[tag.tagContext].length;
         contextPollsRef.update(pollLinkObject);
+
         if (!$rootScope.MainCtrlRef.currentUserData.contexts[tag.tagContext]) {
             $rootScope.MainCtrlRef.currentUserData.contexts[tag.tagContext] = 1;
         } else {
@@ -323,7 +348,6 @@ function PollTemplateCtrl($rootScope, $scope, MEMBER, contextFactory, $state, fi
         $scope.tags = '';
         $scope.manualTags = '';
     };
-
 
     $scope.addPollCommentForView = function (body) {
         if (!$scope.selectedItem.pollComments) {
@@ -340,6 +364,38 @@ function PollTemplateCtrl($rootScope, $scope, MEMBER, contextFactory, $state, fi
     $scope.pollCommentDateDifference = function (date) {
         return dateDifference(date);
 
+    };
+
+    /*$scope.doughnutData = [
+        {
+            value: 300,
+            color: "#a3e1d4",
+            highlight: "#1ab394",
+            label: "App"
+        },
+        {
+            value: 50,
+            color: "#dedede",
+            highlight: "#1ab394",
+            label: "Software"
+        },
+        {
+            value: 100,
+            color: "#b5b8cf",
+            highlight: "#1ab394",
+            label: "Laptop"
+        }
+    ];*/
+
+    $scope.doughnutOptions = {
+        segmentShowStroke: true,
+        segmentStrokeColor: "#fff",
+        segmentStrokeWidth: 2,
+        percentageInnerCutout: 45, // This is 0 for Pie charts
+        animationSteps: 100,
+        animationEasing: "easeOutBounce",
+        animateRotate: true,
+        animateScale: false
     };
 
     $scope.showContent = function (fieldKey, contentKey) {
@@ -370,6 +426,48 @@ function PollTabCtrl($scope) {
 
         return tabs == checkTab;
 
+    };
+
+}
+
+function chartJsCtrl() {
+
+    /**
+     * Data for Doughnut chart
+     */
+    this.doughnutData = [
+        {
+            value: 300,
+            color: "#a3e1d4",
+            highlight: "#1ab394",
+            label: "App"
+        },
+        {
+            value: 50,
+            color: "#dedede",
+            highlight: "#1ab394",
+            label: "Software"
+        },
+        {
+            value: 100,
+            color: "#b5b8cf",
+            highlight: "#1ab394",
+            label: "Laptop"
+        }
+    ];
+
+    /**
+     * Options for Doughnut chart
+     */
+    this.doughnutOptions = {
+        segmentShowStroke: true,
+        segmentStrokeColor: "#fff",
+        segmentStrokeWidth: 2,
+        percentageInnerCutout: 45, // This is 0 for Pie charts
+        animationSteps: 100,
+        animationEasing: "easeOutBounce",
+        animateRotate: true,
+        animateScale: false
     };
 
 }
@@ -523,12 +621,12 @@ angular
                 return $firebaseObject(helperFactory.getPollsInContextRef(context));
             };
 
-            helperFactory.getUserInContextRef = function (context,userId) {
+            helperFactory.getUserInContextRef = function (context, userId) {
                 return helperFactory.getUsersInContextRef(context).child(userId);
             };
 
-            helperFactory.getUserInContextObject = function (context,userId) {
-                return $firebaseObject(helperFactory.getUserInContextRef(context,userId));
+            helperFactory.getUserInContextObject = function (context, userId) {
+                return $firebaseObject(helperFactory.getUserInContextRef(context, userId));
             };
             return helperFactory;
 

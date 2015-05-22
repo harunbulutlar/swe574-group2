@@ -73,6 +73,13 @@ function config($stateProvider, $urlRouterProvider, $ocLazyLoadProvider) {
                         {
                             name: 'ui.select',
                             files: ['css/plugins/ui-select/select.css','js/plugins/ui-select/select.js']
+                        },
+                        {
+                            files: ['js/plugins/chartJs/Chart.min.js']
+                        },
+                        {
+                            name: 'angles',
+                            files: ['js/plugins/chartJs/angles.js']
                         }
                     ]);
                 }
@@ -173,6 +180,13 @@ function config($stateProvider, $urlRouterProvider, $ocLazyLoadProvider) {
                         {
                             name: 'ui.select',
                             files: ['css/plugins/ui-select/select.css','js/plugins/ui-select/select.js']
+                        },
+                        {
+                            files: ['js/plugins/chartJs/Chart.min.js']
+                        },
+                        {
+                            name: 'angles',
+                            files: ['js/plugins/chartJs/angles.js']
                         }
                     ]);
                 }

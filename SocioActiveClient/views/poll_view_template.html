@@ -1,11 +1,10 @@
-
 <div class="ibox-title">
     <h3>{{selectedItem.title}}
         <small>{{selectedItem.description}}</small>
         <div ibox-tools></div>
     </h3>
 </div>
-<div class="ibox-content" >
+<div class="ibox-content">
 
 
     <div class="form-group" ng-hide="isPollDisabled()"><label>Just For: </label>
@@ -124,12 +123,19 @@
 
             <div class='form-group' ng-show="isSelected(1)">
 
-                <comment-template item-comment="selectedItem.pollComments" add-comment-callback="addPollCommentForView"></comment-template>
+                <comment-template item-comment="selectedItem.pollComments"
+                                  add-comment-callback="addPollCommentForView"></comment-template>
 
             </div>
 
             <div class='form-group' ng-show="isSelected(2)">
                 <h4>Results</h4>
+
+                <div>
+                    <canvas doughnutchart options="doughnutOptions" data="doughnutData" height="140"
+                            responsive=true></canvas>
+                </div>
+
             </div>
 
 
@@ -139,9 +145,6 @@
 
 
 </div>
-<div class="form-group"><label>Deneme Sonuc: {{}}</label></div>
-
-
 <div class="form-group"><label>{{selectedItem.title}}'s fields</label></div>
 <script type="text/ng-template" id="content_renderer.html">
     <div ui-tree-handle class="tree-node tree-node-content">
@@ -169,5 +172,6 @@
         <li ng-repeat="(fieldKey,node) in selectedItem.fields" ui-tree-node
             ng-include="'field_renderer.html'"></li>
     </ol>
+
 </div>
 
