@@ -866,7 +866,6 @@ function HomeCtrl($scope, $rootScope, fireFactory) {
             var searchResultGroup = [];
             var searchResultPoll = [];
             angular.forEach($scope.groupsFromDB, function (value, key) {
-                console.log("value: " + value.description + " key: " + key);
                 var tempSearchTerm = $scope.searchTerm;
                 var tempDescription = value.description;
                 tempSearchTerm = angular.lowercase(tempSearchTerm);
@@ -874,16 +873,48 @@ function HomeCtrl($scope, $rootScope, fireFactory) {
                 if (tempDescription.search(tempSearchTerm) > -1) {
                     searchResultGroup.push({key: key, value: fireFactory.getDataTypeObjectById("groups", key)});
                 }
+                if(value.contexts != undefined) {
+                    angular.forEach(value.contexts, function (value2, key2){
+                        angular.forEach(value2, function(value3,key3) {
+                            var tempTagContext = value3.tagContext;
+                            var tempTagName = value3.tagName;
+
+                            tempTagContext = angular.lowercase(tempTagContext);
+                            tempTagName = angular.lowercase(tempTagName);
+                            if(tempTagContext.search(tempSearchTerm) > -1 || tempTagName.search(tempSearchTerm) > -1) {
+                                searchResultGroup.push({key: key, value: fireFactory.getDataTypeObjectById("groups", key)});
+                            }
+                        });
+
+
+                    });
+                }
             });
 
             angular.forEach($scope.pollsFromDB, function (value, key) {
-                console.log("value: " + value.description + " key: " + key);
                 var tempSearchTerm = $scope.searchTerm;
                 var tempDescription = value.description;
                 tempSearchTerm = angular.lowercase(tempSearchTerm);
                 tempDescription = angular.lowercase(tempDescription);
                 if (tempDescription.search(tempSearchTerm) > -1) {
                     searchResultPoll.push({key: key, value: fireFactory.getDataTypeObjectById("polls", key)});
+                }
+
+                if(value.pollTagContext != undefined) {
+                    angular.forEach(value.pollTagContext, function (value2, key2){
+                        angular.forEach(value2, function(value3,key3) {
+                            var tempTagContext = value3.tagContext;
+                            var tempTagName = value3.tagName;
+
+                            tempTagContext = angular.lowercase(tempTagContext);
+                            tempTagName = angular.lowercase(tempTagName);
+                            if(tempTagContext.search(tempSearchTerm) > -1 || tempTagName.search(tempSearchTerm) > -1) {
+                                searchResultPoll.push({key: key, value: fireFactory.getDataTypeObjectById("polls", key)});
+                            }
+                        });
+
+
+                    });
                 }
             });
             $scope.groups = searchResultGroup;
