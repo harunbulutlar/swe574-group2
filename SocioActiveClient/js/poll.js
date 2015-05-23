@@ -18,7 +18,7 @@ function PollCtrl($scope, $rootScope, $state, contextFactory, MEMBER, fireFactor
 
     $scope.initializePoll = function () {
         $scope.createdPoll = {
-            pollPrivacy: "",
+            pollPrivacy: "friends",
             title: "",
             description: "",
             pollOptions: [],
@@ -340,7 +340,7 @@ function PollTemplateCtrl($rootScope, $scope, MEMBER, contextFactory, $state, fi
         }
         $scope.selectedItem.pollComments.push({
             "commentBody": body,
-            "commentUserEmail": $scope.currentUserId,
+            "commentUserId": $scope.currentUserId,
             "commentUserName": $scope.currentUserName,
             "commentDateTime": new Date().getTime()
         });

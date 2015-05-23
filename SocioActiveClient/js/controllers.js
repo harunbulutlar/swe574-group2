@@ -31,7 +31,7 @@ function MainCtrl($window, fireFactory, $rootScope) {
 
 }
 
-function CustomTypesCtrl($state, $scope, contextFactory, $rootScope, fireFactory) {
+function CustomTypesCtrl($state, $scope, contextFactory, $rootScope, fireFactory, MEMBER) {
 
     $scope.isCreateObject = true; //Variable is for the tag! Do not delete!
     $scope.loading = false;
@@ -137,6 +137,7 @@ function CustomTypesCtrl($state, $scope, contextFactory, $rootScope, fireFactory
     $scope.userFieldType = '';
     $scope.types = $rootScope.primitiveTypes;
     $scope.userFieldName = '';
+    $scope.groupRoles = MEMBER.MEMBER_ROLES;
 
     $scope.initPage = function () {
         $scope.createdGroup = {};
@@ -147,6 +148,8 @@ function CustomTypesCtrl($state, $scope, contextFactory, $rootScope, fireFactory
         $scope.createdGroup["fields"] = [];
         $scope.createdGroup["contexts"] = {};
         $scope.createdGroup["comments"] = [];
+        $scope.createdGroup["roles"] = [];
+        $scope.createdGroup["privacy"] = 'friends';
 
     };
     $scope.initPage();
@@ -330,7 +333,20 @@ function GroupTemplateCtrl($rootScope, $scope, contextFactory, $state, fireFacto
 
     $scope.addButtonClick = function (selectedTypeId) {
         $state.go('index.group_add_content', {groupId: $scope.selectedItemId, typeId: selectedTypeId});
-    }
+    };
+
+    //for adding comments on group view pannel
+    $scope.addGroupCommentForView = function (body) {
+        if (!$scope.selectedItem.comments) {
+            $scope.selectedItem.comments = [];
+        }
+        $scope.selectedItem.comments.push({
+            "commentBody": body,
+            "commentUserId": $rootScope.MainCtrlRef.userId,
+            "commentUserName": $rootScope.MainCtrlRef.currentUserData.userName,
+            "commentDateTime": new Date().getTime()
+        });
+    };
 }
 
 function GroupAddCtrl($scope, $state, $rootScope, $stateParams, fireFactory) {
@@ -565,7 +581,7 @@ function EventCtrl($scope, $rootScope, fireFactory, $state, contextFactory, MEMB
 
     $scope.initializeEvent = function () {
         $scope.createdEvent = {
-            eventPrivacy: "",
+            eventPrivacy: "friends",
             title: "",
             description: "",
             eventLocation: "",
@@ -623,12 +639,12 @@ function EventCtrl($scope, $rootScope, fireFactory, $state, contextFactory, MEMB
 
         }
 
-/*        if (!$scope.createdEvent.eventDate) {
+        /*        if (!$scope.createdEvent.eventDate) {
 
-            alert("You need to enter a date for your event!");
-            return;
+         alert("You need to enter a date for your event!");
+         return;
 
-        }*/
+         }*/
 
         if ($scope.isEventObjectEmpty($scope.createdEvent.eventTagContext)) {
 
@@ -682,7 +698,7 @@ function EventCtrl($scope, $rootScope, fireFactory, $state, contextFactory, MEMB
 
 }
 
-function EventTemplateCtrl($rootScope, $scope, MEMBER, contextFactory, $state, fireFactory) {
+function EventTemplateCtrl($rootScope, $scope, MEMBER, fireFactoryForEvent, $state, fireFactory) {
 
     $scope.selectedItemId = $scope.$parent.selectedItemId;
     var syncObj = fireFactory.getDataTypeObjectById('events', $scope.selectedItemId);
@@ -753,7 +769,7 @@ function EventTemplateCtrl($rootScope, $scope, MEMBER, contextFactory, $state, f
         }
         $scope.selectedItem.eventComments.push({
             "commentBody": body,
-            "commentUserEmail": $scope.currentUserId,
+            "commentUserId": $scope.currentUserId,
             "commentUserName": $scope.currentUserName,
             "commentDateTime": new Date().getTime()
         });
@@ -816,7 +832,7 @@ function ProfileViewCtrl($scope, $rootScope, fireFactory, $stateParams) {
 
         $scope.specificUserProfile = fireFactory.getUserObject($stateParams.userToBeViewed);
 
-        $scope.specificUserProfile.$loaded().then(function(loadedData){
+        $scope.specificUserProfile.$loaded().then(function (loadedData) {
             $scope.specificUserName = loadedData.userName;
             $scope.specificUserLastName = loadedData.userLastName;
             $scope.specificUserImage = loadedData.userImage;
@@ -841,7 +857,6 @@ function ProfileViewCtrl($scope, $rootScope, fireFactory, $stateParams) {
 }
 
 
-
 function CommentCtrl($scope, $rootScope) {
 
     $scope.addComments = function () {
@@ -850,14 +865,15 @@ function CommentCtrl($scope, $rootScope) {
             $scope.itemComment = [];
         }
 
-        $scope.itemComment.push({
-            "commentBody": $scope.commentBody,
-            "commentUserId": $rootScope.MainCtrlRef.userId,
-            "commentUserName": $rootScope.MainCtrlRef.currentUserData.userName,
-            "commentDateTime": new Date().getTime()
-        });
 
-        if ($scope.addCommentCallback) {
+        if (!$scope.addCommentCallback) {
+            $scope.itemComment.push({
+                "commentBody": $scope.commentBody,
+                "commentUserId": $rootScope.MainCtrlRef.userId,
+                "commentUserName": $rootScope.MainCtrlRef.currentUserData.userName,
+                "commentDateTime": new Date().getTime()
+            });
+        }else{
 
             $scope.addCommentCallback($scope.commentBody);
 
@@ -936,16 +952,19 @@ function HomeCtrl($scope, $rootScope, fireFactory) {
                 if (tempDescription.search(tempSearchTerm) > -1) {
                     searchResultGroup.push({key: key, value: fireFactory.getDataTypeObjectById("groups", key)});
                 }
-                if(value.contexts != undefined) {
-                    angular.forEach(value.contexts, function (value2, key2){
-                        angular.forEach(value2, function(value3,key3) {
+                if (value.contexts != undefined) {
+                    angular.forEach(value.contexts, function (value2, key2) {
+                        angular.forEach(value2, function (value3, key3) {
                             var tempTagContext = value3.tagContext;
                             var tempTagName = value3.tagName;
 
                             tempTagContext = angular.lowercase(tempTagContext);
                             tempTagName = angular.lowercase(tempTagName);
-                            if(tempTagContext.search(tempSearchTerm) > -1 || tempTagName.search(tempSearchTerm) > -1) {
-                                searchResultGroup.push({key: key, value: fireFactory.getDataTypeObjectById("groups", key)});
+                            if (tempTagContext.search(tempSearchTerm) > -1 || tempTagName.search(tempSearchTerm) > -1) {
+                                searchResultGroup.push({
+                                    key: key,
+                                    value: fireFactory.getDataTypeObjectById("groups", key)
+                                });
                             }
                         });
 
@@ -963,16 +982,19 @@ function HomeCtrl($scope, $rootScope, fireFactory) {
                     searchResultPoll.push({key: key, value: fireFactory.getDataTypeObjectById("polls", key)});
                 }
 
-                if(value.pollTagContext != undefined) {
-                    angular.forEach(value.pollTagContext, function (value2, key2){
-                        angular.forEach(value2, function(value3,key3) {
+                if (value.pollTagContext != undefined) {
+                    angular.forEach(value.pollTagContext, function (value2, key2) {
+                        angular.forEach(value2, function (value3, key3) {
                             var tempTagContext = value3.tagContext;
                             var tempTagName = value3.tagName;
 
                             tempTagContext = angular.lowercase(tempTagContext);
                             tempTagName = angular.lowercase(tempTagName);
-                            if(tempTagContext.search(tempSearchTerm) > -1 || tempTagName.search(tempSearchTerm) > -1) {
-                                searchResultPoll.push({key: key, value: fireFactory.getDataTypeObjectById("polls", key)});
+                            if (tempTagContext.search(tempSearchTerm) > -1 || tempTagName.search(tempSearchTerm) > -1) {
+                                searchResultPoll.push({
+                                    key: key,
+                                    value: fireFactory.getDataTypeObjectById("polls", key)
+                                });
                             }
                         });
 
@@ -1083,12 +1105,12 @@ function capitalizeFirstLetter(string) {
 
 function getRandomColor() {
 
-    var colors = ['#D2FFFF','#BFFFFF','#A6FFFF','#91FFFF','#7FFFFF',
-        '#BBFFFF','#9FFFFF','#7AFFFF','#5AFFFF','#3FFFFF',
-        '#AEFFFF','#8CFFFF','#60FFFF','#39FFFF','#19FFFF',
-        '#A5FFFF','#7FFFFF','#4EFFFF','#23FFFF','#00FFFF',
-        '#9AEEEE','#77EEEE','#49EEEE','#21EEEE','#00EEEE',
-        '#85CDCD','#66CDCD','#3FCDCD','#1CCDCD','#00CDCD'];
+    var colors = ['#D2FFFF', '#BFFFFF', '#A6FFFF', '#91FFFF', '#7FFFFF',
+        '#BBFFFF', '#9FFFFF', '#7AFFFF', '#5AFFFF', '#3FFFFF',
+        '#AEFFFF', '#8CFFFF', '#60FFFF', '#39FFFF', '#19FFFF',
+        '#A5FFFF', '#7FFFFF', '#4EFFFF', '#23FFFF', '#00FFFF',
+        '#9AEEEE', '#77EEEE', '#49EEEE', '#21EEEE', '#00EEEE',
+        '#85CDCD', '#66CDCD', '#3FCDCD', '#1CCDCD', '#00CDCD'];
 
     return colors[Math.floor(Math.random() * colors.length)];
 }
@@ -1272,7 +1294,6 @@ angular
             };
 
 
-
             ///Specific Helpers
             helperFactory.getUserInContextRef = function (context, userId) {
                 return helperFactory.getUsersInContextRef(context).child(userId);
@@ -1306,12 +1327,11 @@ angular
             };
 
 
-
             return helperFactory;
 
 
         }]
-    )
+)
     .factory('contextFactory', ['$http', '$rootScope',
         function contextFactory($http) {
             var helperFactory = {};
@@ -1385,4 +1405,4 @@ angular
 
             return helperFactory;
         }]
-    );
+);
