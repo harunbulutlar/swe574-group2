@@ -5,7 +5,7 @@
 /** @namespace contextFilter.notable */
 
 
-function PollCtrl($scope, $rootScope, $stateParams, $state, contextFactory, MEMBER, fireFactoryForPoll) {
+function PollCtrl($scope, $rootScope, $state, contextFactory, MEMBER, fireFactoryForPoll) {
 
     $scope.isVotedTemp = false;
     $scope.getPollTags = contextFactory.getTagContext;
@@ -14,7 +14,7 @@ function PollCtrl($scope, $rootScope, $stateParams, $state, contextFactory, MEMB
     $scope.tags = '';
     $scope.manualTags = '';
     $scope.pollRoles = MEMBER.MEMBER_ROLES;
-    $scope.pollToBeViewed = $stateParams.pollToBeViewed;
+    $scope.isCreateObject = true;
 
     $scope.initializePoll = function () {
         $scope.createdPoll = {
@@ -174,6 +174,8 @@ function PollCtrl($scope, $rootScope, $stateParams, $state, contextFactory, MEMB
 }
 
 function PollTemplateCtrl($rootScope, $scope, MEMBER, contextFactory, $state, fireFactoryForPoll) {
+
+    $scope.isCreateObject = false; //Variable is for the tag! Do not delete!
 
     $scope.selectedItemId = $scope.$parent.selectedItemId;
     var syncObj = fireFactoryForPoll.getDataTypeObjectById('polls', $scope.selectedItemId);
@@ -381,47 +383,6 @@ function PollTabCtrl($scope) {
 
 }
 
-function chartJsCtrl() {
-
-    /**
-     * Data for Doughnut chart
-     */
-    this.doughnutData = [
-        {
-            value: 300,
-            color: "#a3e1d4",
-            highlight: "#1ab394",
-            label: "App"
-        },
-        {
-            value: 50,
-            color: "#dedede",
-            highlight: "#1ab394",
-            label: "Software"
-        },
-        {
-            value: 100,
-            color: "#b5b8cf",
-            highlight: "#1ab394",
-            label: "Laptop"
-        }
-    ];
-
-    /**
-     * Options for Doughnut chart
-     */
-    this.doughnutOptions = {
-        segmentShowStroke: true,
-        segmentStrokeColor: "#fff",
-        segmentStrokeWidth: 2,
-        percentageInnerCutout: 45, // This is 0 for Pie charts
-        animationSteps: 100,
-        animationEasing: "easeOutBounce",
-        animateRotate: true,
-        animateScale: false
-    };
-
-}
 
 function calculateAverage(data) {
     var sum = data.reduce(function (sum, value) {

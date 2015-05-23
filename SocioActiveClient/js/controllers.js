@@ -32,6 +32,8 @@ function MainCtrl($window, fireFactory, $rootScope) {
 }
 
 function CustomTypesCtrl($state, $scope, contextFactory, $rootScope, fireFactory) {
+
+    $scope.isCreateObject = true; //Variable is for the tag! Do not delete!
     $scope.loading = false;
     $scope.getGroupTagContext = contextFactory.getTagContext;
     $scope.addCustomType = function () {
@@ -87,6 +89,13 @@ function CustomTypesCtrl($state, $scope, contextFactory, $rootScope, fireFactory
             return;
         }
 
+        if (isObjectEmpty($scope.createdGroup.contexts)) {
+
+            alert("You need to add tags for your poll!");
+            return;
+
+        }
+
         var strippedGroups = angular.fromJson(angular.toJson($scope.createdGroup));
         var fireBaseObj = fireFactory.getGroupsRef().push(strippedGroups);
 
@@ -137,6 +146,7 @@ function CustomTypesCtrl($state, $scope, contextFactory, $rootScope, fireFactory
         $scope.createdGroup["description"] = '';
         $scope.createdGroup["fields"] = [];
         $scope.createdGroup["contexts"] = {};
+        $scope.createdGroup["comments"] = [];
 
     };
     $scope.initPage();
@@ -277,6 +287,9 @@ function CurrentGroupsCtrl($scope, fireFactory) {
 }
 
 function GroupTemplateCtrl($rootScope, $scope, contextFactory, $state, fireFactory) {
+
+    $scope.isCreateObject = false; //Variable is for the tag! Do not delete!
+
     var syncObj = fireFactory.getDataTypeObjectById('groups', $scope.selectedItemId);
     syncObj.$bindTo($scope, "selectedItem");
     $scope.toggle = function (scope) {
@@ -548,6 +561,8 @@ function EventCtrl($scope, $rootScope, fireFactory, $state, contextFactory, MEMB
 
     $scope.eventRoles = MEMBER.MEMBER_ROLES;
 
+    $scope.isCreateObject = true;
+
     $scope.initializeEvent = function () {
         $scope.createdEvent = {
             eventPrivacy: "",
@@ -615,6 +630,13 @@ function EventCtrl($scope, $rootScope, fireFactory, $state, contextFactory, MEMB
 
         }
 
+        if ($scope.isEventObjectEmpty($scope.createdEvent.eventTagContext)) {
+
+            alert("You need to add tags for your poll!");
+            return;
+
+        }
+
         var strippedEvents = angular.fromJson(angular.toJson($scope.createdEvent));
         var fireBaseObj = fireFactory.getEventsRef().push(strippedEvents);
 
@@ -652,6 +674,12 @@ function EventCtrl($scope, $rootScope, fireFactory, $state, contextFactory, MEMB
 
     };
 
+    $scope.isEventObjectEmpty = function (obj) {
+
+        return isObjectEmpty(obj);
+
+    };
+
 }
 
 function EventTemplateCtrl($rootScope, $scope, MEMBER, contextFactory, $state, fireFactory) {
@@ -666,6 +694,8 @@ function EventTemplateCtrl($rootScope, $scope, MEMBER, contextFactory, $state, f
 
     $scope.tags = '';
     $scope.manualTags = '';
+
+    $scope.isCreateObject = false;
 
     $scope.tagContextList = ["Professional Sports Team",
         "College/University",

@@ -244,7 +244,8 @@ function freebaseTags() {
             tagContext: '=',
             addManualTagCallback: '=',
             addTagCallback: '=',
-            removeTagCallback: '='
+            removeTagCallback: '=',
+            isCreate: '='
         },
         templateUrl: 'views/tag_template.html'
     };

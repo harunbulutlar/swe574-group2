@@ -7,6 +7,7 @@
 
                     <div ibox-tools></div>
                 </div>
+
                 <div class="ibox-content">
                     <div class=" form-group"><label>Title</label> <input type="text"
                                                                          ng-model="createdEvent.title"
@@ -20,7 +21,8 @@
                                                                             ng-model="createdEvent.description"
                                                                             class="form-control"></textarea>
                     </div>
-
+                </div>
+                <div class="ibox-content">
                     <div class="form-group"><label>Just For: </label>
 
                         <div class="radio"><label> <input type="radio" value="friends" id="friendsRadio"
@@ -37,7 +39,9 @@
                                 ng-options="roles for roles in eventRoles" multiple="multiple" multiselect-dropdown>
                         </select>
                     </div>
+                </div>
 
+                <div class="ibox-content">
                     <div class=" form-group"><label>Place</label> <input type="text"
                                                                          placeholder="Enter a location for your event"
                                                                          ng-model="createdEvent.eventLocation"
@@ -53,48 +57,70 @@
                                    required=""><span
                                 class='input-group-addon'><i class='fa fa-calendar'></i></span></div>
                     </div>
+                </div>
 
-                    <freebase-tags tag-context="createdEvent.eventTagContext"></freebase-tags>
+                <div class="ibox-content">
+                    <freebase-tags tag-context="createdEvent.eventTagContext"
+                                   is-create='isCreateObject'></freebase-tags>
+                </div>
 
+
+                <br>
+
+                <div class="ibox-content">
                     <section ng-controller="TabCtrl">
 
-                        <div class="ibox-content">
-                            <tabset>
-                                <tab ng-click="selectTab(1)">
-                                    <tab-heading>
-                                        Comments
-                                    </tab-heading>
 
-                                </tab>
+                        <tabset>
+                            <tab ng-click="selectTab(1)">
+                                <tab-heading>
+                                    Comments
+                                </tab-heading>
 
-                                <tab ng-click="selectTab(2)">
-                                    <tab-heading>
-                                        Results
-                                    </tab-heading>
+                            </tab>
+                        </tabset>
 
-                                </tab>
-                            </tabset>
-                        </div>
 
                         <div class='form-group' ng-show="isSelected(1)">
 
                             <comment-template item-comment="createdEvent.eventComments"></comment-template>
                         </div>
 
-                        <div class='form-group' ng-show="isSelected(2)">
-                            <h4>Participants</h4>
-                        </div>
-
                     </section>
-
-
                 </div>
-                <form class="col-lg-12" ng-submit="saveEventData()">
-                    <button type="submit" class="btn btn-primary btn-sm btn-block"><i class="fa fa-save"></i> Save Your Changes
-                    </button>
-                </form>
             </div>
         </div>
-    </div>
 
+
+        <div class="col-lg-6">
+            <div class="ibox float-e-margins">
+                <div class="ibox-title">
+                    <h5>Custom Types</h5>
+
+                    <div ibox-tools></div>
+                </div>
+                <div class="ibox-content">
+                    <tabset>
+                        <tab ng-repeat=" value in $root.MainCtrlRef.currentUserData.customTypes">
+                            <tab-heading>
+                                {{value.name}}<a class="pull-right btn btn-white btn-xs" data-nodrag
+                                                 ng-click="removeTab(value)"><span class="fa fa-trash"></span></a>
+                            </tab-heading>
+                            <type-template type-parameter="value"></type-template>
+                        </tab>
+                        <button class="btn btn-w-m btn-primary" ng-click="addCustomType()"><i class="fa fa-plus"></i>
+                            Add Type
+                        </button>
+                    </tabset>
+                </div>
+            </div>
+        </div>
+
+        <form class="col-lg-12" ng-submit="saveEventData()">
+            <button type="submit" class="btn btn-primary btn-sm btn-block"><i class="fa fa-save"></i> Save Your
+                Changes
+            </button>
+        </form>
+    </div>
 </div>
+

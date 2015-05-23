@@ -1,13 +1,13 @@
 <div class="ibox-title">
-    <h3>Group Content
-        <small>content of the group you select</small>
+    <h3>{{selectedItem.title}} |
+        <small>{{selectedItem.description}}</small>
         <div ibox-tools></div>
     </h3>
 </div>
 <div class="ibox-content">
 
     <div class="form-group"><label>{{selectedItem.title}}'s fields</label></div>
-    <freebase-tags tag-context="selectedItem.contexts" add-tag-callback="addGroupTag"></freebase-tags>
+    <freebase-tags tag-context="selectedItem.contexts" add-tag-callback="addGroupTag" is-create = 'isCreateObject'></freebase-tags>
 
     <script type="text/ng-template" id="content_renderer.html">
         <div ui-tree-handle class="tree-node tree-node-content">

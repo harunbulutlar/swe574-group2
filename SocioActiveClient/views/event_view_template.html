@@ -1,5 +1,5 @@
 <div class="ibox-title">
-    <h3>{{selectedItem.title}}
+    <h3>{{selectedItem.title}} |
         <small>{{selectedItem.description}}</small>
         <div ibox-tools></div>
     </h3>
@@ -43,7 +43,7 @@
                     class='input-group-addon'><i class='fa fa-calendar'></i></span></div>
         </div>
 
-        <freebase-tags tag-context="selectedItem.eventTagContext"></freebase-tags>
+        <freebase-tags tag-context="selectedItem.eventTagContext" add-tag-callback="addEventTagForView" is-create = 'isCreateObject'></freebase-tags>
 
         <section ng-controller="TabCtrl">
 

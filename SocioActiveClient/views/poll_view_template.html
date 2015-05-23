@@ -1,5 +1,5 @@
 <div class="ibox-title">
-    <h3>{{selectedItem.title}}
+    <h3>{{selectedItem.title}} |
         <small>{{selectedItem.description}}</small>
         <div ibox-tools></div>
     </h3>
@@ -96,7 +96,7 @@
 
     </div>
 
-    <freebase-tags tag-context="selectedItem.pollTagContext" add-tag-callback="addPollTagForView"></freebase-tags>
+    <freebase-tags tag-context="selectedItem.pollTagContext" add-tag-callback="addPollTagForView" is-create = 'isCreateObject'></freebase-tags>
 
     <section ng-controller="PollTabCtrl">
 
