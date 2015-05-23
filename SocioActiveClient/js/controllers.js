@@ -936,6 +936,7 @@ function HomeCtrl($scope, $rootScope, fireFactory) {
     $scope.init();
     $scope.groupsFromDB = fireFactory.getGroupsObjectAll();
     $scope.pollsFromDB = fireFactory.getPollsObjectAll();
+    $scope.eventsFromDB = fireFactory.getEventsObjectAll();
     $scope.searchTerm = '';
     $scope.$watch('searchTerm', function () {
 
@@ -944,13 +945,21 @@ function HomeCtrl($scope, $rootScope, fireFactory) {
             $scope.polls = '';
             var searchResultGroup = [];
             var searchResultPoll = [];
+            var searchResultEvent = [];
             angular.forEach($scope.groupsFromDB, function (value, key) {
                 var tempSearchTerm = $scope.searchTerm;
                 var tempDescription = value.description;
                 tempSearchTerm = angular.lowercase(tempSearchTerm);
                 tempDescription = angular.lowercase(tempDescription);
                 if (tempDescription.search(tempSearchTerm) > -1) {
-                    searchResultGroup.push({key: key, value: fireFactory.getDataTypeObjectById("groups", key)});
+
+                    var matches = searchResultGroup.filter(function(datum) {
+                        return datum.key === key;
+                    });
+                    if (!matches.length) {
+                        searchResultGroup.push({key: key, value: fireFactory.getDataTypeObjectById("groups", key)});
+                    }
+
                 }
                 if (value.contexts != undefined) {
                     angular.forEach(value.contexts, function (value2, key2) {
@@ -961,10 +970,16 @@ function HomeCtrl($scope, $rootScope, fireFactory) {
                             tempTagContext = angular.lowercase(tempTagContext);
                             tempTagName = angular.lowercase(tempTagName);
                             if (tempTagContext.search(tempSearchTerm) > -1 || tempTagName.search(tempSearchTerm) > -1) {
-                                searchResultGroup.push({
-                                    key: key,
-                                    value: fireFactory.getDataTypeObjectById("groups", key)
+                                var matches = searchResultGroup.filter(function(datum) {
+                                    return datum.key === key;
                                 });
+                                if (!matches.length) {
+                                    searchResultGroup.push({
+                                        key: key,
+                                        value: fireFactory.getDataTypeObjectById("groups", key)
+                                    });
+                                }
+
                             }
                         });
 
@@ -979,7 +994,12 @@ function HomeCtrl($scope, $rootScope, fireFactory) {
                 tempSearchTerm = angular.lowercase(tempSearchTerm);
                 tempDescription = angular.lowercase(tempDescription);
                 if (tempDescription.search(tempSearchTerm) > -1) {
-                    searchResultPoll.push({key: key, value: fireFactory.getDataTypeObjectById("polls", key)});
+                    var matches = searchResultPoll.filter(function(datum) {
+                        return datum.key === key;
+                    });
+                    if (!matches.length) {
+                        searchResultPoll.push({key: key, value: fireFactory.getDataTypeObjectById("polls", key)});
+                    }
                 }
 
                 if (value.pollTagContext != undefined) {
@@ -991,10 +1011,54 @@ function HomeCtrl($scope, $rootScope, fireFactory) {
                             tempTagContext = angular.lowercase(tempTagContext);
                             tempTagName = angular.lowercase(tempTagName);
                             if (tempTagContext.search(tempSearchTerm) > -1 || tempTagName.search(tempSearchTerm) > -1) {
-                                searchResultPoll.push({
-                                    key: key,
-                                    value: fireFactory.getDataTypeObjectById("polls", key)
+                                var matches = searchResultPoll.filter(function(datum) {
+                                    return datum.key === key;
                                 });
+                                if (!matches.length) {
+                                    searchResultPoll.push({
+                                        key: key,
+                                        value: fireFactory.getDataTypeObjectById("polls", key)
+                                    });
+                                }
+                            }
+                        });
+
+
+                    });
+                }
+            });
+
+            angular.forEach($scope.eventsFromDB, function (value, key) {
+                var tempSearchTerm = $scope.searchTerm;
+                var tempDescription = value.description;
+                tempSearchTerm = angular.lowercase(tempSearchTerm);
+                tempDescription = angular.lowercase(tempDescription);
+                if (tempDescription.search(tempSearchTerm) > -1) {
+                    var matches = searchResultEvent.filter(function(datum) {
+                        return datum.key === key;
+                    });
+                    if (!matches.length) {
+                        searchResultEvent.push({key: key, value: fireFactory.getDataTypeObjectById("events", key)});
+                    }
+                }
+                if (value.eventTagContext != undefined) {
+                    angular.forEach(value.eventTagContext, function (value2, key2) {
+                        angular.forEach(value2, function (value3, key3) {
+                            var tempTagContext = value3.tagContext;
+                            var tempTagName = value3.tagName;
+
+                            tempTagContext = angular.lowercase(tempTagContext);
+                            tempTagName = angular.lowercase(tempTagName);
+                            if (tempTagContext.search(tempSearchTerm) > -1 || tempTagName.search(tempSearchTerm) > -1) {
+                                var matches = searchResultEvent.filter(function(datum) {
+                                    return datum.key === key;
+                                });
+                                if (!matches.length) {
+                                    searchResultEvent.push({
+                                        key: key,
+                                        value: fireFactory.getDataTypeObjectById("events", key)
+                                    });
+                                }
                             }
                         });
 
@@ -1004,6 +1068,8 @@ function HomeCtrl($scope, $rootScope, fireFactory) {
             });
             $scope.groups = searchResultGroup;
             $scope.polls = searchResultPoll;
+            $scope.events = searchResultEvent;
+
         }
         else {
             $scope.init();
@@ -1324,6 +1390,10 @@ angular
             };
             helperFactory.getPollsObjectAll = function () {
                 return $firebaseObject(helperFactory.getPollsRef());
+            };
+
+            helperFactory.getEventsObjectAll = function () {
+                return $firebaseObject(helperFactory.getEventsRef());
             };
 
 
