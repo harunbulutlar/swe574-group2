@@ -1,4 +1,4 @@
-<div class="form-poll" ng-controller="CommentCtrl"><label>Comments</label>
+<div class="form-group" ng-controller="CommentCtrl">
 
     <div class="panel pre-scrollable">
         <div class="feed-activity-list"
@@ -28,13 +28,15 @@
         </div>
     </div>
 
-    <form name='addComment' ng-submit="addComments()">
+    <div class="ibox-content"><label>Make a comment...</label>
+        <form name='addComment' ng-submit="addComments()">
 
                                 <textarea ng-model="commentBody"
                                           placeholder="Post anything on your mind!"
                                           class="form-control" required=""></textarea>
 
-        <button type="submit" class="btn btn-primary">Post Comment</button>
+            <button type="submit" class="btn btn-primary">Post Comment</button>
 
-    </form>
+        </form>
+    </div>
 </div>

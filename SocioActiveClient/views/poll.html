@@ -8,90 +8,88 @@
 
                     <div ibox-tools></div>
                 </div>
-
-
-                    <div class="ibox-content">
-                        <div class=" form-group"><label>Title</label> <input type="text"
-                                                                             ng-model="createdPoll.title"
-                                                                             placeholder="Enter a Title for your poll"
-                                                                             class="form-control"
-                                                                             required="">
-                        </div>
-                        <div class="form-group"><label>Detail</label> <textarea
-                                ng-model="createdPoll.description"
-                                placeholder="Enter some description for your poll"
-                                class="form-control"></textarea>
-                        </div>
+                <div class="ibox-content">
+                    <div class=" form-group"><label>Title</label> <input type="text"
+                                                                         ng-model="createdPoll.title"
+                                                                         placeholder="Enter a Title for your poll"
+                                                                         class="form-control"
+                                                                         required="">
                     </div>
-                    <div class="ibox-content">
-                        <div class="form-group"><label>Just For: </label>
-
-                            <div class="radio"><label> <input type="radio" value="friends" id="friendsRadio"
-                                                              ng-checked="true"
-                                                              name="privacyRadios"
-                                                              ng-model="createdPoll.pollPrivacy">Friends</label>
-                            </div>
-                            <div class=" radio"><label> <input type="radio" value="public" id="publicRadio"
-                                                               name="privacyRadios"
-                                                               ng-model="createdPoll.pollPrivacy">Public</label>
-                            </div>
-                            <select class="form-control MultiSelect" data-placeholder="Roles"
-                                    ng-model="createdPoll.pollRoles"
-                                    ng-options="roles for roles in pollRoles" multiple="multiple" multiselect-dropdown>
-                            </select>
-                        </div>
+                    <div class="form-group"><label>Detail</label> <textarea
+                            ng-model="createdPoll.description"
+                            placeholder="Enter some description for your poll"
+                            class="form-control"></textarea>
                     </div>
+                </div>
+                <div class="ibox-content">
+                    <div class="form-group"><label>Just For: </label>
 
-                    <div class="ibox-content">
-                        <div class="form-group"><label>End Date</label>
-
-                            <div class='input-group date'><input type='datetime' class='form-control' date-time
-                                                                 ng-model='createdPoll.endDate' view='date'
-                                                                 required=""><span
-                                    class='input-group-addon'><i class='fa fa-calendar'></i></span></div>
-
+                        <div class="radio"><label> <input type="radio" value="friends" id="friendsRadio"
+                                                          ng-checked="true"
+                                                          name="privacyRadios"
+                                                          ng-model="createdPoll.pollPrivacy">Friends</label>
                         </div>
+                        <div class=" radio"><label> <input type="radio" value="public" id="publicRadio"
+                                                           name="privacyRadios"
+                                                           ng-model="createdPoll.pollPrivacy">Public</label>
+                        </div>
+                        <select class="form-control MultiSelect" data-placeholder="Roles"
+                                ng-model="createdPoll.pollRoles"
+                                ng-options="roles for roles in pollRoles" multiple="multiple" multiselect-dropdown>
+                        </select>
                     </div>
+                </div>
 
-                    <div class="ibox-content">
-                        <div class="form-poll"><label>Options</label>
+                <div class="ibox-content">
+                    <div class="form-group"><label>End Date</label>
 
-                            <div class="form-group">
-                                <div class="panel pre-scrollable"
-                                     ng-hide="isPollObjectEmpty(createdPoll.pollOptions)">
-                                    <div class="panel-body">
-                                        <ul class="list-group"
-                                            ng-repeat="option in createdPoll.pollOptions">
+                        <div class='input-group date'><input type='datetime' class='form-control' date-time
+                                                             ng-model='createdPoll.endDate' view='date'
+                                                             required=""><span
+                                class='input-group-addon'><i class='fa fa-calendar'></i></span></div>
 
-                                            <li class="list-group-item">
+                    </div>
+                </div>
 
-                                                <form name='vote'>
+                <div class="ibox-content">
+                    <div class="form-poll"><label>Options</label>
 
-                                                    <a class="pull-right btn btn-white btn-xs" data-nodrag
-                                                       ng-click="removePollOption(option.optionId)"
-                                                       ng-show="(isVotedTemp == false) && (pollToBeViewed == null)"><span
-                                                            class="fa fa-trash"></span></a>
+                        <div class="form-group">
+                            <div class="panel pre-scrollable"
+                                 ng-hide="isPollObjectEmpty(createdPoll.pollOptions)">
+                                <div class="panel-body">
+                                    <ul class="list-group"
+                                        ng-repeat="option in createdPoll.pollOptions">
 
-                                                    <a class="btn btn-xs btn-white pull-right"
-                                                       ng-class=" {disabled: isCurrentUserVoted()}"
-                                                       ng-show="isCurrentUserVoted()"><i
-                                                            class="fa fa-thumbs-up"></i>{{ option.optionVoteCount }}</a>
+                                        <li class="list-group-item">
 
-                                                </form>
+                                            <form name='vote'>
 
-                                                <b>{{ option.optionName }}</b> | {{ option.optionDetail }}
+                                                <a class="pull-right btn btn-white btn-xs" data-nodrag
+                                                   ng-click="removePollOption(option.optionId)"
+                                                   ng-show="(isVotedTemp == false) && (pollToBeViewed == null)"><span
+                                                        class="fa fa-trash"></span></a>
+
+                                                <a class="btn btn-xs btn-white pull-right"
+                                                   ng-class=" {disabled: isCurrentUserVoted()}"
+                                                   ng-show="isCurrentUserVoted()"><i
+                                                        class="fa fa-thumbs-up"></i>{{ option.optionVoteCount }}</a>
+
+                                            </form>
+
+                                            <b>{{ option.optionName }}</b> | {{ option.optionDetail }}
 
 
-                                            </li>
+                                        </li>
 
 
-                                        </ul>
+                                    </ul>
 
 
-                                    </div>
                                 </div>
+                            </div>
 
-                                <div class="form-group">
+                            <div class="ibox-content"><label>Add new options...</label>
 
                                     <form name='addOption' ng-submit="addPollOption()">
 
@@ -105,15 +103,16 @@
 
                                     </form>
 
-                                </div>
                             </div>
+
                         </div>
                     </div>
+                </div>
 
-                    <div class="ibox-content">
-                        <freebase-tags tag-context="createdPoll.pollTagContext"
-                                       is-create='isCreateObject'></freebase-tags>
-                    </div>
+                <div class="ibox-content">
+                    <freebase-tags tag-context="createdPoll.pollTagContext"
+                                   is-create='isCreateObject'></freebase-tags>
+                </div>
 
                 <br>
 
