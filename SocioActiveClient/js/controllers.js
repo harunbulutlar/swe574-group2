@@ -1027,6 +1027,7 @@ function HomeCtrl($scope, $rootScope, fireFactory) {
                     });
                 }
             });
+            
 
             angular.forEach($scope.eventsFromDB, function (value, key) {
                 var tempSearchTerm = $scope.searchTerm;
