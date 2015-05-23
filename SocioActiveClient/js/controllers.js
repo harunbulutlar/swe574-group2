@@ -698,7 +698,7 @@ function EventCtrl($scope, $rootScope, fireFactory, $state, contextFactory, MEMB
 
 }
 
-function EventTemplateCtrl($rootScope, $scope, MEMBER, fireFactoryForEvent, $state, fireFactory) {
+function EventTemplateCtrl($rootScope, $scope, MEMBER, fireFactory, $state) {
 
     $scope.selectedItemId = $scope.$parent.selectedItemId;
     var syncObj = fireFactory.getDataTypeObjectById('events', $scope.selectedItemId);
@@ -745,7 +745,7 @@ function EventTemplateCtrl($rootScope, $scope, MEMBER, fireFactoryForEvent, $sta
             $rootScope.MainCtrlRef.currentUserData.contexts = {};
         }
 
-        var contextEventsRef = fireFactoryForEvent.getEventsInContextRef(tag.tagContext);
+        var contextEventsRef = fireFactory.getEventsInContextRef(tag.tagContext);
         var eventLinkObject = {};
         eventLinkObject[$scope.selectedItemId] = $scope.selectedItem.eventTagContext[tag.tagContext].length;
         contextEventsRef.update(eventLinkObject);
