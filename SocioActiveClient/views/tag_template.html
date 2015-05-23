@@ -1,4 +1,4 @@
-<div class="form-group" ng-controller="TagContextCtrl"><label>Tags</label>
+<div class="form-group" ng-controller="TagContextCtrl"><label>Tags --- {{isCreate}}</label>
 
     <div class="form-group pre-scrollable">
 
@@ -7,11 +7,10 @@
             <h4>{{key}}</h4>
 
             <div ng-repeat="tag in value" style="display: inline">
-                <button class="btn btn-w-m btn-info"><i
-                        class="fa fa-tag pull-left"></i>{{tag.tagName}} <i
-                        class="fa fa-trash pull-right " data-nodrag
-                        ng-click="removeTag(key, tag.tagId)"></i>
-                </button> &nbsp;
+                &nbsp;<button class="btn btn-w-m btn-info"><i
+                        class="fa fa-tag pull-left"></i>{{tag.tagName}}<i class="fa fa-trash pull-right " data-nodrag
+                    ng-click="removeTag(key, tag.tagId)"></i>
+                </button>&nbsp;
             </div>
         </div>
 

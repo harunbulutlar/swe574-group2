@@ -101,7 +101,7 @@
                             </div>
                         </div>
                     </div>
-                    <freebase-tags tag-context="createdPoll.pollTagContext"></freebase-tags>
+                    <freebase-tags tag-context="createdPoll.pollTagContext" is-created="isCreate"></freebase-tags>
                     <section ng-controller="PollTabCtrl">
 
                         <div class="ibox-content">
@@ -184,56 +184,3 @@
         </div>
     </div>
 </div>
-
-<script>
-
-    $(document).ready(function () {
-
-        $('#semanticTagName').focusout(function () {
-
-            $('#semanticTagContext').empty();
-            var input_parameter = this.value;
-
-            function getRelatedCategories(keyword, currentTopic, uniqueCat) {
-                var topic_id = currentTopic;
-
-                var service_url = 'https://www.googleapis.com/freebase/v1/topic';
-                var params = {
-                    'key': 'AIzaSyBfJNRIjAao3J0PZeO9ALipSJ_k9NjETwc'
-                };
-
-                $.getJSON(service_url + topic_id, params, function (topic) {
-
-                    if (topic.property['/type/object/type'].values[0].text != 'Topic') {
-                        var current_topic = topic.property['/type/object/type'].values[0].text;
-                        if (uniqueCat[current_topic] == null) {
-
-                            uniqueCat[current_topic] = "exists";
-                            $('<option>', {text: current_topic, value: current_topic}).appendTo('#semanticTagContext');
-                            /*return $('<option>').val(current_topic).text(current_topic);*/
-
-                        }
-                    }
-                });
-            }
-
-            var service_url = 'https://www.googleapis.com/freebase/v1/search';
-
-            var params = {
-                'query': input_parameter,
-                'key': 'AIzaSyBfJNRIjAao3J0PZeO9ALipSJ_k9NjETwc',
-                'limit': 50
-            };
-
-            $.getJSON(service_url + '?callback=?', params, function (response) {
-
-                var uniqueCat = {};
-                $.each(response.result, function (i, result) {
-                    getRelatedCategories(result['name'], result['mid'], uniqueCat);
-                });
-            });
-
-        });
-    });
-
-</script>

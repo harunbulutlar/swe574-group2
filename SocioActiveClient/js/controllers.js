@@ -988,12 +988,15 @@ function capitalizeFirstLetter(string) {
 }
 
 function getRandomColor() {
-    var letters = '0123456789ABCDEF'.split('');
-    var color = '#';
-    for (var i = 0; i < 6; i++ ) {
-        color += letters[Math.floor(Math.random() * 16)];
-    }
-    return color;
+
+    var colors = ['#D2FFFF','#BFFFFF','#A6FFFF','#91FFFF','#7FFFFF',
+        '#BBFFFF','#9FFFFF','#7AFFFF','#5AFFFF','#3FFFFF',
+        '#AEFFFF','#8CFFFF','#60FFFF','#39FFFF','#19FFFF',
+        '#A5FFFF','#7FFFFF','#4EFFFF','#23FFFF','#00FFFF',
+        '#9AEEEE','#77EEEE','#49EEEE','#21EEEE','#00EEEE',
+        '#85CDCD','#66CDCD','#3FCDCD','#1CCDCD','#00CDCD'];
+
+    return colors[Math.floor(Math.random() * colors.length)];
 }
 angular
     .module('socioactive')

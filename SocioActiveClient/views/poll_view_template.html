@@ -131,7 +131,13 @@
             <div class='form-group' ng-show="isSelected(2)">
                 <h4>Results</h4>
 
-                <div>
+                <div ng-hide="isCurrentUserVoted()">
+
+                    <p style = "color: darkred">You can't see the vote result unless you vote!</p>
+
+                </div>
+
+                <div ng-show="isCurrentUserVoted()">
                     <canvas doughnutchart options="doughnutOptions" data="doughnutData" height="140"
                             responsive=true></canvas>
                 </div>

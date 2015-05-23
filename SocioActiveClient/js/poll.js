@@ -85,31 +85,6 @@ function PollCtrl($scope, $rootScope, $stateParams, $state, contextFactory, MEMB
 
     };
 
-
-    //TODO Remove voting in create poll
-    /*$scope.votePoll = function (optionId, optionName, optionDetail, optionVoteCount) {
-
-     $scope.createdPoll.pollOptions[optionId] = {
-
-     "optionId": optionId,
-     "optionName": optionName,
-     "optionDetail": optionDetail,
-     "optionVoteCount": optionVoteCount + 1
-
-     };
-
-     $scope.isVotedTemp = true;
-     $scope.createdPoll.pollParticipantList.push($scope.currentUserId);
-
-     };
-
-     $scope.isCurrentUserVoted = function () {
-
-     return (($scope.isVotedTemp == true) ||
-     ($scope.createdPoll.pollParticipantList.indexOf($scope.currentUserId) != -1));
-
-     };*/
-
     $scope.reloadState = function () {
         $state.reload();
     };
@@ -150,6 +125,13 @@ function PollCtrl($scope, $rootScope, $stateParams, $state, contextFactory, MEMB
 
         }
 
+        if ($scope.isPollObjectEmpty($scope.createdPoll.pollTagContext)) {
+
+            alert("You need to add tags for your poll!");
+            return;
+
+        }
+
         var strippedPolls = angular.fromJson(angular.toJson($scope.createdPoll));
         var fireBaseObj = fireFactoryForPoll.getPollsRef().push(strippedPolls);
 
@@ -182,18 +164,8 @@ function PollCtrl($scope, $rootScope, $stateParams, $state, contextFactory, MEMB
         $scope.loading = true;
         $rootScope.MainCtrlRef.currentUserData.$save().then(function () {
             $scope.loading = false;
-
-            if ($scope.pollToBeViewed == null) {
-
                 alert("Your poll created!");
                 $state.go('activity.pollsv2');
-
-            } else {
-
-                alert("Your changes are saved!");
-                $scope.reloadState();
-            }
-
         });
 
 
@@ -205,27 +177,37 @@ function PollTemplateCtrl($rootScope, $scope, MEMBER, contextFactory, $state, fi
 
     $scope.selectedItemId = $scope.$parent.selectedItemId;
     var syncObj = fireFactoryForPoll.getDataTypeObjectById('polls', $scope.selectedItemId);
-    syncObj.$bindTo($scope, "selectedItem");
+    syncObj.$bindTo($scope, "selectedItem")
+        .then(function () {
 
-    $scope.doughnutData = [];
+            $scope.doughnutData = [];
 
-    var deneme = fireFactoryForPoll.getPollObject($scope.selectedItemId);
+            angular.forEach($scope.selectedItem.pollOptions, function (value) {
 
-    deneme.$loaded().then(function (loadedData) {
+                $scope.doughnutData.push({
 
-        for (var i = 0; i < loadedData.pollOptions.length; i++) {
+                    value: value.optionVoteCount,
+                    color: getRandomColor(),
+                    highlight: "#2A8B7E",
+                    label: value.optionName
 
-            $scope.doughnutData.push({
-
-                value: loadedData.pollOptions[i].optionVoteCount,
-                color: getRandomColor(),
-                highlight: getRandomColor(),
-                label: loadedData.pollOptions[i].optionName
+                });
 
             });
 
-        }
-    });
+            $scope.doughnutOptions = {
+                segmentShowStroke: true,
+                segmentStrokeColor: "#fff",
+                segmentStrokeWidth: 2,
+                percentageInnerCutout: 45,
+                animationSteps: 250,
+                animationEasing: "easeOutQuart",
+                animateRotate: true,
+                animateScale: false
+            };
+
+
+        });
 
     $scope.currentUserId = $rootScope.MainCtrlRef.userId;
     $scope.currentUserName = $rootScope.MainCtrlRef.currentUserData.userName;
@@ -290,8 +272,9 @@ function PollTemplateCtrl($rootScope, $scope, MEMBER, contextFactory, $state, fi
 
                 $rootScope.MainCtrlRef.currentUserData.$save().then(function () {
                     $scope.loading = false;
-                    alert("Your vote is saved!");
+
                 });
+
             });
         });
     };
@@ -364,38 +347,6 @@ function PollTemplateCtrl($rootScope, $scope, MEMBER, contextFactory, $state, fi
     $scope.pollCommentDateDifference = function (date) {
         return dateDifference(date);
 
-    };
-
-    /*$scope.doughnutData = [
-        {
-            value: 300,
-            color: "#a3e1d4",
-            highlight: "#1ab394",
-            label: "App"
-        },
-        {
-            value: 50,
-            color: "#dedede",
-            highlight: "#1ab394",
-            label: "Software"
-        },
-        {
-            value: 100,
-            color: "#b5b8cf",
-            highlight: "#1ab394",
-            label: "Laptop"
-        }
-    ];*/
-
-    $scope.doughnutOptions = {
-        segmentShowStroke: true,
-        segmentStrokeColor: "#fff",
-        segmentStrokeWidth: 2,
-        percentageInnerCutout: 45, // This is 0 for Pie charts
-        animationSteps: 100,
-        animationEasing: "easeOutBounce",
-        animateRotate: true,
-        animateScale: false
     };
 
     $scope.showContent = function (fieldKey, contentKey) {
