@@ -1066,6 +1066,7 @@ function HomeCtrl($scope, $rootScope, fireFactory) {
                     });
                 }
             });
+            
             $scope.groups = searchResultGroup;
             $scope.polls = searchResultPoll;
             $scope.events = searchResultEvent;
