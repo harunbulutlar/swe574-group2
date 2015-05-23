@@ -1,4 +1,4 @@
-<div class="wrapper wrapper-content" ng-controller="ProfileCtrl">
+<div class="wrapper wrapper-content" ng-controller="ProfileViewCtrl">
     <div class="row animated fadeInRight">
         <div class="col-lg-4">
             <div class="ibox float-e-margins">
@@ -7,29 +7,29 @@
                 </div>
                 <div>
                     <div class="ibox-content no-padding border-left-right">
-                        <img alt="image" class="img-responsive" src="{{main.currentUserData.userImage}}">
+                        <img alt="image" class="img-responsive" src="{{specificUserImage}}">
                     </div>
                     <div class="ibox-content profile-content">
 
                         <div class=" form-group"><label>Name</label> <input type="text"
-                                                                             ng-model="main.currentUserData.userName"
-                                                                             placeholder="Your name..."
-                                                                             class="form-control"
-                                                                             required="">
-                        </div>
-
-                        <div class=" form-group"><label>Last Name</label> <input type="text"
-                                                                            ng-model="main.currentUserData.userLastName"
-                                                                            placeholder="Your last name..."
+                                                                            ng-model="specificUserName"
+                                                                            placeholder="Your name..."
                                                                             class="form-control"
                                                                             required="">
                         </div>
 
-                        <div class=" form-group"><label>Write Something About Your Self</label> <textarea
-                                                                                 ng-model="main.currentUserData.description"
-                                                                                 placeholder="Here goes something"
+                        <div class=" form-group"><label>Last Name</label> <input type="text"
+                                                                                 ng-model="main.currentUserData.userLastName"
+                                                                                 placeholder="Your last name..."
                                                                                  class="form-control"
-                                                                                 required=""></textarea>
+                                                                                 required="">
+                        </div>
+
+                        <div class=" form-group"><label>Write Something About Your Self</label> <textarea
+                                ng-model="main.currentUserData.description"
+                                placeholder="Here goes something"
+                                class="form-control"
+                                required=""></textarea>
                         </div>
                         <div class=" form-group">
                             <h3>You are Interested in</h3>
@@ -44,7 +44,7 @@
                 <div class="ibox float-e-margins">
                     <div class="ibox-title">
                         <h3>Recommended People
-                            <small>You may want to be friend with these people.</small>
+                            <small>You may want to be friends with these people...</small>
                         </h3>
                     </div>
                     <div class="ibox-content">

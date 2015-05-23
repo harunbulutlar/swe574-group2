@@ -91,7 +91,7 @@ function CustomTypesCtrl($state, $scope, contextFactory, $rootScope, fireFactory
 
         if (isObjectEmpty($scope.createdGroup.contexts)) {
 
-            alert("You need to add tags for your poll!");
+            alert("You need to add tags for your group!");
             return;
 
         }
@@ -407,8 +407,8 @@ function PictureUploadCtrl($scope, resizeService, $rootScope) {
                 size: 100,
                 sizeScale: 'ko',
                 otherOptions: '',
-                height: 128,
-                width: 128
+                height: 96,
+                width: 96
             }, function (err, image) {
                 if (err) {
                     console.error(err);
@@ -570,7 +570,7 @@ function EventCtrl($scope, $rootScope, fireFactory, $state, contextFactory, MEMB
             description: "",
             eventLocation: "",
             eventDate: "",
-            createdBy: "",
+            owner: "",
             createDate: "",
             updateDate: "",
             eventTagContext: {},
@@ -590,7 +590,7 @@ function EventCtrl($scope, $rootScope, fireFactory, $state, contextFactory, MEMB
     };
 
     $scope.initializeEvent();
-    $scope.createdEvent.createdBy = $scope.currentUserId;
+    $scope.createdEvent.owner = $scope.currentUserId;
     $scope.createdEvent.createDate = new Date();
     $scope.createdEvent.updateDate = new Date();
 
@@ -623,16 +623,16 @@ function EventCtrl($scope, $rootScope, fireFactory, $state, contextFactory, MEMB
 
         }
 
-        if (!$scope.createdEvent.eventDate) {
+/*        if (!$scope.createdEvent.eventDate) {
 
             alert("You need to enter a date for your event!");
             return;
 
-        }
+        }*/
 
         if ($scope.isEventObjectEmpty($scope.createdEvent.eventTagContext)) {
 
-            alert("You need to add tags for your poll!");
+            alert("You need to add tags for your event!");
             return;
 
         }
@@ -713,7 +713,7 @@ function EventTemplateCtrl($rootScope, $scope, MEMBER, contextFactory, $state, f
         if ($scope.selectedItemId == null) {
             return false;
         } else {
-            return !(($scope.currentUserId === $scope.selectedItem.createdBy) || $scope.currentUserIsAdmin);
+            return !(($scope.currentUserId === $scope.selectedItem.owner) || $scope.currentUserIsAdmin);
         }
     };
 
@@ -809,6 +809,39 @@ function ProfileCtrl($scope, $rootScope, fireFactory) {
     $scope.init();
 
 }
+
+
+function ProfileViewCtrl($scope, $rootScope, fireFactory, $stateParams) {
+    $scope.init = function () {
+
+        $scope.specificUserProfile = fireFactory.getUserObject($stateParams.userToBeViewed);
+
+        $scope.specificUserProfile.$loaded().then(function(loadedData){
+            $scope.specificUserName = loadedData.userName;
+            $scope.specificUserLastName = loadedData.userLastName;
+            $scope.specificUserImage = loadedData.userImage;
+            $scope.specificUserImage = loadedData.userImage;
+
+        });
+
+    };
+
+    $scope.getClass = function (item) {
+        if (!item.userImageSmall) {
+            item.userImageSmall = "img/space_invaders_small.jpg";
+        }
+
+        return "feed-element";
+    };
+    $scope.follow = function (item) {
+
+    };
+    $scope.init();
+
+}
+
+
+
 function CommentCtrl($scope, $rootScope) {
 
     $scope.addComments = function () {
@@ -1078,6 +1111,7 @@ angular
     .controller('EventTemplateCtrl', EventTemplateCtrl)
     .controller('TagContextCtrl', TagContextCtrl)
     .controller('ProfileCtrl', ProfileCtrl)
+    .controller('ProfileViewCtrl', ProfileViewCtrl)
     .controller('TabCtrl', TabCtrl)
     .controller('CommentCtrl', CommentCtrl)
     .run(["$templateCache", "$rootScope", function ($templateCache, $rootScope) {

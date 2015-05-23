@@ -23,7 +23,7 @@ function PollCtrl($scope, $rootScope, $state, contextFactory, MEMBER, fireFactor
             description: "",
             pollOptions: [],
             pollParticipantList: [],
-            createdBy: "",
+            owner: "",
             createDate: "",
             endDate: "",
             updateDate: "",
@@ -44,7 +44,7 @@ function PollCtrl($scope, $rootScope, $state, contextFactory, MEMBER, fireFactor
 
     $scope.initializePoll();
 
-    $scope.createdPoll.createdBy = $scope.currentUserId;
+    $scope.createdPoll.owner = $scope.currentUserId;
     $scope.createdPoll.createDate = new Date();
     $scope.createdPoll.updateDate = new Date();
 
@@ -235,7 +235,7 @@ function PollTemplateCtrl($rootScope, $scope, MEMBER, contextFactory, $state, fi
         if ($scope.selectedItemId == null) {
             return false;
         } else {
-            return !(($scope.currentUserId === $scope.selectedItem.createdBy) || $scope.currentUserIsAdmin);
+            return !(($scope.currentUserId === $scope.selectedItem.owner) || $scope.currentUserIsAdmin);
         }
     };
 
