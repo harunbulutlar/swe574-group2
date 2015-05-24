@@ -207,7 +207,7 @@ function ItemPreviewCtrl($scope, fireFactory) {
     $scope.getItemType = function (item) {
         if (item.hasOwnProperty("pollOptions")) {
             return "poll";
-        } else if (item.hasOwnProperty("eventDate")) {
+        } else if (item.hasOwnProperty("eventLocation")) {
             return "event";
         } else {
             return "group";
@@ -981,6 +981,22 @@ function CommentCtrl($scope, $rootScope, fireFactory, $stateParams) {
     $scope.commentDateDifference = function (date) {
         return dateDifference(date);
     };
+
+    /*$scope.getCommentUserPicture = function (uid) {
+
+        if(uid){
+
+            $scope.userData = fireFactory.getUserObject(uid);
+
+            $scope.userData.$loaded().then(function(loadedData){
+
+                $scope.userImageForComment = loadedData.userImageSmall;
+
+            });
+
+        }
+
+    };*/
 
     /*$scope.getCommentUserData = function (child, item){
 
