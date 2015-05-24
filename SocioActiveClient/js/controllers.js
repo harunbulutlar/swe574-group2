@@ -768,6 +768,46 @@ function EventTemplateCtrl($rootScope, $scope, MEMBER, fireFactory, $state) {
 
     $scope.joinEvent = function (){
 
+        if (!$scope.selectedItem.eventParticipantList) {
+            $scope.selectedItem.eventParticipantList = [];
+        }
+        $scope.selectedItem.eventParticipantList.push({
+            "participantUserId": $scope.currentUserId,
+            "participantUserName": $scope.currentUserName
+        });
+
+        if (!$rootScope.MainCtrlRef.currentUserData.attendedEvents) {
+            $rootScope.MainCtrlRef.currentUserData.attendedEvents = {};
+        }
+        $rootScope.MainCtrlRef.currentUserData.attendedEvents[$scope.selectedItemId] = true;
+
+        $scope.eventUserInteraction();
+
+    };
+
+    $scope.leaveEvent = function (){
+
+        var indexUser = arrayObjectIndexOf($scope.selectedItem.eventParticipantList, $scope.currentUserId, 'participantUserId')
+
+        //var indexUser = $scope.selectedItem.eventParticipantList.indexOf($scope.currentUserId);
+        $scope.selectedItem.eventParticipantList.splice(indexUser, 1);
+
+        delete $rootScope.MainCtrlRef.currentUserData.attendedEvents[$scope.selectedItemId];
+
+        $scope.loading = true;
+        $rootScope.MainCtrlRef.currentUserData.$save();
+        $scope.loading = false;
+
+    };
+
+    $scope.isCurrentUserAttended = function (){
+
+        if ($scope.selectedItemId != null) {
+            if (!$rootScope.MainCtrlRef.currentUserData.attendedEvents) {
+                return false;
+            }
+            return $rootScope.MainCtrlRef.currentUserData.attendedEvents[$scope.selectedItemId];
+        }
 
     };
 

@@ -4,106 +4,103 @@
         <div ibox-tools></div>
     </h3>
 </div>
+
+
 <div class="ibox-content">
 
-    <div class="ibox-content">
+    <div class="form-group" ng-hide="isEventDisabled()"><label>Just For: </label>
 
-        <div class="form-group" ng-hide="isEventDisabled()"><label>Just For: </label>
-
-            <div class="radio"><label> <input type="radio" value="friends" id="friendsRadio"
-                                              ng-checked="true"
-                                              name="privacyRadios"
-                                              ng-model="selectedItem.eventPrivacy">Friends</label>
-            </div>
-            <div class=" radio"><label> <input type="radio" value="public" id="publicRadio"
-                                               name="privacyRadios"
-                                               ng-model="selectedItem.eventPrivacy">Public</label>
-            </div>
-            <select class="form-control MultiSelect" data-placeholder="Roles"
-                    ng-model="selectedItem.eventRoles"
-                    ng-options="roles for roles in eventRoles" multiple="multiple" multiselect-dropdown>
-            </select>
+        <div class="radio"><label> <input type="radio" value="friends" id="friendsRadio"
+                                          ng-checked="true"
+                                          name="privacyRadios"
+                                          ng-model="selectedItem.eventPrivacy">Friends</label>
         </div>
-
-        <div class=" form-group"><label>Place</label> <input type="text"
-                                                             placeholder="Enter a location for your event"
-                                                             ng-model="selectedItem.eventLocation"
-                                                             class="form-control"
-                                                             ng-disabled="isEventDisabled()"
-                                                             required="">
+        <div class=" radio"><label> <input type="radio" value="public" id="publicRadio"
+                                           name="privacyRadios"
+                                           ng-model="selectedItem.eventPrivacy">Public</label>
         </div>
-        <div class=" form-group"><label>Time</label>
-
-            <div class='input-group date'>
-                <input type='datetime' class='form-control' date-time
-                       view='date'
-                       ng-model="selectedItem.eventDate"
-                       ng-disabled="isEventDisabled()"
-                       required=""><span
-                    class='input-group-addon'><i class='fa fa-calendar'></i></span></div>
-        </div>
-
-        <freebase-tags tag-context="selectedItem.eventTagContext" add-tag-callback="addEventTagForView" is-create = 'isCreateObject'></freebase-tags>
-
-        <section ng-controller="TabCtrl">
-
-            <div class="ibox-content">
-                <tabset>
-                    <tab ng-click="selectTab(1)">
-                        <tab-heading>
-                            Comments
-                        </tab-heading>
-
-                    </tab>
-
-                    <tab ng-click="selectTab(2)">
-                        <tab-heading>
-                            Participants
-                        </tab-heading>
-
-                    </tab>
-                </tabset>
-            </div>
-
-            <div class='form-group' ng-show="isSelected(1)">
-
-                <comment-template item-comment="selectedItem.eventComments" add-comment-callback="addEventCommentForView"></comment-template>
-            </div>
-
-            <div class='form-group' ng-show="isSelected(2)">
-                <h4>Participants</h4>
-            </div>
-
-        </section>
-
+        <select class="form-control MultiSelect" data-placeholder="Roles"
+                ng-model="selectedItem.eventRoles"
+                ng-options="roles for roles in eventRoles" multiple="multiple" multiselect-dropdown>
+        </select>
     </div>
+</div>
+
+<div class="ibox-content">
+    <div class=" form-group"><label>Place</label> <input type="text"
+                                                         placeholder="Enter a location for your event"
+                                                         ng-model="selectedItem.eventLocation"
+                                                         class="form-control"
+                                                         ng-disabled="isEventDisabled()"
+                                                         required="">
+    </div>
+
+
+    <div class=" form-group"><label>Time</label>
+
+        <div class='input-group date'>
+            <input type='datetime' class='form-control' date-time
+                   view='date'
+                   ng-model="selectedItem.eventDate"
+                   ng-disabled="isEventDisabled()"
+                   required=""><span
+                class='input-group-addon'><i class='fa fa-calendar'></i></span></div>
+    </div>
+</div>
+
+<div class="ibox-content">
+    <freebase-tags tag-context="selectedItem.eventTagContext" add-tag-callback="addEventTagForView"
+                   is-create='isCreateObject'></freebase-tags>
+</div>
+
+
+<div class="ibox-content">
+
+    <a class="btn btn-primary pull-right"
+       ng-click="joinEvent()"
+       ng-hide="isCurrentUserAttended()"><i
+            class="fa fa-thumbs-up"></i>Join</a>
+
+    <a class="btn btn-danger pull-right"
+       ng-click="leaveEvent()"
+       ng-show="isCurrentUserAttended()"><i
+            class="fa fa-thumbs-down"></i>Leave</a>
+    <br>
 
 </div>
-<div class="form-group"><label>{{selectedItem.title}}'s fields</label></div>
-<script type="text/ng-template" id="content_renderer.html">
-    <div ui-tree-handle class="tree-node tree-node-content">
-        <a class="pull-right btn btn-white btn-xs" data-nodrag
-           ng-click="showContent(fieldKey, contentKey)"><span class="fa fa-eye"></span></a>
-        {{node.owner}}'s content
-    </div>
-</script>
-<script type="text/ng-template" id="field_renderer.html">
-    <div ui-tree-handle class="tree-node tree-node-content">
-        <a class="pull-right btn btn-white btn-xs" data-nodrag ng-click="addButtonClick(fieldKey)"><span
-                class="fa fa-plus"></span></a>
-        <a class="btn btn-primary btn-xs" data-nodrag ng-click="toggle(this)"><span class="fa"
-                                                                                    ng-class="{'fa-angle-down': collapsed, 'fa-angle-right': !collapsed}"></span></a>
-        {{node.name}}(Type:{{node.type.name}})
-    </div>
-    <ol ui-tree-nodes="" ng-model="node.content" ng-class="{hidden: collapsed}">
-        <li ng-repeat="(contentKey, node) in node.content" ui-tree-node
-            ng-include="'content_renderer.html'">
-        </li>
-    </ol>
-</script>
-<div ui-tree id="tree-root">
-    <ol ui-tree-nodes ng-model="selectedGroup.fields">
-        <li ng-repeat="(fieldKey,node) in selectedItem.fields" ui-tree-node
-            ng-include="'field_renderer.html'"></li>
-    </ol>
+
+
+<div class="ibox-content">
+    <section ng-controller="TabCtrl">
+
+        <div class="ibox-content">
+            <tabset>
+                <tab ng-click="selectTab(1)">
+                    <tab-heading>
+                        Comments
+                    </tab-heading>
+
+                </tab>
+
+                <tab ng-click="selectTab(2)">
+                    <tab-heading>
+                        Participants
+                    </tab-heading>
+
+                </tab>
+            </tabset>
+        </div>
+
+        <div class='form-group' ng-show="isSelected(1)">
+
+            <comment-template item-comment="selectedItem.eventComments"
+                              add-comment-callback="addEventCommentForView"></comment-template>
+        </div>
+
+        <div class='form-group' ng-show="isSelected(2)">
+            <h4>Participants</h4>
+        </div>
+
+    </section>
+
 </div>
