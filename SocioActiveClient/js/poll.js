@@ -239,6 +239,22 @@ function PollTemplateCtrl($rootScope, $scope, MEMBER, contextFactory, $state, fi
         }
     };
 
+    $scope.isPrivacyDisabled = function (){
+
+        $scope.isPrivacy  = $scope.selectedItem.pollRoles.indexOf($rootScope.MainCtrlRef.currentUserData.role);
+
+        if ($scope.isPrivacy > -1){
+
+            return false;
+        }
+
+    };
+
+    $scope.isFriendWithUser = function (){
+
+
+    };
+
     $scope.isPollObjectEmpty = function (obj) {
         return isObjectEmpty(obj);
     };
@@ -251,15 +267,6 @@ function PollTemplateCtrl($rootScope, $scope, MEMBER, contextFactory, $state, fi
             loadedData.$save(item).then(function () {
                 // data has been saved to Firebase
                 $scope.loading = true;
-                if (!$rootScope.MainCtrlRef.currentUserData.interactedPolls) {
-                    $rootScope.MainCtrlRef.currentUserData.interactedPolls = {};
-                }
-                if (!$rootScope.MainCtrlRef.currentUserData.votedPolls) {
-                    $rootScope.MainCtrlRef.currentUserData.votedPolls = {};
-                }
-
-                $rootScope.MainCtrlRef.currentUserData.interactedPolls[$scope.selectedItemId] = true;
-                $rootScope.MainCtrlRef.currentUserData.votedPolls[$scope.selectedItemId] = true;
 
                 angular.forEach($scope.selectedItem.pollTagContext, function (value, key) {
                     if (!$rootScope.MainCtrlRef.currentUserData.contexts) {
@@ -361,6 +368,7 @@ function PollTemplateCtrl($rootScope, $scope, MEMBER, contextFactory, $state, fi
 }
 
 function CurrentPollsCtrl($scope, fireFactoryForPoll) {
+
     $scope.polls = fireFactoryForPoll.getPollsObject();
 
 }
