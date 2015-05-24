@@ -881,6 +881,8 @@ function ProfileCtrl($scope, $rootScope, fireFactory) {
         });
     };
 
+    $scope.alert = function(x){window.alert("My interest is "+x);};
+    $scope.showDetail = false;
 
     $scope.getClass = function (item) {
         if (!item.userImageSmall) {
@@ -903,13 +905,22 @@ function ProfileViewCtrl($scope, $rootScope, fireFactory, $stateParams) {
         $scope.specificUserProfile = fireFactory.getUserObject($stateParams.userToBeViewed);
 
         $scope.specificUserProfile.$loaded().then(function (loadedData) {
+
+            $scope.specificemail = loadedData.email;
+            $scope.specificisAdmin = loadedData.isAdmin;
+            $scope.specificrole = loadedData.role;
             $scope.specificUserName = loadedData.userName;
             $scope.specificUserLastName = loadedData.userLastName;
+            $scope.specificdescription = loadedData.description;
+            $scope.specificcontexts = loadedData.contexts;
             $scope.specificUserImage = loadedData.userImage;
 
         });
 
     };
+
+    $scope.alert = function(x){window.alert($scope.specificUserName+"'s interest is "+x);};
+    $scope.showDetail = false;
 
     $scope.getClass = function (item) {
         if (!item.userImageSmall) {

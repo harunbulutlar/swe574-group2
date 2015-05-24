@@ -11,19 +11,6 @@
                     </div>
                     <div class="ibox-content profile-content">
 
-                        <div class=" form-group"><label>E-Mail</label> <input type="text"
-                                                                            ng-model="main.currentUserData.email"
-                                                                            placeholder="Your email address..."
-                                                                            class="form-control"
-                                                                            required="">
-                        </div>
-
-                        <div class=" form-group"><label>Admin Status</label> {{main.currentUserData.isAdmin?"Admin":"Not Admin"}}
-                        </div>
-
-                        <div class=" form-group"><label>Role</label> {{main.currentUserData.role}}
-                        </div>
-
                         <div class=" form-group"><label>Name</label> <input type="text"
                                                                             ng-model="main.currentUserData.userName"
                                                                             placeholder="Your name..."
@@ -38,6 +25,26 @@
                                                                             required="">
                         </div>
 
+                        <div><button class="btn btn-w-m btn-warning" ng-hide="showDetail" ng-click="showDetail=!showDetail;">
+                            <i class="fa fa-arrow-down pull-left"></i> Show Details
+                        </button> &nbsp;
+                        <button class="btn btn-w-m btn-warning" ng-show="showDetail" ng-click="showDetail=!showDetail;">
+                            <i class="fa fa-arrow-up pull-left"></i> Hide Details
+                        </button> &nbsp;
+                        </div>
+                        <div class=" form-group" ng-show="showDetail"><label>E-Mail</label> <input type="text"
+                                                                                                   ng-model="main.currentUserData.email"
+                                                                                                   placeholder="Your email address..."
+                                                                                                   class="form-control"
+                                                                                                   required="">
+                        </div>
+
+                        <div class=" form-group" ng-show="showDetail"><label>Admin Status</label> {{main.currentUserData.isAdmin?"Admin":"Not Admin"}}
+                        </div>
+
+                        <div class=" form-group" ng-show="showDetail"><label>Role</label> {{main.currentUserData.role}}
+                        </div>
+
                         <div class=" form-group"><label>Write Something About Your Self</label> <textarea
                                                                                  ng-model="main.currentUserData.description"
                                                                                  placeholder="Here goes something"
@@ -47,7 +54,7 @@
                         <div class=" form-group">
                             <h3>You are Interested in</h3>
                             <div ng-repeat="(context,interestedTimes) in main.currentUserData.contexts" style="display: inline">
-                                <button class="btn btn-w-m btn-warning" ng-click="alert('My interest is : '+context)"><i
+                                <button class="btn btn-w-m btn-warning" ng-click="alert(context)"><i
                                         class="fa fa-star pull-left"></i>{{context}}
                                 </button> &nbsp;
                             </div>
