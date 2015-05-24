@@ -901,6 +901,10 @@ function ProfileViewCtrl($scope, $rootScope, fireFactory, $stateParams) {
         $scope.specificUserProfile = fireFactory.getUserObject($stateParams.userToBeViewed);
 
         $scope.specificUserProfile.$loaded().then(function (loadedData) {
+
+            $scope.specificemail = loadedData.email;
+            $scope.specificisAdmin = loadedData.isAdmin;
+            $scope.specificrole = loadedData.role;
             $scope.specificUserName = loadedData.userName;
             $scope.specificUserLastName = loadedData.userLastName;
             $scope.specificUserImage = loadedData.userImage;

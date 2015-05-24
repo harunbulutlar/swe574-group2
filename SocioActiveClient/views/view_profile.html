@@ -1,6 +1,6 @@
 <div class="wrapper wrapper-content" ng-controller="ProfileViewCtrl">
     <div class="row animated fadeInRight">
-        <div class="col-lg-4">
+        <div class="col-lg-12">
             <div class="ibox float-e-margins">
                 <div class="ibox-title">
                     <h5>Profile Detail</h5>
@@ -10,6 +10,18 @@
                         <img alt="image" class="img-responsive" src="{{specificUserImage}}">
                     </div>
                     <div class="ibox-content profile-content">
+                        <div class=" form-group"><label>E-Mail</label> <input type="text"
+                                                                              ng-model="specificemail"
+                                                                              placeholder="Your email address..."
+                                                                              class="form-control"
+                                                                              required="">
+                        </div>
+
+                        <div class=" form-group"><label>Admin Status</label> {{specificisAdmin?"Admin":"Not Admin"}}
+                        </div>
+
+                        <div class=" form-group"><label>Role</label> {{specificrole}}
+                        </div>
 
                         <div class=" form-group"><label>Name</label> <input type="text"
                                                                             ng-model="specificUserName"
