@@ -10,13 +10,13 @@
  */
 function pageTitle($rootScope, $timeout) {
     return {
-        link: function(scope, element) {
-            var listener = function(event, toState, toParams, fromState, fromParams) {
+        link: function (scope, element) {
+            var listener = function (event, toState, toParams, fromState, fromParams) {
                 // Default title - load on Dashboard 1
                 var title = 'SocioActive';
                 // Create your own title pattern
                 if (toState.data && toState.data.pageTitle) title = 'SocioActive | ' + toState.data.pageTitle;
-                $timeout(function() {
+                $timeout(function () {
                     element.text(title);
                 });
             };
@@ -31,9 +31,9 @@ function pageTitle($rootScope, $timeout) {
 function sideNavigation($timeout) {
     return {
         restrict: 'A',
-        link: function(scope, element) {
+        link: function (scope, element) {
             // Call the metsiMenu plugin and plug it to sidebar navigation
-            $timeout(function(){
+            $timeout(function () {
                 element.metisMenu();
             });
         }
@@ -74,7 +74,7 @@ function iboxTools($timeout) {
 
 /**
  * minimalizaSidebar - Directive for minimalize sidebar
-*/
+ */
 function minimalizaSidebar($timeout) {
     return {
         restrict: 'A',
@@ -90,7 +90,7 @@ function minimalizaSidebar($timeout) {
                         function () {
                             $('#side-menu').fadeIn(500);
                         }, 100);
-                } else if ($('body').hasClass('fixed-sidebar')){
+                } else if ($('body').hasClass('fixed-sidebar')) {
                     $('#side-menu').hide();
                     setTimeout(
                         function () {
@@ -109,21 +109,21 @@ function minimalizaSidebar($timeout) {
  * dropZone - Directive for Drag and drop zone file upload plugin
  */
 function dropZone() {
-    return function(scope, element, attrs) {
+    return function (scope, element, attrs) {
         element.dropzone({
             url: "/upload",
             maxFilesize: 100,
             paramName: "uploadfile",
             maxThumbnailFilesize: 5,
-            init: function() {
-                this.on('success', function(file, json) {
+            init: function () {
+                this.on('success', function (file, json) {
                 });
-                this.on('addedfile', function(file) {
-                    scope.$apply(function(){
+                this.on('addedfile', function (file) {
+                    scope.$apply(function () {
                         scope.files.push(file);
                     });
                 });
-                this.on('drop', function(file) {
+                this.on('drop', function (file) {
                 });
             }
         });
@@ -136,9 +136,9 @@ function fileDropzone() {
             file: '=',
             fileName: '='
         },
-        link: function(scope, element, attrs) {
+        link: function (scope, element, attrs) {
             var checkSize, isTypeValid, processDragOverOrEnter, validMimeTypes;
-            processDragOverOrEnter = function(event) {
+            processDragOverOrEnter = function (event) {
                 if (event != null) {
                     event.preventDefault();
                 }
@@ -146,7 +146,7 @@ function fileDropzone() {
                 return false;
             };
             validMimeTypes = attrs.fileDropzone;
-            checkSize = function(size) {
+            checkSize = function (size) {
                 var _ref;
                 if (((_ref = attrs.maxFileSize) === (void 0) || _ref === '') || (size / 1024) / 1024 < attrs.maxFileSize) {
                     return true;
@@ -155,7 +155,7 @@ function fileDropzone() {
                     return false;
                 }
             };
-            isTypeValid = function(type) {
+            isTypeValid = function (type) {
                 if ((validMimeTypes === (void 0) || validMimeTypes === '') || validMimeTypes.indexOf(type) > -1) {
                     return true;
                 } else {
@@ -165,15 +165,15 @@ function fileDropzone() {
             };
             element.bind('dragover', processDragOverOrEnter);
             element.bind('dragenter', processDragOverOrEnter);
-            return element.bind('drop', function(event) {
+            return element.bind('drop', function (event) {
                 var file, name, reader, size, type;
                 if (event != null) {
                     event.preventDefault();
                 }
                 reader = new FileReader();
-                reader.onload = function(evt) {
+                reader.onload = function (evt) {
                     if (checkSize(size) && isTypeValid(type)) {
-                        return scope.$apply(function() {
+                        return scope.$apply(function () {
                             scope.file = evt.target.result;
                             if (angular.isString(scope.fileName)) {
                                 return scope.fileName = name;
@@ -258,6 +258,16 @@ function commentTemplate() {
             itemComment: '=',
             addCommentCallback: '='
         },
+        link: function (scope, element, attrs) {
+            var html, templateCtrl, templateScope;
+            scope.$watch('itemComment', function (data) {
+                if (!data) {
+
+                    scope.itemComment = [];
+                }
+
+            }, true);
+        },
         templateUrl: 'views/comment_template.html'
     };
 }
@@ -273,17 +283,17 @@ function dynamicArea($compile, $http, $controller) {
         replace: true,
         link: function (scope, element, attrs) {
             var html, templateCtrl, templateScope;
-            scope.$watch('selectedItemId', function(data) {
-                if(data){
-                    var ctrl = capitalizeFirstLetter(scope.areaType) +"TemplateCtrl";
+            scope.$watch('selectedItemId', function (data) {
+                if (data) {
+                    var ctrl = capitalizeFirstLetter(scope.areaType) + "TemplateCtrl";
                     var templateUrl = "views/" + scope.areaType + "_view_template.html";
-                    var html = '<div ng-controller="'+ ctrl+ '" ng-include="\'' +templateUrl +'\'"></div>';
+                    var html = '<div ng-controller="' + ctrl + '" ng-include="\'' + templateUrl + '\'"></div>';
                     element.empty();
                     element.append(html);
-                    $compile( element.contents())( scope );
+                    $compile(element.contents())(scope);
                 }
 
-            },true);
+            }, true);
         }
     };
 }
@@ -297,7 +307,7 @@ angular
     .directive('sideNavigation', sideNavigation)
     .directive('iboxTools', iboxTools)
     .directive('minimalizaSidebar', minimalizaSidebar)
-    .directive('fileDropzone',fileDropzone)
+    .directive('fileDropzone', fileDropzone)
     .directive('addNodeInfo', addNodeInfo)
     .directive('typeTemplate', typeTemplate)
     .directive('freebaseTags', freebaseTags)

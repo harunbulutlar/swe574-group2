@@ -754,6 +754,7 @@ function EventTemplateCtrl($rootScope, $scope, MEMBER, fireFactory, $state) {
     };
 
     $scope.addEventCommentForView = function (body) {
+
         if (!$scope.selectedItem.eventComments) {
             $scope.selectedItem.eventComments = [];
         }
@@ -764,9 +765,10 @@ function EventTemplateCtrl($rootScope, $scope, MEMBER, fireFactory, $state) {
             "commentDateTime": new Date().getTime()
         });
         $scope.eventUserInteraction();
+
     };
 
-    $scope.joinEvent = function (){
+    $scope.joinEvent = function () {
 
         if (!$scope.selectedItem.eventParticipantList) {
             $scope.selectedItem.eventParticipantList = [];
@@ -785,7 +787,7 @@ function EventTemplateCtrl($rootScope, $scope, MEMBER, fireFactory, $state) {
 
     };
 
-    $scope.leaveEvent = function (){
+    $scope.leaveEvent = function () {
 
         var indexUser = arrayObjectIndexOf($scope.selectedItem.eventParticipantList, $scope.currentUserId, 'participantUserId')
 
@@ -800,7 +802,7 @@ function EventTemplateCtrl($rootScope, $scope, MEMBER, fireFactory, $state) {
 
     };
 
-    $scope.isCurrentUserAttended = function (){
+    $scope.isCurrentUserAttended = function () {
 
         if ($scope.selectedItemId != null) {
             if (!$rootScope.MainCtrlRef.currentUserData.attendedEvents) {
@@ -819,7 +821,7 @@ function EventTemplateCtrl($rootScope, $scope, MEMBER, fireFactory, $state) {
         $state.go('activity.group_add_content', {eventIdId: $scope.selectedItemId, typeId: selectedTypeId});
     };
 
-    $scope.eventUserInteraction = function (){
+    $scope.eventUserInteraction = function () {
 
         if (!$rootScope.MainCtrlRef.currentUserData.interactedEvents) {
             $rootScope.MainCtrlRef.currentUserData.interactedEvents = {};
@@ -926,27 +928,24 @@ function ProfileViewCtrl($scope, $rootScope, fireFactory, $stateParams) {
 
 function CommentCtrl($scope, $rootScope, fireFactory, $stateParams) {
 
-    var comment = null;
-
     $scope.addComments = function () {
 
         if (!$scope.itemComment) {
             $scope.itemComment = [];
         }
 
-
         if (!$scope.addCommentCallback) {
-            $scope.itemComment.push({
-                "commentBody": $scope.commentBody,
-                "commentUserId": $rootScope.MainCtrlRef.userId,
-                "commentUserName": $rootScope.MainCtrlRef.currentUserData.userName,
-                "commentDateTime": new Date().getTime()
-            });
-        }else{
+         $scope.itemComment.push({
+         "commentBody": $scope.commentBody,
+         "commentUserId": $rootScope.MainCtrlRef.userId,
+         "commentUserName": $rootScope.MainCtrlRef.currentUserData.userName,
+         "commentDateTime": new Date().getTime()
+         });
+         }else{
 
-            $scope.addCommentCallback($scope.commentBody);
+         $scope.addCommentCallback($scope.commentBody);
 
-        }
+         }
         $scope.commentBody = '';
     };
 
@@ -956,47 +955,47 @@ function CommentCtrl($scope, $rootScope, fireFactory, $stateParams) {
 
     /*$scope.getCommentUserData = function (child, item){
 
-        comment = fireFactory.getCommentsObject(child, item);
+     comment = fireFactory.getCommentsObject(child, item);
 
-        comment.$loaded().then(function (loadedData) {
-
-
-            $scope.deneme = loadedData;
-
-            /!*if (!loadedData.imageLoaded) {
-                loadedData.image = "img/space_invaders_small.jpg";
-                if (loadedData.commentUserId) {
-                    var image = fireFactory.getUserImageSmallObject(loadedData.commentUserId);
-                    image.$loaded().then(function (loadedDatas) {
-                        if (loadedDatas.$value) {
-                            $scope.image = loadedDatas.$value;
-                        }
-                    })
-                }
-                loadedData.imageLoaded = true;
-            }*!/
-
-            /!*if (!item.userName) {
-
-                //item.userName = item.commentUserName;
-
-                if (item.commentUserId) {
-                    var userName = fireFactory.getUserObject(item.commentUserId);
-                    userName.$loaded().then(function (loadedData) {
-                        if (loadedData.userName) {
-                            item.userName = loadedData.userName;
-                        }
-                    })
-                }
+     comment.$loaded().then(function (loadedData) {
 
 
-            }*!/
+     $scope.deneme = loadedData;
+
+     /!*if (!loadedData.imageLoaded) {
+     loadedData.image = "img/space_invaders_small.jpg";
+     if (loadedData.commentUserId) {
+     var image = fireFactory.getUserImageSmallObject(loadedData.commentUserId);
+     image.$loaded().then(function (loadedDatas) {
+     if (loadedDatas.$value) {
+     $scope.image = loadedDatas.$value;
+     }
+     })
+     }
+     loadedData.imageLoaded = true;
+     }*!/
+
+     /!*if (!item.userName) {
+
+     //item.userName = item.commentUserName;
+
+     if (item.commentUserId) {
+     var userName = fireFactory.getUserObject(item.commentUserId);
+     userName.$loaded().then(function (loadedData) {
+     if (loadedData.userName) {
+     item.userName = loadedData.userName;
+     }
+     })
+     }
 
 
-        });
+     }*!/
 
 
-    }*/
+     });
+
+
+     }*/
 
 }
 
@@ -1066,7 +1065,7 @@ function HomeCtrl($scope, $rootScope, fireFactory) {
                 tempDescription = angular.lowercase(tempDescription);
                 if (tempDescription.search(tempSearchTerm) > -1) {
 
-                    var matches = searchResultGroup.filter(function(datum) {
+                    var matches = searchResultGroup.filter(function (datum) {
                         return datum.key === key;
                     });
                     if (!matches.length) {
@@ -1083,7 +1082,7 @@ function HomeCtrl($scope, $rootScope, fireFactory) {
                             tempTagContext = angular.lowercase(tempTagContext);
                             tempTagName = angular.lowercase(tempTagName);
                             if (tempTagContext.search(tempSearchTerm) > -1 || tempTagName.search(tempSearchTerm) > -1) {
-                                var matches = searchResultGroup.filter(function(datum) {
+                                var matches = searchResultGroup.filter(function (datum) {
                                     return datum.key === key;
                                 });
                                 if (!matches.length) {
@@ -1107,7 +1106,7 @@ function HomeCtrl($scope, $rootScope, fireFactory) {
                 tempSearchTerm = angular.lowercase(tempSearchTerm);
                 tempDescription = angular.lowercase(tempDescription);
                 if (tempDescription.search(tempSearchTerm) > -1) {
-                    var matches = searchResultPoll.filter(function(datum) {
+                    var matches = searchResultPoll.filter(function (datum) {
                         return datum.key === key;
                     });
                     if (!matches.length) {
@@ -1124,7 +1123,7 @@ function HomeCtrl($scope, $rootScope, fireFactory) {
                             tempTagContext = angular.lowercase(tempTagContext);
                             tempTagName = angular.lowercase(tempTagName);
                             if (tempTagContext.search(tempSearchTerm) > -1 || tempTagName.search(tempSearchTerm) > -1) {
-                                var matches = searchResultPoll.filter(function(datum) {
+                                var matches = searchResultPoll.filter(function (datum) {
                                     return datum.key === key;
                                 });
                                 if (!matches.length) {
@@ -1147,7 +1146,7 @@ function HomeCtrl($scope, $rootScope, fireFactory) {
                 tempSearchTerm = angular.lowercase(tempSearchTerm);
                 tempDescription = angular.lowercase(tempDescription);
                 if (tempDescription.search(tempSearchTerm) > -1) {
-                    var matches = searchResultEvent.filter(function(datum) {
+                    var matches = searchResultEvent.filter(function (datum) {
                         return datum.key === key;
                     });
                     if (!matches.length) {
@@ -1163,7 +1162,7 @@ function HomeCtrl($scope, $rootScope, fireFactory) {
                             tempTagContext = angular.lowercase(tempTagContext);
                             tempTagName = angular.lowercase(tempTagName);
                             if (tempTagContext.search(tempSearchTerm) > -1 || tempTagName.search(tempSearchTerm) > -1) {
-                                var matches = searchResultEvent.filter(function(datum) {
+                                var matches = searchResultEvent.filter(function (datum) {
                                     return datum.key === key;
                                 });
                                 if (!matches.length) {
@@ -1179,7 +1178,7 @@ function HomeCtrl($scope, $rootScope, fireFactory) {
                     });
                 }
             });
-            
+
             $scope.groups = searchResultGroup;
             $scope.polls = searchResultPoll;
             $scope.events = searchResultEvent;
