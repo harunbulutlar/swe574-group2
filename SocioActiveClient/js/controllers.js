@@ -690,6 +690,11 @@ function EventCtrl($scope, $rootScope, fireFactory, $state, contextFactory, MEMB
             $rootScope.MainCtrlRef.currentUserData.contexts[key]++;
         });
 
+        angular.forEach($rootScope.MainCtrlRef.currentUserData.contexts, function (value, key) {
+            var userInContext = fireFactory.getUserInContextRef(key, $rootScope.MainCtrlRef.userId);
+            userInContext.set(value);
+        });
+
         $rootScope.MainCtrlRef.currentUserData.createdEvents[fireBaseObj.key()] = true;
         $scope.loading = true;
         $rootScope.MainCtrlRef.currentUserData.$save().then(function () {
