@@ -241,6 +241,19 @@ function ItemPreviewCtrl($scope, fireFactory) {
             item.imageLoaded = true;
         }
 
+        if (!item.userNameChanged) {
+
+            if (userId) {
+                var userName = fireFactory.getUserNameObject(userId);
+                userName.$loaded().then(function (loadedData) {
+                    if (loadedData.$value) {
+                        item.ownerNameDynamic = loadedData.$value;
+                    }
+                })
+            }
+            item.userNameChanged = true;
+        }
+
         return itemClass;
     };
 }
@@ -1515,6 +1528,10 @@ angular
 
             helperFactory.getUserImageSmallObject = function (uid) {
                 return $firebaseObject(helperFactory.getUserRef(uid).child("userImageSmall"));
+            };
+
+            helperFactory.getUserNameObject = function (uid) {
+                return $firebaseObject(helperFactory.getUserRef(uid).child("userName"));
             };
 
             helperFactory.getGroupsObjectAll = function () {
