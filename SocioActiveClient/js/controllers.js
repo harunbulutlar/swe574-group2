@@ -924,13 +924,13 @@ function ProfileViewCtrl($scope, $rootScope, fireFactory, $stateParams) {
 
         $scope.specificUserProfile.$loaded().then(function (loadedData) {
 
-            $scope.specificemail = loadedData.email;
-            $scope.specificisAdmin = loadedData.isAdmin;
-            $scope.specificrole = loadedData.role;
+            $scope.specificEmail = loadedData.email;
+            $scope.specificIsAdmin = loadedData.isAdmin;
+            $scope.specificRole = loadedData.role;
             $scope.specificUserName = loadedData.userName;
             $scope.specificUserLastName = loadedData.userLastName;
-            $scope.specificdescription = loadedData.description;
-            $scope.specificcontexts = loadedData.contexts;
+            $scope.specificDescription = loadedData.description;
+            $scope.specificContexts = loadedData.contexts;
             $scope.specificUserImage = loadedData.userImage;
 
         });

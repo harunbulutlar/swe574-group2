@@ -40,6 +40,7 @@
 </div>
 
 <div class="ibox-content">
+
     <section ng-controller="TabCtrl">
         <tabset>
             <tab ng-click="selectTab(1)">
@@ -59,20 +60,16 @@
 
         <br>
 
-        <div class="ibox-content">
-
-            <div class='form-group' ng-show="isSelected(1)">
+            <div class='ibox-content' ng-show="isSelected(1)">
 
                 <comment-template item-comment="selectedItem.comments"
                                   add-comment-callback="addGroupCommentForView"></comment-template>
 
             </div>
 
-            <div class='form-group' ng-show="isSelected(2)">
+            <div class='ibox-content' ng-show="isSelected(2)">
                 <h4>Participants</h4>
             </div>
-
-        </div>
 
     </section>
 </div>

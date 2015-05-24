@@ -71,34 +71,54 @@
 
 
 <div class="ibox-content">
+
     <section ng-controller="TabCtrl">
 
-        <div class="ibox-content">
-            <tabset>
-                <tab ng-click="selectTab(1)">
-                    <tab-heading>
-                        Comments
-                    </tab-heading>
+        <tabset>
+            <tab ng-click="selectTab(1)">
+                <tab-heading>
+                    Comments
+                </tab-heading>
 
-                </tab>
+            </tab>
 
-                <tab ng-click="selectTab(2)">
-                    <tab-heading>
-                        Participants
-                    </tab-heading>
+            <tab ng-click="selectTab(2)">
+                <tab-heading>
+                    Participants
+                </tab-heading>
 
-                </tab>
-            </tabset>
-        </div>
+            </tab>
+        </tabset>
 
-        <div class='form-group' ng-show="isSelected(1)">
+        <br>
+
+        <div class='ibox-content' ng-show="isSelected(1)">
 
             <comment-template item-comment="selectedItem.eventComments"
                               add-comment-callback="addEventCommentForView"></comment-template>
         </div>
 
-        <div class='form-group' ng-show="isSelected(2)">
-            <h4>Participants</h4>
+        <div class='ibox-content' ng-show="isSelected(2)">
+
+            <div class="feed-activity-list"
+                 ng-repeat="participant in selectedItem.eventParticipantList">
+
+                <div class="feed-element">
+
+                    <a ui-sref="profile.specificUser({userToBeViewed: participant.participantUserId})" class="pull-left">
+                        <img alt="image" class="img-circle" src="img/a5.jpg">
+                    </a>
+
+                    <div class="media-body ">
+
+                        <strong>{{participant.participantUserName}}</strong> is attending...
+
+                    </div>
+
+                </div>
+
+            </div>
+
         </div>
 
     </section>

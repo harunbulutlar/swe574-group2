@@ -1,6 +1,6 @@
 <div class="wrapper wrapper-content" ng-controller="ProfileCtrl">
     <div class="row animated fadeInRight">
-        <div class="col-lg-12">
+        <div class="col-lg-6">
             <div class="ibox float-e-margins">
                 <div class="ibox-title">
                     <h5>Profile Detail</h5>
@@ -19,48 +19,63 @@
                         </div>
 
                         <div class=" form-group"><label>Last Name</label> <input type="text"
-                                                                            ng-model="main.currentUserData.userLastName"
-                                                                            placeholder="Your last name..."
-                                                                            class="form-control"
-                                                                            required="">
+                                                                                 ng-model="main.currentUserData.userLastName"
+                                                                                 placeholder="Your last name..."
+                                                                                 class="form-control"
+                                                                                 required="">
                         </div>
 
-                        <div><button class="btn btn-w-m btn-warning" ng-hide="showDetail" ng-click="showDetail=!showDetail;">
-                            <i class="fa fa-arrow-down pull-left"></i> Show Details
-                        </button> &nbsp;
-                        <button class="btn btn-w-m btn-warning" ng-show="showDetail" ng-click="showDetail=!showDetail;">
-                            <i class="fa fa-arrow-up pull-left"></i> Hide Details
-                        </button> &nbsp;
-                        </div>
-                        <div class=" form-group" ng-show="showDetail"><label>E-Mail</label> <input type="text"
-                                                                                                   ng-model="main.currentUserData.email"
-                                                                                                   placeholder="Your email address..."
-                                                                                                   class="form-control"
-                                                                                                   required="">
+                        <div>
+                            <button class="btn btn-w-m btn-primary" ng-hide="showDetail"
+                                    ng-click="showDetail=!showDetail;">
+                                <i class="fa fa-arrow-down pull-left"></i> Show Details
+                            </button>
+
+                            <button class="btn btn-w-m btn-default-focus" ng-show="showDetail"
+                                    ng-click="showDetail=!showDetail;">
+                                <i class="fa fa-arrow-up pull-left"></i> Hide Details
+                            </button>
+
                         </div>
 
-                        <div class=" form-group" ng-show="showDetail"><label>Admin Status</label> {{main.currentUserData.isAdmin?"Admin":"Not Admin"}}
-                        </div>
 
-                        <div class=" form-group" ng-show="showDetail"><label>Role</label> {{main.currentUserData.role}}
-                        </div>
+                        <dl class="dd-list" ng-show="showDetail">
+
+                            <dt>E-Mail:</dt>
+                            <dd>{{main.currentUserData.email}}</dd>
+                            <br>
+                            <dt>User Status:</dt>
+                            <dd>{{main.currentUserData.isAdmin?"Admin":"Member"}}</dd>
+                            <br>
+                            <dt>Role:</dt>
+                            <dd>{{main.currentUserData.role}}</dd>
+
+                        </dl>
+
+                        <br>
 
                         <div class=" form-group"><label>Write Something About Your Self</label> <textarea
-                                                                                 ng-model="main.currentUserData.description"
-                                                                                 placeholder="Here goes something"
-                                                                                 class="form-control"
-                                                                                 required=""></textarea>
+                                ng-model="main.currentUserData.description"
+                                placeholder="Here goes something"
+                                class="form-control"
+                                required=""></textarea>
                         </div>
+
                         <div class=" form-group">
                             <h3>You are Interested in</h3>
-                            <div ng-repeat="(context,interestedTimes) in main.currentUserData.contexts" style="display: inline">
+
+                            <div ng-repeat="(context,interestedTimes) in main.currentUserData.contexts"
+                                 style="display: inline">
                                 <button class="btn btn-w-m btn-warning" ng-click="alert(context)"><i
                                         class="fa fa-star pull-left"></i>{{context}}
-                                </button> &nbsp;
+                                </button>
+                                &nbsp;
                             </div>
                         </div>
+
                     </div>
                 </div>
+
                 <div class="ibox float-e-margins">
                     <div class="ibox-title">
                         <h3>Recommended People
@@ -68,8 +83,8 @@
                         </h3>
                     </div>
                     <div class="ibox-content">
-                        <div class="feed-activity-list" >
-                            <div ng-repeat="item in people" ng-class="getClass(item.value)" >
+                        <div class="feed-activity-list">
+                            <div ng-repeat="item in people" ng-class="getClass(item.value)">
 
                                 <a ui-sref="profile.specificUser({userToBeViewed: item.key})" class="pull-left">
                                     <img alt="image" class="img-circle" src="{{item.value.userImageSmall}}">
@@ -77,10 +92,13 @@
 
                                 <div class="media-body ">
                                     <strong>{{item.value.userName}}</strong>
+
                                     <div class="well">
                                         {{item.value.description }}
                                     </div>
-                                    <button type="submit" class="btn btn-primary btn-sm pull-right " ><i class="fa fa-plus"></i>Follow</button>
+                                    <button type="submit" class="btn btn-primary btn-sm pull-right "><i
+                                            class="fa fa-plus"></i>Follow
+                                    </button>
                                 </div>
                             </div>
                         </div>
