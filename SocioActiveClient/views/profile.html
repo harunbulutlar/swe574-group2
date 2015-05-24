@@ -1,6 +1,6 @@
 <div class="wrapper wrapper-content" ng-controller="ProfileCtrl">
     <div class="row animated fadeInRight">
-        <div class="col-lg-4">
+        <div class="col-lg-12">
             <div class="ibox float-e-margins">
                 <div class="ibox-title">
                     <h5>Profile Detail</h5>
@@ -11,11 +11,24 @@
                     </div>
                     <div class="ibox-content profile-content">
 
+                        <div class=" form-group"><label>E-Mail</label> <input type="text"
+                                                                            ng-model="main.currentUserData.email"
+                                                                            placeholder="Your email address..."
+                                                                            class="form-control"
+                                                                            required="">
+                        </div>
+
+                        <div class=" form-group"><label>Admin Status</label> {{main.currentUserData.isAdmin?"Admin":"Not Admin"}}
+                        </div>
+
+                        <div class=" form-group"><label>Role</label> {{main.currentUserData.role}}
+                        </div>
+
                         <div class=" form-group"><label>Name</label> <input type="text"
-                                                                             ng-model="main.currentUserData.userName"
-                                                                             placeholder="Your name..."
-                                                                             class="form-control"
-                                                                             required="">
+                                                                            ng-model="main.currentUserData.userName"
+                                                                            placeholder="Your name..."
+                                                                            class="form-control"
+                                                                            required="">
                         </div>
 
                         <div class=" form-group"><label>Last Name</label> <input type="text"
@@ -34,7 +47,7 @@
                         <div class=" form-group">
                             <h3>You are Interested in</h3>
                             <div ng-repeat="(context,interestedTimes) in main.currentUserData.contexts" style="display: inline">
-                                <button class="btn btn-w-m btn-warning"><i
+                                <button class="btn btn-w-m btn-warning" ng-click="alert('My interest is : '+context)"><i
                                         class="fa fa-star pull-left"></i>{{context}}
                                 </button> &nbsp;
                             </div>
