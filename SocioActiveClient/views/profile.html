@@ -51,7 +51,7 @@
                         <div class="feed-activity-list" >
                             <div ng-repeat="item in people" ng-class="getClass(item.value)" >
 
-                                <a ui-sref="profile" class="pull-left">
+                                <a ui-sref="profile.specificUser({userToBeViewed: item.key})" class="pull-left">
                                     <img alt="image" class="img-circle" src="{{item.value.userImageSmall}}">
                                 </a>
 

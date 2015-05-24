@@ -241,11 +241,19 @@ function PollTemplateCtrl($rootScope, $scope, MEMBER, contextFactory, $state, fi
 
     $scope.isPrivacyDisabled = function (){
 
+        if(isObjectEmpty($scope.selectedItem.pollRoles)){
+
+            return false;
+        }
+
         $scope.isPrivacy  = $scope.selectedItem.pollRoles.indexOf($rootScope.MainCtrlRef.currentUserData.role);
 
         if ($scope.isPrivacy > -1){
 
             return false;
+
+        }else{
+            return true;
         }
 
     };
@@ -266,23 +274,13 @@ function PollTemplateCtrl($rootScope, $scope, MEMBER, contextFactory, $state, fi
             item.optionVoteCount = item.optionVoteCount + 1;
             loadedData.$save(item).then(function () {
                 // data has been saved to Firebase
-                $scope.loading = true;
 
-                angular.forEach($scope.selectedItem.pollTagContext, function (value, key) {
-                    if (!$rootScope.MainCtrlRef.currentUserData.contexts) {
-                        $rootScope.MainCtrlRef.currentUserData.contexts = {};
-                    }
-                    if (!$rootScope.MainCtrlRef.currentUserData.contexts[key]) {
-                        $rootScope.MainCtrlRef.currentUserData.contexts[key] = 1;
-                        return;
-                    }
-                    $rootScope.MainCtrlRef.currentUserData.contexts[key]++;
-                });
+                if (!$rootScope.MainCtrlRef.currentUserData.votedPolls) {
+                    $rootScope.MainCtrlRef.currentUserData.votedPolls = {};
+                }
+                $rootScope.MainCtrlRef.currentUserData.votedPolls[$scope.selectedItemId] = true;
 
-                $rootScope.MainCtrlRef.currentUserData.$save().then(function () {
-                    $scope.loading = false;
-
-                });
+                $scope.pollUserInteraction();
 
             });
         });
@@ -315,12 +313,6 @@ function PollTemplateCtrl($rootScope, $scope, MEMBER, contextFactory, $state, fi
     };
 
     $scope.addPollTagForView = function (tag) {
-        if (!$rootScope.MainCtrlRef.currentUserData.interactedPolls) {
-            $rootScope.MainCtrlRef.currentUserData.interactedPolls = {};
-        }
-        if (!$rootScope.MainCtrlRef.currentUserData.contexts) {
-            $rootScope.MainCtrlRef.currentUserData.contexts = {};
-        }
 
         var contextPollsRef = fireFactoryForPoll.getPollsInContextRef(tag.tagContext);
         var pollLinkObject = {};
@@ -328,29 +320,27 @@ function PollTemplateCtrl($rootScope, $scope, MEMBER, contextFactory, $state, fi
         pollLinkObject[$scope.selectedItemId] = $scope.selectedItem.pollTagContext[tag.tagContext].length;
         contextPollsRef.update(pollLinkObject);
 
-        if (!$rootScope.MainCtrlRef.currentUserData.contexts[tag.tagContext]) {
-            $rootScope.MainCtrlRef.currentUserData.contexts[tag.tagContext] = 1;
-        } else {
-            $rootScope.MainCtrlRef.currentUserData.contexts[tag.tagContext]++;
-        }
+        $scope.pollUserInteraction();
 
-        $rootScope.MainCtrlRef.currentUserData.interactedPolls[$scope.selectedItemId] = true;
-        $scope.loading = true;
-        $rootScope.MainCtrlRef.currentUserData.$save();
         $scope.tags = '';
         $scope.manualTags = '';
     };
 
     $scope.addPollCommentForView = function (body) {
+
         if (!$scope.selectedItem.pollComments) {
             $scope.selectedItem.pollComments = [];
         }
+
         $scope.selectedItem.pollComments.push({
             "commentBody": body,
             "commentUserId": $scope.currentUserId,
             "commentUserName": $scope.currentUserName,
             "commentDateTime": new Date().getTime()
         });
+
+        $scope.pollUserInteraction();
+
     };
 
     $scope.pollCommentDateDifference = function (date) {
@@ -365,6 +355,37 @@ function PollTemplateCtrl($rootScope, $scope, MEMBER, contextFactory, $state, fi
     $scope.addButtonClick = function (selectedTypeId) {
         $state.go('activity.group_add_content', {pollIdId: $scope.selectedItemId, typeId: selectedTypeId});
     };
+
+    $scope.pollUserInteraction = function () {
+
+        if (!$rootScope.MainCtrlRef.currentUserData.interactedPolls) {
+            $rootScope.MainCtrlRef.currentUserData.interactedPolls = {};
+        }
+        $rootScope.MainCtrlRef.currentUserData.interactedPolls[$scope.selectedItemId] = true;
+
+        angular.forEach($scope.selectedItem.pollTagContext, function (value, key) {
+            if (!$rootScope.MainCtrlRef.currentUserData.contexts) {
+                $rootScope.MainCtrlRef.currentUserData.contexts = {};
+            }
+            if (!$rootScope.MainCtrlRef.currentUserData.contexts[key]) {
+                $rootScope.MainCtrlRef.currentUserData.contexts[key] = 1;
+                return;
+            }
+            $rootScope.MainCtrlRef.currentUserData.contexts[key]++;
+        });
+
+        angular.forEach($rootScope.MainCtrlRef.currentUserData.contexts, function (value, key) {
+            var userInContext = fireFactoryForPoll.getUsersInContextRef(key);
+
+            var pollLinkObject = {};
+            pollLinkObject[$rootScope.MainCtrlRef.userId] = $rootScope.MainCtrlRef.currentUserData.contexts[key];
+            userInContext.update(pollLinkObject);
+        });
+
+        $scope.loading = true;
+        $rootScope.MainCtrlRef.currentUserData.$save();
+        $scope.loading = false;
+    }
 }
 
 function CurrentPollsCtrl($scope, fireFactoryForPoll) {

@@ -6,15 +6,15 @@
 
             <div class="feed-element">
 
-                <a ui-sref="profile" class="pull-left">
-                    <img alt="image" class="img-circle" src="img/a5.jpg">
+                <a ui-sref="profile.specificUser({userToBeViewed: comment.commentUserId})" class="pull-left">
+                    <img alt="image" class="img-circle" src="img/space_invaders_big.jpg">
                 </a>
 
                 <div class="media-body ">
                     <small class="pull-right">
                         {{commentDateDifference(comment.commentDateTime)}} ago
                     </small>
-                    <strong>{{comment.commentUserName}}</strong> posted a message
+                    <strong>{{comment.userName}}</strong> posted a message
                     <br>
                     <small class="text-muted">{{comment.commentDateTime | date:'yyyy-MM-dd HH:mm'}}
                     </small>

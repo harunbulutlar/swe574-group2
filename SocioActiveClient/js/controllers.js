@@ -25,6 +25,7 @@ function MainCtrl($window, fireFactory, $rootScope) {
         }
         if (loadedData.userImage) {
             $rootScope.MainCtrlRef.userImage = loadedData.userImage;
+            $rootScope.MainCtrlRef.userImageSmall = loadedData.userImageSmall;
         }
 
     });
@@ -738,30 +739,19 @@ function EventTemplateCtrl($rootScope, $scope, MEMBER, fireFactory, $state) {
     };
 
     $scope.addEventTagForView = function (tag) {
-        if (!$rootScope.MainCtrlRef.currentUserData.interactedEvents) {
-            $rootScope.MainCtrlRef.currentUserData.interactedEvents = {};
-        }
-        if (!$rootScope.MainCtrlRef.currentUserData.contexts) {
-            $rootScope.MainCtrlRef.currentUserData.contexts = {};
-        }
 
         var contextEventsRef = fireFactory.getEventsInContextRef(tag.tagContext);
         var eventLinkObject = {};
+
         eventLinkObject[$scope.selectedItemId] = $scope.selectedItem.eventTagContext[tag.tagContext].length;
         contextEventsRef.update(eventLinkObject);
-        if (!$rootScope.MainCtrlRef.currentUserData.contexts[tag.tagContext]) {
-            $rootScope.MainCtrlRef.currentUserData.contexts[tag.tagContext] = 1;
-        } else {
-            $rootScope.MainCtrlRef.currentUserData.contexts[tag.tagContext]++;
-        }
 
-        $rootScope.MainCtrlRef.currentUserData.interactedEvents[$scope.selectedItemId] = true;
-        $scope.loading = true;
-        $rootScope.MainCtrlRef.currentUserData.$save();
+        $scope.eventUserInteraction();
+
         $scope.tags = '';
         $scope.manualTags = '';
-    };
 
+    };
 
     $scope.addEventCommentForView = function (body) {
         if (!$scope.selectedItem.eventComments) {
@@ -773,6 +763,12 @@ function EventTemplateCtrl($rootScope, $scope, MEMBER, fireFactory, $state) {
             "commentUserName": $scope.currentUserName,
             "commentDateTime": new Date().getTime()
         });
+        $scope.eventUserInteraction();
+    };
+
+    $scope.joinEvent = function (){
+
+
     };
 
     $scope.showContent = function (fieldKey, contentKey) {
@@ -782,6 +778,38 @@ function EventTemplateCtrl($rootScope, $scope, MEMBER, fireFactory, $state) {
     $scope.addButtonClick = function (selectedTypeId) {
         $state.go('activity.group_add_content', {eventIdId: $scope.selectedItemId, typeId: selectedTypeId});
     };
+
+    $scope.eventUserInteraction = function (){
+
+        if (!$rootScope.MainCtrlRef.currentUserData.interactedEvents) {
+            $rootScope.MainCtrlRef.currentUserData.interactedEvents = {};
+        }
+        $rootScope.MainCtrlRef.currentUserData.interactedEvents[$scope.selectedItemId] = true;
+
+        angular.forEach($scope.selectedItem.eventTagContext, function (value, key) {
+            if (!$rootScope.MainCtrlRef.currentUserData.contexts) {
+                $rootScope.MainCtrlRef.currentUserData.contexts = {};
+            }
+            if (!$rootScope.MainCtrlRef.currentUserData.contexts[key]) {
+                $rootScope.MainCtrlRef.currentUserData.contexts[key] = 1;
+                return;
+            }
+            $rootScope.MainCtrlRef.currentUserData.contexts[key]++;
+        });
+
+        angular.forEach($rootScope.MainCtrlRef.currentUserData.contexts, function (value, key) {
+            var userInContext = fireFactory.getUsersInContextRef(key);
+
+            var eventLinkObject = {};
+            eventLinkObject[$rootScope.MainCtrlRef.userId] = $rootScope.MainCtrlRef.currentUserData.contexts[key];
+            userInContext.update(eventLinkObject);
+        });
+
+        $scope.loading = true;
+        $rootScope.MainCtrlRef.currentUserData.$save();
+        $scope.loading = false;
+
+    }
 
 
 }
@@ -836,7 +864,6 @@ function ProfileViewCtrl($scope, $rootScope, fireFactory, $stateParams) {
             $scope.specificUserName = loadedData.userName;
             $scope.specificUserLastName = loadedData.userLastName;
             $scope.specificUserImage = loadedData.userImage;
-            $scope.specificUserImage = loadedData.userImage;
 
         });
 
@@ -857,7 +884,9 @@ function ProfileViewCtrl($scope, $rootScope, fireFactory, $stateParams) {
 }
 
 
-function CommentCtrl($scope, $rootScope) {
+function CommentCtrl($scope, $rootScope, fireFactory, $stateParams) {
+
+    var comment = null;
 
     $scope.addComments = function () {
 
@@ -884,6 +913,50 @@ function CommentCtrl($scope, $rootScope) {
     $scope.commentDateDifference = function (date) {
         return dateDifference(date);
     };
+
+    /*$scope.getCommentUserData = function (child, item){
+
+        comment = fireFactory.getCommentsObject(child, item);
+
+        comment.$loaded().then(function (loadedData) {
+
+
+            $scope.deneme = loadedData;
+
+            /!*if (!loadedData.imageLoaded) {
+                loadedData.image = "img/space_invaders_small.jpg";
+                if (loadedData.commentUserId) {
+                    var image = fireFactory.getUserImageSmallObject(loadedData.commentUserId);
+                    image.$loaded().then(function (loadedDatas) {
+                        if (loadedDatas.$value) {
+                            $scope.image = loadedDatas.$value;
+                        }
+                    })
+                }
+                loadedData.imageLoaded = true;
+            }*!/
+
+            /!*if (!item.userName) {
+
+                //item.userName = item.commentUserName;
+
+                if (item.commentUserId) {
+                    var userName = fireFactory.getUserObject(item.commentUserId);
+                    userName.$loaded().then(function (loadedData) {
+                        if (loadedData.userName) {
+                            item.userName = loadedData.userName;
+                        }
+                    })
+                }
+
+
+            }*!/
+
+
+        });
+
+
+    }*/
 
 }
 
@@ -1287,6 +1360,10 @@ angular
                 return helperFactory.getContextRef(context).child('events');
             };
 
+            helperFactory.getCommentsRef = function (child, uid) {
+                return helperFactory.getDataRef().child(child).child(uid).child('comments');
+            };
+
 
             ///Singular References
             helperFactory.getGroupRef = function (uid) {
@@ -1333,6 +1410,10 @@ angular
 
             helperFactory.getEventsInContextObject = function (context) {
                 $firebaseObject(helperFactory.getEventsInContextRef(context));
+            };
+
+            helperFactory.getCommentsObject = function (child, uid) {
+                return $firebaseObject(helperFactory.getCommentsRef(child, uid));
             };
 
             ///Singular Objects
