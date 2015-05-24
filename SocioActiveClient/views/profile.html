@@ -5,78 +5,76 @@
                 <div class="ibox-title">
                     <h5>Profile Detail</h5>
                 </div>
-                <div>
-                    <div class="ibox-content no-padding border-left-right">
-                        <img alt="image" class="img-responsive" src="{{main.currentUserData.userImage}}">
+                <div class="ibox-content">
+                    <img alt="image" class="img-responsive" src="{{main.currentUserData.userImage}}">
+                </div>
+                <div class="ibox-content profile-content">
+
+                    <div class=" form-group"><label>Name</label> <input type="text"
+                                                                        ng-model="main.currentUserData.userName"
+                                                                        placeholder="Your name..."
+                                                                        class="form-control"
+                                                                        required="">
                     </div>
-                    <div class="ibox-content profile-content">
 
-                        <div class=" form-group"><label>Name</label> <input type="text"
-                                                                            ng-model="main.currentUserData.userName"
-                                                                            placeholder="Your name..."
-                                                                            class="form-control"
-                                                                            required="">
-                        </div>
+                    <div class=" form-group"><label>Last Name</label> <input type="text"
+                                                                             ng-model="main.currentUserData.userLastName"
+                                                                             placeholder="Your last name..."
+                                                                             class="form-control"
+                                                                             required="">
+                    </div>
 
-                        <div class=" form-group"><label>Last Name</label> <input type="text"
-                                                                                 ng-model="main.currentUserData.userLastName"
-                                                                                 placeholder="Your last name..."
-                                                                                 class="form-control"
-                                                                                 required="">
-                        </div>
+                    <div>
+                        <button class="btn btn-w-m btn-primary" ng-hide="showDetail"
+                                ng-click="showDetail=!showDetail;">
+                            <i class="fa fa-arrow-down pull-left"></i> Show Details
+                        </button>
 
-                        <div>
-                            <button class="btn btn-w-m btn-primary" ng-hide="showDetail"
-                                    ng-click="showDetail=!showDetail;">
-                                <i class="fa fa-arrow-down pull-left"></i> Show Details
-                            </button>
+                        <button class="btn btn-w-m btn-default-focus" ng-show="showDetail"
+                                ng-click="showDetail=!showDetail;">
+                            <i class="fa fa-arrow-up pull-left"></i> Hide Details
+                        </button>
 
-                            <button class="btn btn-w-m btn-default-focus" ng-show="showDetail"
-                                    ng-click="showDetail=!showDetail;">
-                                <i class="fa fa-arrow-up pull-left"></i> Hide Details
-                            </button>
-
-                        </div>
+                    </div>
 
 
-                        <dl class="dd-list" ng-show="showDetail">
+                    <dl class="dd-list" ng-show="showDetail">
 
-                            <dt>E-Mail:</dt>
-                            <dd>{{main.currentUserData.email}}</dd>
-                            <br>
-                            <dt>User Status:</dt>
-                            <dd>{{main.currentUserData.isAdmin?"Admin":"Member"}}</dd>
-                            <br>
-                            <dt>Role:</dt>
-                            <dd>{{main.currentUserData.role}}</dd>
-
-                        </dl>
-
+                        <dt>E-Mail:</dt>
+                        <dd>{{main.currentUserData.email}}</dd>
                         <br>
+                        <dt>User Status:</dt>
+                        <dd>{{main.currentUserData.isAdmin?"Admin":"Member"}}</dd>
+                        <br>
+                        <dt>Role:</dt>
+                        <dd>{{main.currentUserData.role}}</dd>
 
-                        <div class=" form-group"><label>Write Something About Your Self</label> <textarea
-                                ng-model="main.currentUserData.description"
-                                placeholder="Here goes something"
-                                class="form-control"
-                                required=""></textarea>
-                        </div>
+                    </dl>
 
-                        <div class=" form-group">
-                            <h3>You are Interested in</h3>
+                    <br>
 
-                            <div ng-repeat="(context,interestedTimes) in main.currentUserData.contexts"
-                                 style="display: inline">
-                                <button class="btn btn-w-m btn-warning" ng-click="alert(context)"><i
-                                        class="fa fa-star pull-left"></i>{{context}}
-                                </button>
-                                &nbsp;
-                            </div>
-                        </div>
-
+                    <div class=" form-group"><label>Write Something About Your Self</label> <textarea
+                            ng-model="main.currentUserData.description"
+                            placeholder="Here goes something"
+                            class="form-control"
+                            required=""></textarea>
                     </div>
+
+                    <div class=" form-group">
+                        <h3>You are Interested in</h3>
+
+                        <div ng-repeat="(context,interestedTimes) in main.currentUserData.contexts"
+                             style="display: inline">
+                            <button class="btn btn-w-m btn-warning" ng-click="alert(context)"><i
+                                    class="fa fa-star pull-left"></i>{{context}}
+                            </button>
+                            &nbsp;
+                        </div>
+                    </div>
+
                 </div>
 
-                <div class="ibox float-e-margins">
+                <div class="ibox-content profile-content">
                     <div class="ibox-title">
                         <h3>Recommended People
                             <small>You may want to be friend with these people.</small>
@@ -101,6 +99,52 @@
                                     </button>
                                 </div>
                             </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <div class="col-lg-6">
+            <div class="row animated fadeInRight" ng-controller="PictureUploadCtrl">
+                <div class="ibox float-e-margins">
+                    <div class="ibox-title">
+                        <h5>Upload Photo</h5>
+
+                        <div ibox-tools></div>
+                    </div>
+                    <div class="ibox-content">
+                        <div flow-init="{singleFile:true}"
+                             flow-file-added="!!{png:1,gif:1,jpg:1,jpeg:1}[$file.getExtension()]"
+                             class="ng-scope" ng-controller="PictureUploadCtrl">
+                            <h3>
+                                <a name="image-example" class="anchor" href="#image-example"><span
+                                        class="octicon octicon-link"></span></a>Single Image upload</h3>
+
+                            <div class="thumbnail ng-hide" ng-show="!$flow.files.length">
+                                <img src="http://www.placehold.it/200x150/EFEFEF/AAAAAA&amp;text=no+image">
+                            </div>
+                            <div class="thumbnail" ng-show="$flow.files.length">
+                                <img flow-img="$flow.files[0]">
+                            </div>
+                            <div>
+                                        <span class="btn btn-primary ng-hide" ng-show="!$flow.files.length" flow-btn="">Select image<input
+                                                type="file" style="visibility: hidden; position: absolute;"></span>
+                                <button class="btn btn-primary" ng-click="uploadImage()"
+                                        ng-show="$flow.files.length">Upload
+                                </button>
+                                        <span class="btn btn-info" ng-show="$flow.files.length" flow-btn="">Change<input
+                                                type="file" style="visibility: hidden; position: absolute;"></span>
+                                        <span class="btn btn-danger" ng-show="$flow.files.length"
+                                              ng-click="$flow.cancel()">Remove
+                                        </span>
+                            </div>
+                            <p>
+                                Only PNG,GIF,JPG,JEPG files allowed.
+                            </p>
+                            <img ng-src="{{bigImage}}">
+                            <img ng-src="{{smallImage}}">
                         </div>
                     </div>
                 </div>

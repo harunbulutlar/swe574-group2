@@ -55,19 +55,18 @@
 
 
 <div class="ibox-content">
-
-    <a class="btn btn-primary pull-right"
+    <a class="btn btn-lg btn-primary pull-right"
        ng-click="joinEvent()"
        ng-hide="isCurrentUserAttended()"><i
             class="fa fa-thumbs-up"></i>Join</a>
 
-    <a class="btn btn-danger pull-right"
+    <a class="btn btn-lg btn-danger pull-right"
        ng-click="leaveEvent()"
        ng-show="isCurrentUserAttended()"><i
             class="fa fa-thumbs-down"></i>Leave</a>
-    <br>
-
+    <br><br>
 </div>
+
 
 
 <div class="ibox-content">
@@ -105,13 +104,14 @@
 
                 <div class="feed-element">
 
-                    <a ui-sref="profile.specificUser({userToBeViewed: participant.participantUserId})" class="pull-left">
+                    <!--<a ui-sref="profile.specificUser({userToBeViewed: participant.participantUserId})" class="pull-left">
                         <img alt="image" class="img-circle" src="img/a5.jpg">
-                    </a>
+                    </a>-->
 
                     <div class="media-body ">
 
-                        <strong>{{participant.participantUserName}}</strong> is attending...
+                        <a ui-sref="profile.specificUser({userToBeViewed: participant.participantUserId})"
+                           class="pull-left"><strong>{{participant.participantUserName}}</strong> is attending...</a>
 
                     </div>
 

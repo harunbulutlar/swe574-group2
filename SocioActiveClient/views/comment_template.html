@@ -6,15 +6,16 @@
 
             <div class="feed-element">
 
-                <a ui-sref="profile.specificUser({userToBeViewed: comment.commentUserId})" class="pull-left">
+                <!--<a ui-sref="profile.specificUser({userToBeViewed: comment.commentUserId})" class="pull-left">
                     <img alt="image" class="img-circle" src="img/a5.jpg">
-                </a>
+                </a>-->
 
                 <div class="media-body ">
                     <small class="pull-right">
                         {{commentDateDifference(comment.commentDateTime)}} ago
                     </small>
-                    <strong>{{comment.commentUserName}}</strong> posted a message
+                    <a ui-sref="profile.specificUser({userToBeViewed: comment.commentUserId})"><strong>{{comment.commentUserName}}</strong>
+                        posted a message...</a>
                     <br>
                     <small class="text-muted">{{comment.commentDateTime | date:'yyyy-MM-dd HH:mm'}}
                     </small>
@@ -29,14 +30,14 @@
     </div>
 
 
-        <form name='addComment' ng-submit="addComments()"><label>Make a comment...</label>
+    <form name='addComment' ng-submit="addComments()"><label>Make a comment...</label>
 
                                 <textarea ng-model="commentBody"
                                           placeholder="Post anything on your mind!"
                                           class="form-control" required=""></textarea>
 
-            <button type="submit" class="btn btn-primary">Post Comment</button>
+        <button type="submit" class="btn btn-primary">Post Comment</button>
 
-        </form>
+    </form>
 
 </div>
