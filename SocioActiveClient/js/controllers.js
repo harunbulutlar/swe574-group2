@@ -128,8 +128,6 @@ function CustomTypesCtrl($state, $scope, contextFactory, $rootScope, fireFactory
         $scope.loading = true;
         $rootScope.MainCtrlRef.currentUserData.$save().then(function () {
             $scope.loading = false;
-
-
             $state.go('activity.groups');
 
         });
@@ -1012,6 +1010,16 @@ function ProfileCtrl($scope, $rootScope, fireFactory) {
                 $scope.people = calculateWeightAndDecide(recommendedPeople, fireFactory.getUserObject);
             })
         });
+    };
+
+    $scope.updateProfile = function (){
+
+        $rootScope.MainCtrlRef.currentUserData.$save().then(function (){
+
+            alert("Profile updated!");
+
+        })
+
     };
 
     $scope.alert = function (x) {
