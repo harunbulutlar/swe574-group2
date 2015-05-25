@@ -1113,26 +1113,35 @@ function ProfileViewCtrl($scope, $rootScope, fireFactory, $stateParams) {
 
     $scope.ignoreFriend = function () {
 
-        var indexUser = arrayObjectIndexOf($scope.selectedItem.eventParticipantList, $scope.currentUserId, 'participantUserId')
+        var indexUser = arrayObjectIndexOf($scope.specificUserProfile.friendList, $rootScope.MainCtrlRef.userId, 'friendUserId');
 
-        //var indexUser = $scope.selectedItem.eventParticipantList.indexOf($scope.currentUserId);
-        $scope.selectedItem.eventParticipantList.splice(indexUser, 1);
+        $scope.specificUserProfile.friendList.splice(indexUser, 1);
 
-        delete $rootScope.MainCtrlRef.currentUserData.attendedEvents[$scope.selectedItemId];
+        var indexMyUser = arrayObjectIndexOf($rootScope.MainCtrlRef.currentUserData.friendList, $stateParams.userToBeViewed, "friendUserId");
+
+        $rootScope.MainCtrlRef.currentUserData.friendList.splice(indexMyUser, 1);
 
         $scope.loading = true;
-        $rootScope.MainCtrlRef.currentUserData.$save();
+        $rootScope.MainCtrlRef.currentUserData.$save().then(function (){
+
+            $scope.specificUserProfile.$save().then(function (){
+
+                alert($scope.specificUserProfile.userName + " is deletedd from your Friend List...")
+
+            });
+
+        });
         $scope.loading = false;
 
     };
 
     $scope.isCurrentUserFriend = function () {
 
-        if ($scope.selectedItemId != null) {
-            if (!$rootScope.MainCtrlRef.currentUserData.attendedEvents) {
+        if ($scope.specificUserProfile != null) {
+            if (!$rootScope.MainCtrlRef.currentUserData.friendList) {
                 return false;
             }
-            return $rootScope.MainCtrlRef.currentUserData.attendedEvents[$scope.selectedItemId];
+            return arrayObjectIndexOf($rootScope.MainCtrlRef.currentUserData.friendList, $stateParams.userToBeViewed, "friendUserId") > -1;
         }
 
     };

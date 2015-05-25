@@ -103,6 +103,30 @@
                     </div>
                 </div>
 
+                <div class="ibox-title">
+                    <h5>Friends</h5>
+                </div>
+                <div class="ibox-content profile-content">
+                    <div class="feed-activity-list"
+                         ng-repeat="friend in main.currentUserData.friendList">
+
+                        <div class="feed-element">
+
+                            <!--<a ui-sref="profile.specificUser({userToBeViewed: participant.participantUserId})" class="pull-left">
+                                <img alt="image" class="img-circle" src="img/a5.jpg">
+                            </a>-->
+
+                            <div class="media-body ">
+
+                                <a ui-sref="profile.specificUser({userToBeViewed: friend.friendUserId})"
+                                   class="pull-left"><strong>{{friend.friendUserName}}</strong> is your friend.</a>
+                            </div>
+
+                        </div>
+
+                    </div>
+                </div>
+
             </div>
         </div>
 

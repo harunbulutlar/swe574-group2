@@ -63,23 +63,49 @@
                     </div>
 
                 </div>
-
+                <br>
                 <div class="ibox-content profile-content">
 
 
                     <a class="btn btn-lg btn-primary pull-right"
                        ng-click="addFriend()"
                        ng-hide="isCurrentUserFriend()"><i
-                            class="fa fa-thumbs-up"></i>Join</a>
+                            class="fa fa-thumbs-up"></i>Add Friend</a>
 
                     <a class="btn btn-lg btn-danger pull-right"
                        ng-click="ignoreFriend()"
                        ng-show="isCurrentUserFriend()"><i
-                            class="fa fa-thumbs-down"></i>Leave</a>
+                            class="fa fa-thumbs-down"></i>Ignore</a>
                     <br><br>
 
 
                 </div>
+                <br>
+
+                <div class="ibox-title">
+                    <h5>Friends</h5>
+                </div>
+                <div class="ibox-content profile-content">
+                    <div class="feed-activity-list"
+                         ng-repeat="friend in specificUserProfile.friendList">
+
+                        <div class="feed-element">
+
+                            <!--<a ui-sref="profile.specificUser({userToBeViewed: participant.participantUserId})" class="pull-left">
+                                <img alt="image" class="img-circle" src="img/a5.jpg">
+                            </a>-->
+
+                            <div class="media-body ">
+
+                                <a ui-sref="profile.specificUser({userToBeViewed: friend.friendUserId})"
+                                   class="pull-left"><strong>{{friend.friendUserName}}</strong> is {{specificUserName}}'s friend.</a>
+                            </div>
+
+                        </div>
+
+                    </div>
+                </div>
+
             </div>
         </div>
     </div>
