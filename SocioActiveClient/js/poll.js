@@ -30,6 +30,7 @@ function PollCtrl($scope, $rootScope, $state, contextFactory, MEMBER, fireFactor
             pollComments: [],
             pollTagContext: {},
             pollRoles: [],
+            fields: [],
             ownerName: $rootScope.MainCtrlRef.currentUserData.userName
         };
 
@@ -169,6 +170,45 @@ function PollCtrl($scope, $rootScope, $state, contextFactory, MEMBER, fireFactor
         });
 
 
+    };
+
+    $scope.addCustomType = function () {
+        var customType = {
+            name: "New Type",
+            data: []
+        };
+        if (!$rootScope.MainCtrlRef.currentUserData.customTypes) {
+            $rootScope.MainCtrlRef.currentUserData.customTypes = [];
+        }
+        $rootScope.MainCtrlRef.currentUserData.customTypes.push(customType);
+
+    };
+
+    $scope.updateSelection = function ($event) {
+        var checkbox = $event.target;
+        $scope.types = (checkbox.checked ? $rootScope.MainCtrlRef.currentUserData.customTypes : $rootScope.primitiveTypes);
+
+    };
+
+    $scope.removeTab = function (customType) {
+        var index = $rootScope.MainCtrlRef.currentUserData.customTypes.indexOf(customType);
+        $rootScope.MainCtrlRef.currentUserData.customTypes.splice(index, 1);
+    };
+
+    $scope.removeUserField = function (userField) {
+        var index = $scope.createdPoll.fields.indexOf(userField);
+        $scope.createdPoll.fields.splice(index, 1);
+    };
+
+    $scope.createUserField = function () {
+        var userField = {
+            name: $scope.userFieldName,
+            type: $scope.userFieldType
+        };
+        if (!$scope.createdPoll.fields) {
+            $scope.createdPoll.fields = [];
+        }
+        $scope.createdPoll.fields.push(userField);
     };
 
 }
@@ -349,11 +389,15 @@ function PollTemplateCtrl($rootScope, $scope, MEMBER, contextFactory, $state, fi
     };
 
     $scope.showContent = function (fieldKey, contentKey) {
-        $state.go('create.asd', {pollId: $scope.selectedItemId, fieldId: fieldKey, contentId: contentKey});
+        $state.go('index.group_view_content', {
+            groupId: $scope.selectedItemId,
+            fieldId: fieldKey,
+            contentId: contentKey
+        });
     };
 
     $scope.addButtonClick = function (selectedTypeId) {
-        $state.go('activity.group_add_content', {pollIdId: $scope.selectedItemId, typeId: selectedTypeId});
+        $state.go('index.group_add_content', {groupId: $scope.selectedItemId, typeId: selectedTypeId});
     };
 
     $scope.pollUserInteraction = function () {

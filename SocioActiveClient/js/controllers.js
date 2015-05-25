@@ -605,6 +605,7 @@ function EventCtrl($scope, $rootScope, fireFactory, $state, contextFactory, MEMB
             updateDate: "",
             eventTagContext: {},
             eventParticipantList: [],
+            fields: [],
             eventComments: [],
             eventRoles: [],
             ownerName: $rootScope.MainCtrlRef.currentUserData.userName
@@ -635,6 +636,46 @@ function EventCtrl($scope, $rootScope, fireFactory, $state, contextFactory, MEMB
 
         $scope.eventCommentTempList.commentBody = '';
 
+    };
+
+
+    $scope.addCustomType = function () {
+        var customType = {
+            name: "New Type",
+            data: []
+        };
+        if (!$rootScope.MainCtrlRef.currentUserData.customTypes) {
+            $rootScope.MainCtrlRef.currentUserData.customTypes = [];
+        }
+        $rootScope.MainCtrlRef.currentUserData.customTypes.push(customType);
+
+    };
+
+    $scope.updateSelection = function ($event) {
+        var checkbox = $event.target;
+        $scope.types = (checkbox.checked ? $rootScope.MainCtrlRef.currentUserData.customTypes : $rootScope.primitiveTypes);
+
+    };
+
+    $scope.removeTab = function (customType) {
+        var index = $rootScope.MainCtrlRef.currentUserData.customTypes.indexOf(customType);
+        $rootScope.MainCtrlRef.currentUserData.customTypes.splice(index, 1);
+    };
+
+    $scope.removeUserField = function (userField) {
+        var index = $scope.createdEvent.fields.indexOf(userField);
+        $scope.createdEvent.fields.splice(index, 1);
+    };
+
+    $scope.createUserField = function () {
+        var userField = {
+            name: $scope.userFieldName,
+            type: $scope.userFieldType
+        };
+        if (!$scope.createdEvent.fields) {
+            $scope.createdEvent.fields = [];
+        }
+        $scope.createdEvent.fields.push(userField);
     };
 
     $scope.saveEventData = function () {
@@ -832,11 +873,15 @@ function EventTemplateCtrl($rootScope, $scope, MEMBER, fireFactory, $state) {
     };
 
     $scope.showContent = function (fieldKey, contentKey) {
-        $state.go('create.asd', {eventId: $scope.selectedItemId, fieldId: fieldKey, contentId: contentKey});
+        $state.go('index.group_view_content', {
+            groupId: $scope.selectedItemId,
+            fieldId: fieldKey,
+            contentId: contentKey
+        });
     };
 
     $scope.addButtonClick = function (selectedTypeId) {
-        $state.go('activity.group_add_content', {eventIdId: $scope.selectedItemId, typeId: selectedTypeId});
+        $state.go('index.group_add_content', {groupId: $scope.selectedItemId, typeId: selectedTypeId});
     };
 
     $scope.eventUserInteraction = function () {

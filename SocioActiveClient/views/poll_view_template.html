@@ -89,6 +89,35 @@
 </div>
 
 <div class="ibox-content">
+    <div class="form-group"><label>{{selectedItem.title}}'s fields</label></div>
+    <script type="text/ng-template" id="content_renderer.html">
+        <div ui-tree-handle class="tree-node tree-node-content">
+            <a class="pull-right btn btn-white btn-xs" data-nodrag ng-click="showContent(fieldKey, contentKey)"><span
+                    class="fa fa-eye"></span></a>
+            {{node.owner}}'s content
+        </div>
+    </script>
+    <script type="text/ng-template" id="field_renderer.html">
+        <div ui-tree-handle class="tree-node tree-node-content">
+            <a class="pull-right btn btn-white btn-xs" data-nodrag ng-click="addButtonClick(fieldKey)"><span
+                    class="fa fa-plus"></span></a>
+            <a class="btn btn-primary btn-xs" data-nodrag ng-click="toggle(this)"><span class="fa"
+                                                                                        ng-class="{'fa-angle-down': collapsed, 'fa-angle-right': !collapsed}"></span></a>
+            {{node.name}}(Type:{{node.type.name}})
+        </div>
+        <ol ui-tree-nodes="" ng-model="node.content" ng-class="{hidden: collapsed}">
+            <li ng-repeat="(contentKey, node) in node.content" ui-tree-node ng-include="'content_renderer.html'">
+            </li>
+        </ol>
+    </script>
+    <div ui-tree id="tree-root">
+        <ol ui-tree-nodes ng-model="selectedItem.fields">
+            <li ng-repeat="(fieldKey,node) in selectedItem.fields" ui-tree-node ng-include="'field_renderer.html'"></li>
+        </ol>
+    </div>
+</div>
+
+<div class="ibox-content">
     <section ng-controller="PollTabCtrl">
         <tabset>
             <tab ng-click="selectTab(1)">

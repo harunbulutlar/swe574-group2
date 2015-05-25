@@ -64,6 +64,35 @@
                                    is-create='isCreateObject'></freebase-tags>
                 </div>
 
+                <div class="ibox-content">
+                    <div class="form-group"><label>User Field Name</label> <input type="text" ng-model="userFieldName"
+                                                                                  placeholder="Enter User Field Name"
+                                                                                  class="form-control"></div>
+
+                    <div class="checkbox"><label> <input icheck type="checkbox" ng-click="updateSelection($event)">Use
+                        Custom Types</label></div>
+                    <select chosen id="types" class="chosen-select" style="width:350px;" tabindex="4"
+                            ng-model="userFieldType" ng-options="value.name for value in types">
+                    </select>
+                    <button class="btn btn-primary" ng-click="createUserField()">Create Group User Addable Field
+                    </button>
+                    <div>
+                        <script type="text/ng-template" id="field_renderer.html">
+                            <div ui-tree-handle class="tree-node tree-node-content">
+                                <a class="pull-right btn btn-white btn-xs" data-nodrag
+                                   ng-click="removeUserField(node)"><span class="fa fa-trash"></span></a>
+
+                                <div>{{node.name}}(Type:{{node.type.name}})</div>
+                            </div>
+                        </script>
+                        <div ui-tree id="tree-root">
+                            <ol ui-tree-nodes ng-model="createdEvent.fields">
+                                <li ng-repeat=" node in createdEvent.fields" ui-tree-node
+                                    ng-include="'field_renderer.html'"></li>
+                            </ol>
+                        </div>
+                    </div>
+                </div>
 
                 <br>
 
