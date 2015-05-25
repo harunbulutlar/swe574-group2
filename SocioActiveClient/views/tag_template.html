@@ -28,7 +28,7 @@
 
         <input type="text" ng-model="manualTags"
                typeahead="contextHead for contextHead in tagContextList | filter:$viewValue | limitTo:10"
-               class="form-control" typeahead-on-select="addManualTag(tags, manualTags)"
+               class="form-control" typeahead-on-select="addTag(null, tags, manualTags)"
                placeholder="Enter tag context..." ng-show="tags != ''">
 
     </div>

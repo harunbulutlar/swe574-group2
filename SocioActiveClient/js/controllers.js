@@ -315,25 +315,15 @@ function GroupTemplateCtrl($rootScope, $scope, contextFactory, $state, fireFacto
     $scope.selectedItem = $scope.$parent.ngModel;
     $scope.selectedItemId = $scope.$parent.selectedItemId;
 
-    $scope.addGroupTag = function (tag) {
-        if (!$rootScope.MainCtrlRef.currentUserData.interactedGroups) {
-            $rootScope.MainCtrlRef.currentUserData.interactedGroups = {};
-        }
+    $scope.addGroupTagForView = function (tag) {
+
         var contextGroupsRef = fireFactory.getGroupsInContextRef(tag.tagContext);
         var groupLinkObject = {};
+
         groupLinkObject[$scope.selectedItemId] = $scope.selectedItem.contexts[tag.tagContext].length;
         contextGroupsRef.update(groupLinkObject);
-        if (!$rootScope.MainCtrlRef.currentUserData.contexts[tag.tagContext]) {
-            $rootScope.MainCtrlRef.currentUserData.contexts[tag.tagContext] = 1;
-        } else {
-            $rootScope.MainCtrlRef.currentUserData.contexts[tag.tagContext]++;
-        }
 
-        var userInContext = fireFactory.getUserInContextRef(tag.tagContext, $rootScope.MainCtrlRef.userId);
-        userInContext.set($rootScope.MainCtrlRef.currentUserData.contexts[tag.tagContext]);
-
-        $rootScope.MainCtrlRef.currentUserData.interactedGroups[$scope.selectedItemId] = true;
-        $rootScope.MainCtrlRef.currentUserData.$save();
+        $scope.groupUserInteraction();
 
     };
 
@@ -360,7 +350,75 @@ function GroupTemplateCtrl($rootScope, $scope, contextFactory, $state, fireFacto
             "commentUserName": $rootScope.MainCtrlRef.currentUserData.userName,
             "commentDateTime": new Date().getTime()
         });
+
+        $scope.groupUserInteraction();
     };
+
+    //For Joining and Leaving a group.
+    /*$scope.joinGroup = function () {
+
+     if (!$scope.selectedItem.eventParticipantList) {
+     $scope.selectedItem.eventParticipantList = [];
+     }
+     $scope.selectedItem.eventParticipantList.push({
+     "participantUserId": $scope.currentUserId,
+     "participantUserName": $scope.currentUserName
+     });
+
+     if (!$rootScope.MainCtrlRef.currentUserData.attendedEvents) {
+     $rootScope.MainCtrlRef.currentUserData.attendedEvents = {};
+     }
+     $rootScope.MainCtrlRef.currentUserData.attendedEvents[$scope.selectedItemId] = true;
+
+     $scope.eventUserInteraction();
+
+     };
+
+     $scope.leaveGroup = function () {
+
+     var indexUser = arrayObjectIndexOf($scope.selectedItem.eventParticipantList, $scope.currentUserId, 'participantUserId')
+
+     //var indexUser = $scope.selectedItem.eventParticipantList.indexOf($scope.currentUserId);
+     $scope.selectedItem.eventParticipantList.splice(indexUser, 1);
+
+     delete $rootScope.MainCtrlRef.currentUserData.attendedEvents[$scope.selectedItemId];
+
+     $scope.loading = true;
+     $rootScope.MainCtrlRef.currentUserData.$save();
+     $scope.loading = false;
+
+     };*/
+
+    $scope.groupUserInteraction = function () {
+
+        if (!$rootScope.MainCtrlRef.currentUserData.interactedGroups) {
+            $rootScope.MainCtrlRef.currentUserData.interactedGroups = {};
+        }
+        $rootScope.MainCtrlRef.currentUserData.interactedGroups[$scope.selectedItemId] = true;
+
+        angular.forEach($scope.selectedItem.contexts, function (value, key) {
+            if (!$rootScope.MainCtrlRef.currentUserData.contexts) {
+                $rootScope.MainCtrlRef.currentUserData.contexts = {};
+            }
+            if (!$rootScope.MainCtrlRef.currentUserData.contexts[key]) {
+                $rootScope.MainCtrlRef.currentUserData.contexts[key] = 1;
+                return;
+            }
+            $rootScope.MainCtrlRef.currentUserData.contexts[key]++;
+        });
+
+        angular.forEach($rootScope.MainCtrlRef.currentUserData.contexts, function (value, key) {
+            var userInContext = fireFactory.getUsersInContextRef(key);
+            var groupLinkObject = {};
+            groupLinkObject[$rootScope.MainCtrlRef.userId] = $rootScope.MainCtrlRef.currentUserData.contexts[key];
+            userInContext.update(groupLinkObject);
+        });
+
+        $scope.loading = true;
+        $rootScope.MainCtrlRef.currentUserData.$save();
+        $scope.loading = false;
+    }
+
 }
 
 function GroupAddCtrl($scope, $state, $rootScope, $stateParams, fireFactory) {
@@ -510,50 +568,51 @@ function TagContextCtrl($scope, contextFactory) {
     $scope.tags = '';
     $scope.manualTags = '';
 
-    $scope.addTag = function (tag) {
+    $scope.addTag = function (tag, tags, inputTagContext) {
 
+        if (tag) {
+            if (!$scope.tagContext) {
+                $scope.tagContext = {};
+            }
+            if (!$scope.tagContext[tag.tagContext]) {
+                $scope.tagContext[tag.tagContext] = [];
+            }
+            $scope.tagContext[tag.tagContext].push(tag);
 
-        if (!$scope.tagContext) {
-            $scope.tagContext = {};
-        }
-        if (!$scope.tagContext[tag.tagContext]) {
-            $scope.tagContext[tag.tagContext] = [];
-        }
-        $scope.tagContext[tag.tagContext].push(tag);
+            if ($scope.addTagCallback) {
+                $scope.addTagCallback(tag);
+            }
 
-        if ($scope.addTagCallback) {
-            $scope.addTagCallback(tag);
+        }else{
+
+            var context = {};
+            var tagId = guid();
+
+            context[tagId] = ({
+                tagId: tagId,
+                name: tags + '<p style= "font-style: italic" class="pull-right">' + inputTagContext,
+                tagName: tags,
+                tagContext: inputTagContext,
+                tagContextParentDomain: '',
+                tagContextChildDomain: '',
+                score: ''
+            });
+
+            if (!$scope.tagContext[inputTagContext]) {
+                $scope.tagContext[inputTagContext] = [];
+            }
+
+            $scope.tagContext[inputTagContext].push(context[tagId]);
+
+            if ($scope.addTagCallback) {
+                $scope.addTagCallback(context[tagId]);
+            }
+
         }
+
         $scope.tags = '';
         $scope.manualTags = '';
-    };
 
-    $scope.addManualTag = function (tags, inputTagContext) {
-
-        var context = {};
-        var tagId = guid();
-
-        context[tagId] = ({
-            tagId: tagId,
-            name: tags + '<p style= "font-style: italic" class="pull-right">' + inputTagContext,
-            tagName: tags,
-            tagContext: inputTagContext,
-            tagContextParentDomain: '',
-            tagContextChildDomain: '',
-            score: ''
-        });
-
-        if (!$scope.tagContext[inputTagContext]) {
-            $scope.tagContext[inputTagContext] = [];
-        }
-
-        $scope.tagContext[inputTagContext].push(context[tagId]);
-        if ($scope.addManualTagCallback) {
-            $scope.addManualTagCallback(tags, inputTagContext);
-        }
-
-        $scope.tags = '';
-        $scope.manualTags = '';
     };
 
     $scope.removeTag = function (key, tagToBeRemoved) {
@@ -944,7 +1003,9 @@ function ProfileCtrl($scope, $rootScope, fireFactory) {
         });
     };
 
-    $scope.alert = function(x){window.alert("My interest is "+x);};
+    $scope.alert = function (x) {
+        window.alert("My interest is " + x);
+    };
     $scope.showDetail = false;
 
     $scope.getClass = function (item) {
@@ -982,7 +1043,9 @@ function ProfileViewCtrl($scope, $rootScope, fireFactory, $stateParams) {
 
     };
 
-    $scope.alert = function(x){window.alert($scope.specificUserName+"'s interest is "+x);};
+    $scope.alert = function (x) {
+        window.alert($scope.specificUserName + "'s interest is " + x);
+    };
     $scope.showDetail = false;
 
     $scope.getClass = function (item) {
@@ -1009,17 +1072,17 @@ function CommentCtrl($scope, $rootScope, fireFactory, $stateParams) {
         }
 
         if (!$scope.addCommentCallback) {
-         $scope.itemComment.push({
-         "commentBody": $scope.commentBody,
-         "commentUserId": $rootScope.MainCtrlRef.userId,
-         "commentUserName": $rootScope.MainCtrlRef.currentUserData.userName,
-         "commentDateTime": new Date().getTime()
-         });
-         }else{
+            $scope.itemComment.push({
+                "commentBody": $scope.commentBody,
+                "commentUserId": $rootScope.MainCtrlRef.userId,
+                "commentUserName": $rootScope.MainCtrlRef.currentUserData.userName,
+                "commentDateTime": new Date().getTime()
+            });
+        } else {
 
-         $scope.addCommentCallback($scope.commentBody);
+            $scope.addCommentCallback($scope.commentBody);
 
-         }
+        }
         $scope.commentBody = '';
     };
 
@@ -1029,19 +1092,19 @@ function CommentCtrl($scope, $rootScope, fireFactory, $stateParams) {
 
     /*$scope.getCommentUserPicture = function (uid) {
 
-        if(uid){
+     if(uid){
 
-            $scope.userData = fireFactory.getUserObject(uid);
+     $scope.userData = fireFactory.getUserObject(uid);
 
-            $scope.userData.$loaded().then(function(loadedData){
+     $scope.userData.$loaded().then(function(loadedData){
 
-                $scope.userImageForComment = loadedData.userImageSmall;
+     $scope.userImageForComment = loadedData.userImageSmall;
 
-            });
+     });
 
-        }
+     }
 
-    };*/
+     };*/
 
     /*$scope.getCommentUserData = function (child, item){
 
@@ -1272,7 +1335,7 @@ function HomeCtrl($scope, $rootScope, fireFactory) {
             $scope.groups = searchResultGroup;
             $scope.polls = searchResultPoll;
             $scope.events = searchResultEvent;
-            
+
 
         }
         else {
