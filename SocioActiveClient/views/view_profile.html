@@ -13,12 +13,14 @@
                     <dl class="dd-list">
 
                         <dt>Name:</dt>
-                        <dd>{{specificUserName}}</dd><br>
+                        <dd>{{specificUserName}}</dd>
+                        <br>
                         <dt>Last Name:</dt>
                         <dd>{{specificUserLastName}}</dd>
 
                     </dl>
                     <br>
+
                     <div>
                         <button class="btn btn-w-m btn-primary" ng-hide="showDetail"
                                 ng-click="showDetail=!showDetail;">
@@ -34,17 +36,20 @@
                     <dl class="dd-list" ng-show="showDetail">
 
                         <dt>E-mail:</dt>
-                        <dd>{{specificEmail}}</dd><br>
+                        <dd>{{specificEmail}}</dd>
+                        <br>
                         <dt>User Status:</dt>
-                        <dd>{{specificIsAdmin?"Admin":"Member"}}</dd><br>
+                        <dd>{{specificIsAdmin?"Admin":"Member"}}</dd>
+                        <br>
                         <dt>Role:</dt>
-                        <dd>{{specificRole}}</dd><br>
+                        <dd>{{specificRole}}</dd>
+                        <br>
                         <dt>About:</dt>
                         <dd>{{specificDescription}}</dd>
 
                     </dl>
 
-                   <br>
+                    <br>
 
                     <div class=" form-group">
                         <h3>Interested in</h3>
@@ -56,6 +61,23 @@
                             &nbsp;
                         </div>
                     </div>
+
+                </div>
+
+                <div class="ibox-content profile-content">
+
+
+                    <a class="btn btn-lg btn-primary pull-right"
+                       ng-click="addFriend()"
+                       ng-hide="isCurrentUserFriend()"><i
+                            class="fa fa-thumbs-up"></i>Join</a>
+
+                    <a class="btn btn-lg btn-danger pull-right"
+                       ng-click="ignoreFriend()"
+                       ng-show="isCurrentUserFriend()"><i
+                            class="fa fa-thumbs-down"></i>Leave</a>
+                    <br><br>
+
 
                 </div>
             </div>

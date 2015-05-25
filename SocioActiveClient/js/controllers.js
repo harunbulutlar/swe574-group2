@@ -1079,6 +1079,64 @@ function ProfileViewCtrl($scope, $rootScope, fireFactory, $stateParams) {
     };
     $scope.init();
 
+    $scope.addFriend = function () {
+
+        if (!$scope.specificUserProfile.friendList) {
+            $scope.specificUserProfile.friendList = [];
+        }
+        $scope.specificUserProfile.friendList.push({
+            "friendUserId": $rootScope.MainCtrlRef.userId,
+            "friendUserName": $rootScope.MainCtrlRef.currentUserData.userName
+        });
+
+        if (!$rootScope.MainCtrlRef.currentUserData.friendList) {
+            $rootScope.MainCtrlRef.currentUserData.friendList = [];
+        }
+        $rootScope.MainCtrlRef.currentUserData.friendList.push({
+            "friendUserId": $stateParams.userToBeViewed,
+            "friendUserName": $scope.specificUserName
+        });
+
+        $rootScope.MainCtrlRef.currentUserData.$save().then(function (){
+
+            $scope.specificUserProfile.$save().then(function (){
+
+             alert($scope.specificUserProfile.userName + " is added to Friend List...")
+
+            });
+
+
+
+        });
+
+    };
+
+    $scope.ignoreFriend = function () {
+
+        var indexUser = arrayObjectIndexOf($scope.selectedItem.eventParticipantList, $scope.currentUserId, 'participantUserId')
+
+        //var indexUser = $scope.selectedItem.eventParticipantList.indexOf($scope.currentUserId);
+        $scope.selectedItem.eventParticipantList.splice(indexUser, 1);
+
+        delete $rootScope.MainCtrlRef.currentUserData.attendedEvents[$scope.selectedItemId];
+
+        $scope.loading = true;
+        $rootScope.MainCtrlRef.currentUserData.$save();
+        $scope.loading = false;
+
+    };
+
+    $scope.isCurrentUserFriend = function () {
+
+        if ($scope.selectedItemId != null) {
+            if (!$rootScope.MainCtrlRef.currentUserData.attendedEvents) {
+                return false;
+            }
+            return $rootScope.MainCtrlRef.currentUserData.attendedEvents[$scope.selectedItemId];
+        }
+
+    };
+
 }
 
 
