@@ -150,6 +150,7 @@ function CustomTypesCtrl($state, $scope, contextFactory, $rootScope, fireFactory
         $scope.createdGroup["contexts"] = {};
         $scope.createdGroup["comments"] = [];
         $scope.createdGroup["roles"] = [];
+        $scope.createdGroup["groupParticipantList"] = [];
         $scope.createdGroup["privacy"] = 'friends';
 
     };
@@ -355,39 +356,49 @@ function GroupTemplateCtrl($rootScope, $scope, contextFactory, $state, fireFacto
     };
 
     //For Joining and Leaving a group.
-    /*$scope.joinGroup = function () {
+    $scope.joinGroup = function () {
 
-     if (!$scope.selectedItem.eventParticipantList) {
-     $scope.selectedItem.eventParticipantList = [];
+     if (!$scope.selectedItem.groupParticipantList) {
+     $scope.selectedItem.groupParticipantList = [];
      }
-     $scope.selectedItem.eventParticipantList.push({
-     "participantUserId": $scope.currentUserId,
-     "participantUserName": $scope.currentUserName
+     $scope.selectedItem.groupParticipantList.push({
+     "participantUserId": $rootScope.MainCtrlRef.userId,
+     "participantUserName": $rootScope.MainCtrlRef.currentUserData.userName
      });
 
-     if (!$rootScope.MainCtrlRef.currentUserData.attendedEvents) {
-     $rootScope.MainCtrlRef.currentUserData.attendedEvents = {};
+     if (!$rootScope.MainCtrlRef.currentUserData.attendedGroups) {
+     $rootScope.MainCtrlRef.currentUserData.attendedGroups = {};
      }
-     $rootScope.MainCtrlRef.currentUserData.attendedEvents[$scope.selectedItemId] = true;
+     $rootScope.MainCtrlRef.currentUserData.attendedGroups[$scope.selectedItemId] = true;
 
-     $scope.eventUserInteraction();
+     $scope.groupUserInteraction();
 
      };
 
      $scope.leaveGroup = function () {
 
-     var indexUser = arrayObjectIndexOf($scope.selectedItem.eventParticipantList, $scope.currentUserId, 'participantUserId')
+     var indexUser = arrayObjectIndexOf($scope.selectedItem.groupParticipantList, $scope.currentUserId, 'participantUserId')
 
-     //var indexUser = $scope.selectedItem.eventParticipantList.indexOf($scope.currentUserId);
-     $scope.selectedItem.eventParticipantList.splice(indexUser, 1);
+     $scope.selectedItem.groupParticipantList.splice(indexUser, 1);
 
-     delete $rootScope.MainCtrlRef.currentUserData.attendedEvents[$scope.selectedItemId];
+     delete $rootScope.MainCtrlRef.currentUserData.attendedGroups[$scope.selectedItemId];
 
      $scope.loading = true;
      $rootScope.MainCtrlRef.currentUserData.$save();
      $scope.loading = false;
 
-     };*/
+     };
+
+    $scope.isCurrentUserAttended = function () {
+
+        if ($scope.selectedItemId != null) {
+            if (!$rootScope.MainCtrlRef.currentUserData.attendedGroups) {
+                return false;
+            }
+            return $rootScope.MainCtrlRef.currentUserData.attendedGroups[$scope.selectedItemId];
+        }
+
+    };
 
     $scope.groupUserInteraction = function () {
 

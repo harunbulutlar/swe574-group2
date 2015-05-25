@@ -40,6 +40,19 @@
 </div>
 
 <div class="ibox-content">
+    <a class="btn btn-lg btn-primary pull-right"
+       ng-click="joinGroup()"
+       ng-hide="isCurrentUserAttended()"><i
+            class="fa fa-thumbs-up"></i>Join</a>
+
+    <a class="btn btn-lg btn-danger pull-right"
+       ng-click="leaveGroup()"
+       ng-show="isCurrentUserAttended()"><i
+            class="fa fa-thumbs-down"></i>Leave</a>
+    <br><br>
+</div>
+
+<div class="ibox-content">
 
     <section ng-controller="TabCtrl">
         <tabset>
@@ -67,9 +80,29 @@
 
             </div>
 
-            <div class='ibox-content' ng-show="isSelected(2)">
-                <h4>Participants</h4>
+        <div class='ibox-content' ng-show="isSelected(2)">
+
+            <div class="feed-activity-list"
+                 ng-repeat="participant in selectedItem.groupParticipantList">
+
+                <div class="feed-element">
+
+                    <!--<a ui-sref="profile.specificUser({userToBeViewed: participant.participantUserId})" class="pull-left">
+                        <img alt="image" class="img-circle" src="img/a5.jpg">
+                    </a>-->
+
+                    <div class="media-body ">
+
+                        <a ui-sref="profile.specificUser({userToBeViewed: participant.participantUserId})"
+                           class="pull-left"><strong>{{participant.participantUserName}}</strong> is attending...</a>
+
+                    </div>
+
+                </div>
+
             </div>
+
+        </div>
 
     </section>
 </div>
